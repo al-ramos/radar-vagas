@@ -1,0 +1,322 @@
+# Uma empresa por linha. O discover.py testa varias variacoes de slug
+# contra Greenhouse, Lever e Ashby e so grava quem responder de verdade.
+Accenture
+Deloitte
+PwC
+EY
+KPMG
+McKinsey
+BCG
+Bain
+IBM
+Capgemini
+TCS
+Infosys
+Cognizant
+Wipro
+HCLTech
+DXC Technology
+Atos
+NTT Data
+Globant
+EPAM
+Endava
+CI&T
+Thoughtworks
+Nubank
+iFood
+Mercado Livre
+Stone
+PagSeguro
+Sicredi
+C6 Bank
+Loft
+QuintoAndar
+VTEX
+Movile
+Locaweb
+Sensedia
+Elo7
+Wellhub
+Gympass
+Contabilizei
+Creditas
+Neon
+Ebanx
+Hotmart
+TakeBlip
+Dock
+Wildlife Studios
+Olist
+Arco Educacao
+Descomplica
+Foxbit
+Mercado Bitcoin
+Binance
+Nuvemshop
+ContaAzul
+Omie
+Conta Simples
+Pipefy
+Runrunit
+Superlogica
+Linx
+TIVIT
+Positivo
+Softplan
+Sankhya
+Senior Sistemas
+Indicium
+Alura
+DIO
+Rocketseat
+Rappi
+99
+Loggi
+JadLog
+Localiza
+Movida
+Azul
+Gol
+Latam Airlines
+Cargill
+Cogna
+Yduqs
+Afya
+Ser Educacional
+Google
+Microsoft
+Amazon
+Meta
+Oracle
+SAP
+Salesforce
+Cisco
+Dell
+Huawei
+Samsung
+Lenovo
+Motorola
+Elo Group
+Zetta
+Sonda
+Serpro
+Dataprev
+Prodam
+Padrao Sistemas
+Selbetti
+Neurotech
+Sidia
+Pismo
+Celcoin
+Klarna
+Ripio
+Konduto
+Zenklub
+Trybe
+Hurb
+99Freelas
+Beblue
+GetNinjas
+Justto
+Adecco
+Randstad
+ManpowerGroup
+Gi Group
+Falconi
+Solides
+DB1 Global Software
+Facily
+Shopper
+Kovi
+Cortex Intelligence
+Datarisk
+Vitru
+Vitta
+Loomi
+Vindi
+Itau
+Bradesco
+Banco do Brasil
+Santander Brasil
+BTG Pactual
+XP Inc
+Inter
+Cielo
+Magazine Luiza
+Via
+Americanas
+Natura
+Renner
+Raia Drogasil
+Ambev
+Carrefour Brasil
+GPA
+Vivara
+Vivo
+Claro
+TIM
+Algar Tech
+Embratel
+Porto Seguro
+SulAmerica
+Hapvida
+NotreDame Intermedica
+Rede D Or
+Fleury
+Dasa
+Amil
+Alice Saude
+Sami Saude
+JBS
+BRF
+Suzano
+Klabin
+Vale
+Gerdau
+WEG
+Embraer
+Raizen
+Cosan
+Petrobras
+Eletrobras
+Engie Brasil
+Neoenergia
+CPFL Energia
+Equatorial Energia
+Nutrien
+Yara Brasil
+Syngenta Brasil
+Bayer Brasil
+Basf Brasil
+Bosch Brasil
+Whirlpool Brasil
+Electrolux Brasil
+Votorantim
+Braskem
+Usiminas
+CSN
+Randon
+Marcopolo
+Tigre
+Duratex
+Klabin Segall
+Even Construtora
+Cyrela
+MRV Engenharia
+Direcional Engenharia
+Multiplan
+Iguatemi
+BR Malls
+Log Commercial Properties
+Ultrapar
+Raia
+Pague Menos
+Drogasil
+Panvel
+Assai Atacadista
+Grupo Mateus
+Grupo Big
+Cencosud Brasil
+Zaffari
+Havan
+Riachuelo
+C&A Brasil
+Marisa
+Grupo Boticario
+Avon Brasil
+LOreal Brasil
+Unilever Brasil
+Nestle Brasil
+Coca Cola Brasil
+Ypioca
+Heineken Brasil
+Grupo Petropolis
+CRBS Ambev
+Sadia
+Perdigao
+Marfrig
+Minerva Foods
+Camil Alimentos
+M Dias Branco
+JBS Foods
+Datamex
+Sicoob
+Sicredi Uniprime
+Banco Pan
+Banco Original
+Banco BS2
+Banco Modal
+Banco Daycoval
+Banco ABC Brasil
+Banco Safra
+Banco Votorantim
+Rico Investimentos
+Clear Corretora
+Toro Investimentos
+Warren Investimentos
+Modalmais
+Genial Investimentos
+Ativa Investimentos
+Guide Investimentos
+Easynvest
+Nomad
+Wise Brasil
+Remessa Online
+Wex
+Trafft
+Simplesdental
+Auvo
+Bee Touch
+Tray Ecommerce
+Yampi
+Cartpanda
+Loja Integrada
+Bling
+Tiny ERP
+Omie ERP
+Conta Azul ERP
+Granatum
+Sponte
+NextFit
+Pacto Solucoes
+Trinus
+Kzas
+Reserva
+Track Field
+Insider Store
+Amaro
+Dafiti
+Kanui
+Netshoes
+Centauro
+Decathlon Brasil
+Riachuelo Digital
+Petz
+Cobasi
+Zee Loja
+Shein Brasil
+Aliexpress Brasil
+Shopee Brasil
+Amazon Brasil Marketplace
+B2W Digital
+Lojas Renner Digital
+Track&Field Digital
+Grupo SBF
+Nike Brasil
+Adidas Brasil
+Puma Brasil
+Under Armour Brasil
+New Balance Brasil
+Vans Brasil
+Crocs Brasil
+Havaianas
+Alpargatas
+Arezzo
+Grendene
+Vulcabras
+Cambuci
+Grupo Technos
+Vivara Joias
+Pandora Brasil
+Swarovski Brasil

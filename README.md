@@ -33,7 +33,32 @@ WHATSAPP_TOKEN=xxx WHATSAPP_PHONE_ID=yyy WHATSAPP_TO=55DDNNNNNNNNN python radar/
 6. Faca push. O workflow roda em dias uteis as 08h de Brasilia, e tambem
    manualmente pela aba Actions (`workflow_dispatch`).
 
-## Como descobrir o ATS de uma empresa
+## Descoberta automatica de empresas (recomendado para escalar)
+
+Em vez de adivinhar slug por slug, `radar/discover.py` testa uma lista de
+nomes contra os tres ATS suportados (Greenhouse, Lever, Ashby) e so grava
+no arquivo de saida quem responder de verdade - nada de "pendente" chutado.
+
+```bash
+pip install -r requirements.txt
+python radar/discover.py --in radar/candidatos.txt --out radar/sources.discovered.yml
+```
+
+Isso demora (uma pausa de 0.3s por tentativa, varias tentativas por nome) -
+para 320 nomes, espere ~15-25 minutos. No final voce tem:
+
+- `sources.discovered.yml` - so as empresas confirmadas, com tipo e slug reais.
+- No terminal, a lista de nomes que nao bateram em nenhum ATS suportado
+  (normalmente porque usam Workday, SuccessFactors ou pagina propria com
+  JSON-LD - adicione essas manualmente como `tipo: jsonld` se souber a URL).
+
+Revise o resultado e mescle com `radar/sources.yml` manualmente, ou rode com
+`--out radar/sources.yml` direto (sobrescreve) quando confiar no processo.
+
+Edite `radar/candidatos.txt` para adicionar mais nomes (uma empresa por
+linha) e rode de novo - o script e idempotente, so soma o que existir.
+
+## Como descobrir o ATS de uma empresa manualmente
 
 Abra a pagina de carreiras e olhe o dominio:
 
