@@ -110,6 +110,31 @@ SELECT ocorrido_em, tipo, COUNT(*) FROM job_event
 GROUP BY ocorrido_em, tipo ORDER BY ocorrido_em DESC;
 ```
 
+## Painel publico (GitHub Pages)
+
+O repositorio ja inclui `docs/index.html` - um painel estatico (sem
+dependencias externas) que le `docs/jobs.json`, gerado automaticamente pelo
+workflow a cada coleta.
+
+Para ativar o endereco publico:
+
+1. No GitHub, va em **Settings > Pages**.
+2. Em **Source**, escolha **Deploy from a branch**.
+3. Branch: `main`, pasta: **/docs**. Salve.
+4. Aguarde 1-2 minutos. O endereco fica em
+   `https://SEU-USUARIO.github.io/radar-vagas/` (aparece na mesma tela).
+
+**Atencao — o repositorio e privado, mas o site do GitHub Pages e publico**
+(qualquer um com o link acessa), a menos que sua conta tenha GitHub
+Enterprise. Como o painel mostra apenas titulo, empresa, local e link da
+vaga (nada sensivel do seu perfil), isso costuma ser aceitavel - mas se
+preferir manter tudo privado, nao ative o Pages e continue usando o arquivo
+`Painel do Radar de Vagas.dc.html` localmente, abrindo `data/jobs.json` na
+maquina.
+
+O `docs/jobs.json` e sobrescrito a cada rodada do workflow, sempre com as
+vagas ativas no momento da coleta.
+
 ## Limites e proximos passos
 
 - **Actions**: 2.000 min/mes em repo privado; uma rodada leva ~2 min.

@@ -320,3 +320,238 @@ Grupo Technos
 Vivara Joias
 Pandora Brasil
 Swarovski Brasil
+
+# --- lote enviado pelo usuario: bypass/verificacao ---
+Kyndryl
+Sonda
+Agility Networks
+Baufest
+CTIS
+Senior Sistemas
+Sankhya
+Linx
+Take Blip
+Zenvia
+Infracommerce
+VTEX
+Cadmus
+Lanlink
+Teltec Solutions
+SoftwareONE
+Brasoftware
+IT-One
+Dataprev
+Serpro
+Prodesp
+IplanRio
+Red Hat
+Oracle
+SAP
+Salesforce
+Micro Focus
+Symantec
+Fortinet
+Palo Alto Networks
+Check Point Software
+Trend Micro
+Kaspersky
+McAfee
+RSA Security
+FireEye
+CrowdStrike
+Qualys
+Tenable
+Okta
+CyberArk
+Proofpoint
+Mimecast
+Splunk
+Datadog
+New Relic
+Dynatrace
+AppDynamics
+SolarWinds
+ManageEngine
+ServiceNow
+Atlassian
+GitHub
+GitLab
+HashiCorp
+Docker
+SUSE
+Canonical
+VMware
+Nutanix
+Veeam Software
+Commvault
+Rubrik
+Cohesity
+Pure Storage
+NetApp
+Hitachi Vantara
+Dell Technologies
+HPE
+Cisco Systems
+Juniper Networks
+Arista Networks
+Extreme Networks
+F5 Networks
+Citrix
+Pegasystems
+Appian
+OutSystems
+Mendix
+UiPath
+Automation Anywhere
+Blue Prism
+Alteryx
+Qlik
+Tableau
+Snowflake
+Databricks
+Cloudera
+Teradata
+Informatica
+Talend
+Matillion
+Fivetran
+Confluent
+MongoDB
+DataStax
+Redis
+Elastic
+Neo4j
+Couchbase
+MariaDB
+Percona
+EnterpriseDB
+Aiven
+Instaclustr
+Rackspace Technology
+Cloudreach
+Slalom
+Capco
+Synechron
+Luxoft
+Virtusa
+LTIMindtree
+Hexaware Technologies
+Coforge
+Zensar Technologies
+Persistent Systems
+Cyient
+KPIT Technologies
+Tata Technologies
+L&T Technology Services
+QuEST Global
+Belatrix Software
+Velocity Partners
+Gorilla Logic
+Growth Acceleration Partners
+PSL Corp
+Perficient
+Kin + Carta
+Nerdery
+Rightpoint
+Valtech
+VMLY&R Commerce
+AKQA
+R/GA
+Wunderman Thompson
+Mirum Agency
+Cadastra
+Enext
+Corebiz
+Maeztra
+Profit-e
+E-Plus
+Jussi
+Fbiz
+Avanti
+B8One
+Hibrido
+Nacao Digital
+Apiki
+Gama Academy
+Trybe
+Kenzie Academy
+Ironhack
+Le Wagon
+Awari
+Digital House
+Cubos Academy
+Resilia
+PrograMaria
+Reprograma
+Laboratoria
+Foursys
+Gazin Tech
+Magalu Cloud
+LuizaLabs
+Ame Digital
+PicPay
+Getnet
+Sinch
+Twilio
+MessageBird
+Infobip
+Gupshup
+Zendesk
+Freshworks
+Zoho
+HubSpot
+Marketo
+Pardot
+RD Station
+Mailchimp
+ActiveCampaign
+Sendinblue
+Keap
+Ontraport
+ClickFunnels
+Leadpages
+Unbounce
+Instapage
+Optimizely
+VWO
+Crazy Egg
+Hotjar
+FullStory
+Mixpanel
+Amplitude
+Heap
+Segment
+mParticle
+Tealium
+ActionIQ
+Simon Data
+Lytics
+Treasure Data
+Bluecore
+Listrak
+Klaviyo
+Omnisend
+Yotpo
+Gorgias
+Recharge
+Bold Commerce
+Shogun
+PageFly
+GemPages
+Zipify
+CartHook
+Mollie
+Adyen
+Stripe
+Braintree
+Authorize.Net
+2Checkout
+Worldpay
+Global Payments
+TSYS
+First Data
+Fiserv
+FIS
+Jack Henry
+NCR
+Diebold Nixdorf
