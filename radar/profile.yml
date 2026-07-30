@@ -1,0 +1,32 @@
+senioridade: senior            # junior | pleno | senior | especialista
+modalidade_preferida: remoto   # remoto | hibrido | presencial
+cidades: ["Remoto", "Brasil", "Sao Paulo"]
+corte: 55                      # pontuacao minima para alertar
+
+domino:
+  - c#
+  - .net
+  - asp.net
+  - react
+  - sql server
+  - python
+  - docker
+  - kubernetes
+  - azure
+  - aws
+  - ddd
+  - microservices
+  - api rest
+
+quero:
+  - arquitetura
+  - plataforma
+  - engenharia de dados
+  - llm
+  - mlops
+
+evitar:
+  - estagio
+  - trainee
+  - suporte tecnico
+  - telemarketing

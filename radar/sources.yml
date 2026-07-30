@@ -1,0 +1,9 @@
+# tipo: greenhouse | lever | ashby | jsonld
+# id:   identificador da empresa na URL do ATS (ou a URL completa, no caso jsonld)
+#
+# Substitua pelos seus alvos reais. Comece com 20.
+
+- { empresa: "Exemplo Greenhouse", tipo: greenhouse, id: "exemplogh" }
+- { empresa: "Exemplo Lever",      tipo: lever,      id: "exemplolever" }
+- { empresa: "Exemplo Ashby",      tipo: ashby,      id: "exemploashby" }
+- { empresa: "Exemplo Gupy",       tipo: jsonld,     id: "https://exemplo.gupy.io/" }
