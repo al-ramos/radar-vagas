@@ -1421,7 +1421,7 @@
     "primeira_vez": "2026-07-31",
     "ultima_vez": "2026-07-31",
     "ativo": 1,
-    "avisado": 0
+    "avisado": 1
   },
   {
     "id": 1269,
@@ -1437,7 +1437,7 @@
     "primeira_vez": "2026-07-31",
     "ultima_vez": "2026-07-31",
     "ativo": 1,
-    "avisado": 0
+    "avisado": 1
   },
   {
     "id": 1659,
@@ -1453,7 +1453,7 @@
     "primeira_vez": "2026-07-31",
     "ultima_vez": "2026-07-31",
     "ativo": 1,
-    "avisado": 0
+    "avisado": 1
   },
   {
     "id": 1852,
@@ -1469,7 +1469,7 @@
     "primeira_vez": "2026-07-31",
     "ultima_vez": "2026-07-31",
     "ativo": 1,
-    "avisado": 0
+    "avisado": 1
   },
   {
     "id": 1785,
@@ -1485,7 +1485,7 @@
     "primeira_vez": "2026-07-31",
     "ultima_vez": "2026-07-31",
     "ativo": 1,
-    "avisado": 0
+    "avisado": 1
   },
   {
     "id": 1784,
@@ -1501,7 +1501,7 @@
     "primeira_vez": "2026-07-31",
     "ultima_vez": "2026-07-31",
     "ativo": 1,
-    "avisado": 0
+    "avisado": 1
   },
   {
     "id": 1783,
@@ -1517,7 +1517,7 @@
     "primeira_vez": "2026-07-31",
     "ultima_vez": "2026-07-31",
     "ativo": 1,
-    "avisado": 0
+    "avisado": 1
   },
   {
     "id": 1782,
@@ -1533,7 +1533,7 @@
     "primeira_vez": "2026-07-31",
     "ultima_vez": "2026-07-31",
     "ativo": 1,
-    "avisado": 0
+    "avisado": 1
   },
   {
     "id": 1590,
@@ -1549,7 +1549,7 @@
     "primeira_vez": "2026-07-31",
     "ultima_vez": "2026-07-31",
     "ativo": 1,
-    "avisado": 0
+    "avisado": 1
   },
   {
     "id": 1440,
@@ -1565,7 +1565,7 @@
     "primeira_vez": "2026-07-31",
     "ultima_vez": "2026-07-31",
     "ativo": 1,
-    "avisado": 0
+    "avisado": 1
   },
   {
     "id": 1011,
@@ -1581,7 +1581,7 @@
     "primeira_vez": "2026-07-31",
     "ultima_vez": "2026-07-31",
     "ativo": 1,
-    "avisado": 0
+    "avisado": 1
   },
   {
     "id": 471,
@@ -1597,7 +1597,7 @@
     "primeira_vez": "2026-07-31",
     "ultima_vez": "2026-07-31",
     "ativo": 1,
-    "avisado": 0
+    "avisado": 1
   },
   {
     "id": 326,
@@ -13915,6 +13915,22 @@
     "url": "https://job-boards.eu.greenhouse.io/ebury/jobs/4866617101",
     "pontos": 30.8,
     "primeira_vez": "2026-07-30",
+    "ultima_vez": "2026-07-31",
+    "ativo": 1,
+    "avisado": 0
+  },
+  {
+    "id": 2260,
+    "empresa": "Clear Corretora",
+    "titulo": "Lead Product Manager, MarTech",
+    "senioridade": "nao_informado",
+    "modalidade": "presencial",
+    "local": "New York, New York, United States",
+    "stack": "",
+    "publicado_em": "2026-07-31",
+    "url": "https://job-boards.greenhouse.io/clear/jobs/8022031",
+    "pontos": 30.5,
+    "primeira_vez": "2026-07-31",
     "ultima_vez": "2026-07-31",
     "ativo": 1,
     "avisado": 0
