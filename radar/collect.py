@@ -186,7 +186,7 @@ def main():
 
         corpo = json.dumps(vagas, ensure_ascii=False)
         con.execute(
-            "INSERT INTO raw_fetch (fonte, url, coletado_em, status, hash, corpo)"
+            "INSERT OR IGNORE INTO raw_fetch (fonte, url, coletado_em, status, hash, corpo)"
             " VALUES (?,?,?,?,?,?)",
             (
                 f["tipo"],
@@ -213,7 +213,7 @@ def main():
                 )
                 continue
             cur = con.execute(
-                "INSERT INTO job (chave, empresa, titulo, senioridade, modalidade,"
+                "INSERT OR IGNORE INTO job (chave, empresa, titulo, senioridade, modalidade,"
                 " local, stack, publicado_em, url, descricao, primeira_vez, ultima_vez)"
                 " VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
                 (
@@ -232,7 +232,7 @@ def main():
                 ),
             )
             con.execute(
-                "INSERT INTO job_event (job_id, tipo, ocorrido_em, detalhe)"
+                "INSERT OR IGNORE INTO job_event (job_id, tipo, ocorrido_em, detalhe)"
                 " VALUES (?,?,?,?)",
                 (cur.lastrowid, "nova", HOJE, f["tipo"]),
             )
@@ -245,7 +245,7 @@ def main():
     for (jid,) in sumidas:
         con.execute("UPDATE job SET ativo = 0 WHERE id = ?", (jid,))
         con.execute(
-            "INSERT INTO job_event (job_id, tipo, ocorrido_em, detalhe)"
+            "INSERT OR IGNORE INTO job_event (job_id, tipo, ocorrido_em, detalhe)"
             " VALUES (?,?,?,?)",
             (jid, "fechada", HOJE, "ausente na coleta"),
         )
