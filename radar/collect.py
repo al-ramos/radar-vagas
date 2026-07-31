@@ -4,15 +4,15 @@ import hashlib
 import json
 import os
 import re
-import sqlite3
 import sys
 
 import requests
 import yaml
 from selectolax.parser import HTMLParser
 
+import db
+
 AQUI = os.path.dirname(os.path.abspath(__file__))
-DB = os.path.join(AQUI, "..", "data", "radar.db")
 UA = "radar-vagas/0.1 (contato: seu-email@exemplo.com)"
 HOJE = dt.date.today().isoformat()
 
@@ -162,8 +162,7 @@ def modalidade(texto):
 
 
 def main():
-    os.makedirs(os.path.dirname(DB), exist_ok=True)
-    con = sqlite3.connect(DB)
+    con = db.conectar()
     with open(os.path.join(AQUI, "schema.sql")) as fh:
         con.executescript(fh.read())
     with open(os.path.join(AQUI, "sources.yml")) as fh:
@@ -248,12 +247,15 @@ def main():
         )
 
     # limpa capturas brutas antigas (raw_fetch e so auditoria, nao e lido em
-    # nenhum outro lugar - sem isso o banco estoura 100MB no git)
+    # nenhum outro lugar - mantem o banco pequeno)
     limite = HOJE
     con.execute("DELETE FROM raw_fetch WHERE coletado_em < ?", (limite,))
 
     con.commit()
-    con.execute("VACUUM")
+    try:
+        con.execute("VACUUM")
+    except Exception:
+        pass  # VACUUM pode nao ser suportado num backend remoto
     print(f"novas: {novas} | fechadas: {len(sumidas)}")
 
 

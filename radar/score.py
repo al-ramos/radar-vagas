@@ -2,12 +2,12 @@
 import datetime as dt
 import os
 import re
-import sqlite3
 
 import yaml
 
+import db
+
 AQUI = os.path.dirname(os.path.abspath(__file__))
-DB = os.path.join(AQUI, "..", "data", "radar.db")
 
 with open(os.path.join(AQUI, "profile.yml")) as fh:
     P = yaml.safe_load(fh)
@@ -77,7 +77,7 @@ def pontuar(titulo, descricao, senior, modal, local, publicado_em):
 
 
 def main():
-    con = sqlite3.connect(DB)
+    con = db.conectar()
     linhas = con.execute(
         "SELECT id, titulo, descricao, senioridade, modalidade, local, publicado_em"
         " FROM job WHERE ativo = 1"

@@ -1,14 +1,24 @@
 """Digest no WhatsApp (Meta Cloud API) das vagas novas acima do corte.
 Silencio quando nao ha nada.
+
+Setup (gratuito, tier de teste):
+1. Crie um app em https://developers.facebook.com > tipo "Business".
+2. Adicione o produto "WhatsApp" ao app - ele ja vem com um numero de teste
+   e um token temporario (valido ~24h; gere um token permanente depois,
+   em System Users, para nao quebrar o agendamento).
+3. Em WhatsApp > API Setup, cadastre seu proprio numero como destinatario
+   de teste (limite do tier gratuito: so numeros verificados recebem).
+4. Guarde: WHATSAPP_TOKEN, WHATSAPP_PHONE_ID (o "Phone number ID" da Meta,
+   nao o numero em si) e WHATSAPP_TO (seu numero, formato 55DDNNNNNNNNN).
 """
 import os
-import sqlite3
 
 import requests
 import yaml
 
+import db
+
 AQUI = os.path.dirname(os.path.abspath(__file__))
-DB = os.path.join(AQUI, "..", "data", "radar.db")
 
 with open(os.path.join(AQUI, "profile.yml")) as fh:
     P = yaml.safe_load(fh)
@@ -17,11 +27,11 @@ TOKEN = os.environ["WHATSAPP_TOKEN"]
 PHONE_ID = os.environ["WHATSAPP_PHONE_ID"]
 TO = os.environ["WHATSAPP_TO"]
 CORTE = P.get("corte", 55)
-LIMITE_MSG = 4000
+LIMITE_MSG = 4000  # margem de seguranca abaixo do limite de 4096 da API
 
 
 def main():
-    con = sqlite3.connect(DB)
+    con = db.conectar()
     linhas = con.execute(
         "SELECT id, empresa, titulo, local, stack, pontos, url FROM job"
         " WHERE ativo = 1 AND avisado = 0 AND pontos >= ?"
