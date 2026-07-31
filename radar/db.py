@@ -34,12 +34,12 @@ class _ConexaoLibsql:
         self._conn = libsql.connect(database=url, auth_token=token)
 
     def execute(self, sql, params=()):
-        result = self._conn.execute(sql, list(params) if params else [])
+        result = self._conn.execute(sql, tuple(params) if params else ())
         return _CursorLibsql(result)
 
     def executemany(self, sql, seq_params):
         for params in seq_params:
-            self._conn.execute(sql, list(params))
+            self._conn.execute(sql, tuple(params))
 
     def executescript(self, script):
         for stmt in [s.strip() for s in script.split(";") if s.strip()]:
