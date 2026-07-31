@@ -200,7 +200,10 @@
     <h2 id="analiseTitulo">Análise da vaga</h2>
     <p class="sub" id="analiseEmpresa"></p>
     <div id="analiseCorpo"></div>
+    <label style="margin-top:14px;">Descrição da vaga (salva na coleta)</label>
+    <textarea id="analiseDescricao" readonly style="width:100%; min-height:140px; padding:10px 12px; border-radius:10px; border:1px solid var(--divider); font-size:12px; font-family:inherit; line-height:1.5; background:var(--neutral-200);"></textarea>
     <div class="acoes">
+      <button class="ghost" id="analiseCopiarDescricao" type="button">📋 Copiar descrição</button>
       <button class="ghost" id="analiseFechar" type="button">Fechar</button>
       <a id="analiseAbrirVaga" href="#" target="_blank" rel="noopener" style="text-decoration:none;">
         <button class="primary" type="button">Abrir vaga</button>
@@ -467,8 +470,18 @@ function abrirAnalise(j){
     <div class="analise-linha"><span>Combinam com seu perfil</span><b style="text-align:right; max-width:60%;">${match.length ? match.join(', ') : 'nenhuma — preencha "Minhas stacks"'}</b></div>
   `;
   document.getElementById('analiseAbrirVaga').href = j.url || '#';
+  document.getElementById('analiseDescricao').value = j.descricao || 'Sem descrição salva para esta vaga (coletada antes deste campo existir, ou a fonte não fornece descrição).';
   document.getElementById('analiseBg').style.display = 'flex';
 }
+document.getElementById('analiseCopiarDescricao').addEventListener('click', () => {
+  const txt = document.getElementById('analiseDescricao').value;
+  navigator.clipboard.writeText(txt).then(() => {
+    const b = document.getElementById('analiseCopiarDescricao');
+    const orig = b.textContent;
+    b.textContent = '✓ Copiado';
+    setTimeout(() => { b.textContent = orig; }, 1500);
+  });
+});
 document.getElementById('analiseFechar').addEventListener('click', () => { document.getElementById('analiseBg').style.display = 'none'; });
 document.getElementById('analiseBg').addEventListener('click', (e) => { if (e.target.id === 'analiseBg') document.getElementById('analiseBg').style.display = 'none'; });
 
