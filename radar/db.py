@@ -59,7 +59,7 @@ def conectar():
         # forca HTTP em vez do protocolo websocket (mais confiavel em runners
         # como o do GitHub Actions, onde o handshake ws as vezes falha)
         if url.startswith("libsql://"):
-            url = "libsql+http://" + url[len("libsql://"):]
+            url = url.replace("libsql://", "libsql+https://")
         return _ConexaoLibsql(url, token)
     os.makedirs(os.path.dirname(DB_LOCAL), exist_ok=True)
     return sqlite3.connect(DB_LOCAL)
