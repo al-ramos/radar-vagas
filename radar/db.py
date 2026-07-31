@@ -12,20 +12,15 @@ DB_LOCAL = os.path.join(AQUI, "..", "data", "radar.db")
 
 
 class _CursorLibsql:
-    def __init__(self, result_set):
-        self._rows = [tuple(r) for r in (result_set.rows or [])]
-        self._i = 0
-        self.lastrowid = getattr(result_set, "last_insert_rowid", None)
+    def __init__(self, cursor):
+        self._cursor = cursor
+        self.lastrowid = getattr(cursor, "lastrowid", None)
 
     def fetchone(self):
-        if self._i >= len(self._rows):
-            return None
-        row = self._rows[self._i]
-        self._i += 1
-        return row
+        return self._cursor.fetchone()
 
     def fetchall(self):
-        return self._rows
+        return self._cursor.fetchall()
 
 
 class _ConexaoLibsql:
