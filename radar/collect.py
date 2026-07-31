@@ -168,6 +168,10 @@ def main():
     with open(os.path.join(AQUI, "sources.yml")) as fh:
         fontes = yaml.safe_load(fh) or []
 
+    # pre-carrega todas as chaves existentes numa unica consulta, em vez de
+    # uma consulta de rede por vaga (essencial com um backend remoto)
+    existentes = {chv: jid for jid, chv in con.execute("SELECT id, chave FROM job").fetchall()}
+
     novas = 0
     for f in fontes:
         fn = COLETORES.get(f.get("tipo"))
@@ -201,11 +205,11 @@ def main():
             empresa = v.get("empresa") or f["empresa"]
             k = chave(empresa, v["titulo"], v["local"])
             texto = f"{v['titulo']} {v['local']} {v['descricao']}"
-            linha = con.execute("SELECT id FROM job WHERE chave = ?", (k,)).fetchone()
-            if linha:
+            jid_existente = existentes.get(k)
+            if jid_existente:
                 con.execute(
                     "UPDATE job SET ultima_vez = ?, ativo = 1 WHERE id = ?",
-                    (HOJE, linha[0]),
+                    (HOJE, jid_existente),
                 )
                 continue
             cur = con.execute(
