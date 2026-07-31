@@ -17,10 +17,12 @@ class _CursorLibsql:
         self.lastrowid = getattr(cursor, "lastrowid", None)
 
     def fetchone(self):
-        return self._cursor.fetchone()
+        row = self._cursor.fetchone()
+        return tuple(row) if row is not None else None
 
     def fetchall(self):
-        return self._cursor.fetchall()
+        rows = self._cursor.fetchall()
+        return [tuple(r) for r in rows]
 
 
 class _ConexaoLibsql:
