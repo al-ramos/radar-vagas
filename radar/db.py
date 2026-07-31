@@ -31,8 +31,7 @@ class _CursorLibsql:
 class _ConexaoLibsql:
     def __init__(self, url, token):
         import libsql_experimental as libsql
-        self._conn = libsql.connect(database=":memory:", sync_url=url, auth_token=token)
-        self._conn.sync()
+        self._conn = libsql.connect(database=url, auth_token=token)
 
     def execute(self, sql, params=()):
         result = self._conn.execute(sql, list(params) if params else [])
@@ -47,7 +46,7 @@ class _ConexaoLibsql:
             self._conn.execute(stmt)
 
     def commit(self):
-        self._conn.sync()
+        pass
 
     def close(self):
         pass
