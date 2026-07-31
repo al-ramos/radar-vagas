@@ -29,6 +29,8 @@ class _ConexaoLibsql:
     def __init__(self, url, token):
         import libsql_experimental as libsql
         self._conn = libsql.connect(database=url, auth_token=token)
+        self._conn.execute("PRAGMA foreign_keys = OFF")
+        self._conn.execute("PRAGMA foreign_keys = OFF")
 
     def execute(self, sql, params=()):
         result = self._conn.execute(sql, tuple(params) if params else ())
