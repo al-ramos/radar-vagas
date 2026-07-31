@@ -1869,7 +1869,7 @@
     "primeira_vez": "2026-07-31",
     "ultima_vez": "2026-07-31",
     "ativo": 1,
-    "avisado": 0
+    "avisado": 1
   },
   {
     "id": 1591,
@@ -1885,7 +1885,7 @@
     "primeira_vez": "2026-07-31",
     "ultima_vez": "2026-07-31",
     "ativo": 1,
-    "avisado": 0
+    "avisado": 1
   },
   {
     "id": 1419,
@@ -1901,7 +1901,7 @@
     "primeira_vez": "2026-07-31",
     "ultima_vez": "2026-07-31",
     "ativo": 1,
-    "avisado": 0
+    "avisado": 1
   },
   {
     "id": 2027,
@@ -1917,7 +1917,7 @@
     "primeira_vez": "2026-07-31",
     "ultima_vez": "2026-07-31",
     "ativo": 1,
-    "avisado": 0
+    "avisado": 1
   },
   {
     "id": 1866,
@@ -1933,7 +1933,7 @@
     "primeira_vez": "2026-07-31",
     "ultima_vez": "2026-07-31",
     "ativo": 1,
-    "avisado": 0
+    "avisado": 1
   },
   {
     "id": 1773,
@@ -1949,7 +1949,7 @@
     "primeira_vez": "2026-07-31",
     "ultima_vez": "2026-07-31",
     "ativo": 1,
-    "avisado": 0
+    "avisado": 1
   },
   {
     "id": 1768,
@@ -1965,7 +1965,7 @@
     "primeira_vez": "2026-07-31",
     "ultima_vez": "2026-07-31",
     "ativo": 1,
-    "avisado": 0
+    "avisado": 1
   },
   {
     "id": 1452,
@@ -1981,7 +1981,7 @@
     "primeira_vez": "2026-07-31",
     "ultima_vez": "2026-07-31",
     "ativo": 1,
-    "avisado": 0
+    "avisado": 1
   },
   {
     "id": 56,
@@ -2013,7 +2013,7 @@
     "primeira_vez": "2026-07-31",
     "ultima_vez": "2026-07-31",
     "ativo": 1,
-    "avisado": 0
+    "avisado": 1
   },
   {
     "id": 1528,
@@ -2029,7 +2029,7 @@
     "primeira_vez": "2026-07-31",
     "ultima_vez": "2026-07-31",
     "ativo": 1,
-    "avisado": 0
+    "avisado": 1
   },
   {
     "id": 1401,
@@ -2045,7 +2045,7 @@
     "primeira_vez": "2026-07-31",
     "ultima_vez": "2026-07-31",
     "ativo": 1,
-    "avisado": 0
+    "avisado": 1
   },
   {
     "id": 1398,
@@ -2061,7 +2061,7 @@
     "primeira_vez": "2026-07-31",
     "ultima_vez": "2026-07-31",
     "ativo": 1,
-    "avisado": 0
+    "avisado": 1
   },
   {
     "id": 2094,
@@ -4298,6 +4298,22 @@
     "publicado_em": "2026-07-20",
     "url": "https://carreiras.btgpactual.com/vagas?gh_jid=5998585004",
     "pontos": 45.8,
+    "primeira_vez": "2026-07-31",
+    "ultima_vez": "2026-07-31",
+    "ativo": 1,
+    "avisado": 0
+  },
+  {
+    "id": 2264,
+    "empresa": "Stone",
+    "titulo": "[Vaga Temporária] Auxiliar de Atendimento Logístico | CNH B (Carro) | Contagem/MG",
+    "senioridade": "nao_informado",
+    "modalidade": "remoto",
+    "local": "Contagem, Minas Gerais, Brasil",
+    "stack": "",
+    "publicado_em": "2026-07-31",
+    "url": "https://job-boards.greenhouse.io/stone/jobs/7822690003",
+    "pontos": 45.5,
     "primeira_vez": "2026-07-31",
     "ultima_vez": "2026-07-31",
     "ativo": 1,
