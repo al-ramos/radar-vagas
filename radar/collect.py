@@ -231,12 +231,13 @@ def main():
                     HOJE,
                 ),
             )
-            con.execute(
-                "INSERT OR IGNORE INTO job_event (job_id, tipo, ocorrido_em, detalhe)"
-                " VALUES (?,?,?,?)",
-                (cur.lastrowid, "nova", HOJE, f["tipo"]),
-            )
-            novas += 1
+            if cur.lastrowid:
+                con.execute(
+                    "INSERT OR IGNORE INTO job_event (job_id, tipo, ocorrido_em, detalhe)"
+                    " VALUES (?,?,?,?)",
+                    (cur.lastrowid, "nova", HOJE, f["tipo"]),
+                )
+                novas += 1
         print(f"{f['empresa']}: {len(vagas)} vagas")
 
     sumidas = con.execute(
