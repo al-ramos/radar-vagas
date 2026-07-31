@@ -1,0 +1,95 @@
+# gerado por discover.py - apenas empresas com board confirmado
+
+- empresa: BCG
+  tipo: greenhouse
+  id: bcg
+- empresa: TCS
+  tipo: greenhouse
+  id: tcs
+- empresa: Thoughtworks
+  tipo: greenhouse
+  id: thoughtworks
+- empresa: Nubank
+  tipo: ashby
+  id: nubank
+- empresa: Stone
+  tipo: greenhouse
+  id: stone
+- empresa: C6 Bank
+  tipo: greenhouse
+  id: c6bank
+- empresa: QuintoAndar
+  tipo: greenhouse
+  id: quintoandar
+- empresa: VTEX
+  tipo: greenhouse
+  id: vtex
+- empresa: Gympass
+  tipo: greenhouse
+  id: gympass
+- empresa: Neon
+  tipo: lever
+  id: neon
+- empresa: Ebanx
+  tipo: greenhouse
+  id: ebanx
+- empresa: Wildlife Studios
+  tipo: greenhouse
+  id: wildlifestudios
+- empresa: Arco Educacao
+  tipo: greenhouse
+  id: arco
+- empresa: Binance
+  tipo: greenhouse
+  id: binance
+- empresa: Azul
+  tipo: lever
+  id: azul
+- empresa: Elo Group
+  tipo: greenhouse
+  id: elo
+- empresa: Cortex Intelligence
+  tipo: greenhouse
+  id: cortex
+- empresa: Vitta
+  tipo: greenhouse
+  id: vitta
+- empresa: BTG Pactual
+  tipo: greenhouse
+  id: btgpactual
+- empresa: XP Inc
+  tipo: greenhouse
+  id: xpinc
+- empresa: Inter
+  tipo: greenhouse
+  id: inter
+- empresa: Via
+  tipo: greenhouse
+  id: via
+- empresa: Braskem
+  tipo: greenhouse
+  id: braskem
+- empresa: Minerva Foods
+  tipo: ashby
+  id: minerva
+- empresa: Banco Pan
+  tipo: greenhouse
+  id: bancopan
+- empresa: Clear Corretora
+  tipo: greenhouse
+  id: clear
+- empresa: Warren Investimentos
+  tipo: ashby
+  id: warren
+- empresa: Nomad
+  tipo: ashby
+  id: nomad
+- empresa: Insider Store
+  tipo: greenhouse
+  id: insider
+- empresa: Shein Brasil
+  tipo: greenhouse
+  id: shein
+- empresa: New Balance Brasil
+  tipo: greenhouse
+  id: new
