@@ -797,7 +797,7 @@
     "primeira_vez": "2026-07-31",
     "ultima_vez": "2026-07-31",
     "ativo": 1,
-    "avisado": 0
+    "avisado": 1
   },
   {
     "id": 1412,
@@ -813,7 +813,7 @@
     "primeira_vez": "2026-07-31",
     "ultima_vez": "2026-07-31",
     "ativo": 1,
-    "avisado": 0
+    "avisado": 1
   },
   {
     "id": 1400,
@@ -829,7 +829,7 @@
     "primeira_vez": "2026-07-31",
     "ultima_vez": "2026-07-31",
     "ativo": 1,
-    "avisado": 0
+    "avisado": 1
   },
   {
     "id": 291,
@@ -861,7 +861,7 @@
     "primeira_vez": "2026-07-31",
     "ultima_vez": "2026-07-31",
     "ativo": 1,
-    "avisado": 0
+    "avisado": 1
   },
   {
     "id": 1434,
@@ -877,7 +877,7 @@
     "primeira_vez": "2026-07-31",
     "ultima_vez": "2026-07-31",
     "ativo": 1,
-    "avisado": 0
+    "avisado": 1
   },
   {
     "id": 1406,
@@ -893,7 +893,7 @@
     "primeira_vez": "2026-07-31",
     "ultima_vez": "2026-07-31",
     "ativo": 1,
-    "avisado": 0
+    "avisado": 1
   },
   {
     "id": 1103,
@@ -909,7 +909,7 @@
     "primeira_vez": "2026-07-31",
     "ultima_vez": "2026-07-31",
     "ativo": 1,
-    "avisado": 0
+    "avisado": 1
   },
   {
     "id": 533,
@@ -925,7 +925,7 @@
     "primeira_vez": "2026-07-31",
     "ultima_vez": "2026-07-31",
     "ativo": 1,
-    "avisado": 0
+    "avisado": 1
   },
   {
     "id": 1203,
@@ -941,7 +941,7 @@
     "primeira_vez": "2026-07-31",
     "ultima_vez": "2026-07-31",
     "ativo": 1,
-    "avisado": 0
+    "avisado": 1
   },
   {
     "id": 555,
@@ -957,7 +957,7 @@
     "primeira_vez": "2026-07-31",
     "ultima_vez": "2026-07-31",
     "ativo": 1,
-    "avisado": 0
+    "avisado": 1
   },
   {
     "id": 477,
@@ -973,7 +973,7 @@
     "primeira_vez": "2026-07-31",
     "ultima_vez": "2026-07-31",
     "ativo": 1,
-    "avisado": 0
+    "avisado": 1
   },
   {
     "id": 65,
@@ -1005,7 +1005,7 @@
     "primeira_vez": "2026-07-31",
     "ultima_vez": "2026-07-31",
     "ativo": 1,
-    "avisado": 0
+    "avisado": 1
   },
   {
     "id": 1206,
@@ -17850,6 +17850,22 @@
     "publicado_em": "2026-07-23",
     "url": "https://www.thoughtworks.com/careers/jobs/8018409?gh_jid=8018409",
     "pontos": 24.5,
+    "primeira_vez": "2026-07-31",
+    "ultima_vez": "2026-07-31",
+    "ativo": 1,
+    "avisado": 0
+  },
+  {
+    "id": 2224,
+    "empresa": "Neon",
+    "titulo": "Especialista CRM - Jornadas",
+    "senioridade": "especialista",
+    "modalidade": "remoto",
+    "local": "Remoto",
+    "stack": "",
+    "publicado_em": "2026-02-19",
+    "url": "https://jobs.lever.co/neon/d70e0003-03bc-4cfa-b9f2-aa884755b378",
+    "pontos": 24.0,
     "primeira_vez": "2026-07-31",
     "ultima_vez": "2026-07-31",
     "ativo": 1,
