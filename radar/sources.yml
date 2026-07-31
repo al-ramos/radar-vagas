@@ -93,3 +93,6 @@
 - empresa: New Balance Brasil
   tipo: greenhouse
   id: new
+
+
+- { empresa: "Gmail (LinkedIn/Infojobs/Catho)", tipo: jsonfeed, id: "https://script.google.com/macros/s/AKfycbxtSsnVpQUcKU3cRZ6UcY1SDpmQdzFYDNJZTJwZhA9WmvbsWJCQVXHs-TGvYrlQHk8Aug/exec" }
