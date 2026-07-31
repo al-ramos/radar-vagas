@@ -1,15 +1,5 @@
 """Digest no WhatsApp (Meta Cloud API) das vagas novas acima do corte.
 Silencio quando nao ha nada.
-
-Setup (gratuito, tier de teste):
-1. Crie um app em https://developers.facebook.com > tipo "Business".
-2. Adicione o produto "WhatsApp" ao app - ele ja vem com um numero de teste
-   e um token temporario (valido ~24h; gere um token permanente depois,
-   em System Users, para nao quebrar o agendamento).
-3. Em WhatsApp > API Setup, cadastre seu proprio numero como destinatario
-   de teste (limite do tier gratuito: so numeros verificados recebem).
-4. Guarde: WHATSAPP_TOKEN, WHATSAPP_PHONE_ID (o "Phone number ID" da Meta,
-   nao o numero em si) e WHATSAPP_TO (seu numero, formato 55DDNNNNNNNNN).
 """
 import os
 import sqlite3
@@ -27,22 +17,7 @@ TOKEN = os.environ["WHATSAPP_TOKEN"]
 PHONE_ID = os.environ["WHATSAPP_PHONE_ID"]
 TO = os.environ["WHATSAPP_TO"]
 CORTE = P.get("corte", 55)
-LIMITE_MSG = 4000  # margem de seguranca abaixo do limite de 4096 da API
-
-
-def enviar(texto):
-    url = f"https://graph.facebook.com/v20.0/{PHONE_ID}/messages"
-    requests.post(
-        url,
-        headers={"Authorization": f"Bearer {TOKEN}"},
-        json={
-            "messaging_product": "whatsapp",
-            "to": TO,
-            "type": "text",
-            "text": {"body": texto, "preview_url": False},
-        },
-        timeout=30,
-    ).raise_for_status()
+LIMITE_MSG = 4000
 
 
 def main():
@@ -71,7 +46,19 @@ def main():
     if len(texto) > LIMITE_MSG:
         texto = texto[:LIMITE_MSG] + "\n(lista cortada - veja o restante no banco)"
 
-    enviar(texto)
+    r = requests.post(
+        f"https://graph.facebook.com/v20.0/{PHONE_ID}/messages",
+        headers={"Authorization": f"Bearer {TOKEN}"},
+        json={
+            "messaging_product": "whatsapp",
+            "to": TO,
+            "type": "text",
+            "text": {"body": texto, "preview_url": False},
+        },
+        timeout=30,
+    )
+    print(f"resposta da API: {r.status_code} {r.text}")
+    r.raise_for_status()
 
     con.executemany(
         "UPDATE job SET avisado = 1 WHERE id = ?", [(l[0],) for l in linhas]
