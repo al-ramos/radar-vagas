@@ -1,0 +1,302 @@
+rodar	Set up job	﻿2026-07-31T11:27:56.3177830Z Current runner version: '2.336.0'
+rodar	Set up job	2026-07-31T11:27:56.3205158Z ##[group]Runner Image Provisioner
+rodar	Set up job	2026-07-31T11:27:56.3206258Z Hosted Compute Agent
+rodar	Set up job	2026-07-31T11:27:56.3206903Z Version: 20260707.563
+rodar	Set up job	2026-07-31T11:27:56.3207696Z Commit: 02667638d2b423fbc733a8e32a88b44996a3ba6e
+rodar	Set up job	2026-07-31T11:27:56.3208486Z Build Date: 2026-07-07T19:33:50Z
+rodar	Set up job	2026-07-31T11:27:56.3209207Z Worker ID: {e029761f-7b4c-4583-bb4b-be9f47a7a962}
+rodar	Set up job	2026-07-31T11:27:56.3210051Z Azure Region: westus
+rodar	Set up job	2026-07-31T11:27:56.3211167Z ##[endgroup]
+rodar	Set up job	2026-07-31T11:27:56.3212999Z ##[group]Operating System
+rodar	Set up job	2026-07-31T11:27:56.3213765Z Ubuntu
+rodar	Set up job	2026-07-31T11:27:56.3214306Z 24.04.4
+rodar	Set up job	2026-07-31T11:27:56.3214933Z LTS
+rodar	Set up job	2026-07-31T11:27:56.3215474Z ##[endgroup]
+rodar	Set up job	2026-07-31T11:27:56.3216126Z ##[group]Runner Image
+rodar	Set up job	2026-07-31T11:27:56.3216822Z Image: ubuntu-24.04
+rodar	Set up job	2026-07-31T11:27:56.3217418Z Version: 20260720.247.2
+rodar	Set up job	2026-07-31T11:27:56.3218604Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260720.247/images/ubuntu/Ubuntu2404-Readme.md
+rodar	Set up job	2026-07-31T11:27:56.3220853Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260720.247
+rodar	Set up job	2026-07-31T11:27:56.3222348Z ##[endgroup]
+rodar	Set up job	2026-07-31T11:27:56.3223597Z ##[group]GITHUB_TOKEN Permissions
+rodar	Set up job	2026-07-31T11:27:56.3225946Z Contents: write
+rodar	Set up job	2026-07-31T11:27:56.3226656Z Metadata: read
+rodar	Set up job	2026-07-31T11:27:56.3227252Z ##[endgroup]
+rodar	Set up job	2026-07-31T11:27:56.3229531Z Secret source: Actions
+rodar	Set up job	2026-07-31T11:27:56.3230929Z Prepare workflow directory
+rodar	Set up job	2026-07-31T11:27:56.3584182Z Prepare all required actions
+rodar	Set up job	2026-07-31T11:27:56.3635039Z Getting action download info
+rodar	Set up job	2026-07-31T11:27:56.7093820Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+rodar	Set up job	2026-07-31T11:27:57.1701927Z Download action repository 'actions/setup-python@v5' (SHA:a26af69be951a213d495a4c3e4e4022e16d87065)
+rodar	Set up job	2026-07-31T11:27:57.3929303Z Complete job name: rodar
+rodar	Run actions/checkout@v4	﻿2026-07-31T11:27:57.4715702Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+rodar	Run actions/checkout@v4	2026-07-31T11:27:57.4724688Z ##[group]Run actions/checkout@v4
+rodar	Run actions/checkout@v4	2026-07-31T11:27:57.4725479Z with:
+rodar	Run actions/checkout@v4	2026-07-31T11:27:57.4726052Z   repository: al-ramos/radar-vagas
+rodar	Run actions/checkout@v4	2026-07-31T11:27:57.4729913Z   token: ***
+rodar	Run actions/checkout@v4	2026-07-31T11:27:57.4730692Z   ssh-strict: true
+rodar	Run actions/checkout@v4	2026-07-31T11:27:57.4731169Z   ssh-user: git
+rodar	Run actions/checkout@v4	2026-07-31T11:27:57.4731680Z   persist-credentials: true
+rodar	Run actions/checkout@v4	2026-07-31T11:27:57.4732202Z   clean: true
+rodar	Run actions/checkout@v4	2026-07-31T11:27:57.4732678Z   sparse-checkout-cone-mode: true
+rodar	Run actions/checkout@v4	2026-07-31T11:27:57.4733223Z   fetch-depth: 1
+rodar	Run actions/checkout@v4	2026-07-31T11:27:57.4733671Z   fetch-tags: false
+rodar	Run actions/checkout@v4	2026-07-31T11:27:57.4734135Z   show-progress: true
+rodar	Run actions/checkout@v4	2026-07-31T11:27:57.4734586Z   lfs: false
+rodar	Run actions/checkout@v4	2026-07-31T11:27:57.4735007Z   submodules: false
+rodar	Run actions/checkout@v4	2026-07-31T11:27:57.4735520Z   set-safe-directory: true
+rodar	Run actions/checkout@v4	2026-07-31T11:27:57.4736036Z   allow-unsafe-pr-checkout: false
+rodar	Run actions/checkout@v4	2026-07-31T11:27:57.4736860Z ##[endgroup]
+rodar	Run actions/checkout@v4	2026-07-31T11:27:57.5790003Z Syncing repository: al-ramos/radar-vagas
+rodar	Run actions/checkout@v4	2026-07-31T11:27:57.5792716Z ##[group]Getting Git version info
+rodar	Run actions/checkout@v4	2026-07-31T11:27:57.5793711Z Working directory is '/home/runner/work/radar-vagas/radar-vagas'
+rodar	Run actions/checkout@v4	2026-07-31T11:27:57.5795100Z [command]/usr/bin/git version
+rodar	Run actions/checkout@v4	2026-07-31T11:27:57.5918944Z git version 2.54.0
+rodar	Run actions/checkout@v4	2026-07-31T11:27:57.5944058Z ##[endgroup]
+rodar	Run actions/checkout@v4	2026-07-31T11:27:57.5960865Z Temporarily overriding HOME='/home/runner/work/_temp/b557d7fb-8d62-45a4-a991-8559329f4036' before making global git config changes
+rodar	Run actions/checkout@v4	2026-07-31T11:27:57.5963391Z Adding repository directory to the temporary git global config as a safe directory
+rodar	Run actions/checkout@v4	2026-07-31T11:27:57.5966749Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/radar-vagas/radar-vagas
+rodar	Run actions/checkout@v4	2026-07-31T11:27:57.6024143Z Deleting the contents of '/home/runner/work/radar-vagas/radar-vagas'
+rodar	Run actions/checkout@v4	2026-07-31T11:27:57.6027992Z ##[group]Initializing the repository
+rodar	Run actions/checkout@v4	2026-07-31T11:27:57.6034203Z [command]/usr/bin/git init /home/runner/work/radar-vagas/radar-vagas
+rodar	Run actions/checkout@v4	2026-07-31T11:27:57.6187256Z hint: Using 'master' as the name for the initial branch. This default branch name
+rodar	Run actions/checkout@v4	2026-07-31T11:27:57.6189369Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+rodar	Run actions/checkout@v4	2026-07-31T11:27:57.6191597Z hint: to use in all of your new repositories, which will suppress this warning,
+rodar	Run actions/checkout@v4	2026-07-31T11:27:57.6193544Z hint: call:
+rodar	Run actions/checkout@v4	2026-07-31T11:27:57.6194541Z hint:
+rodar	Run actions/checkout@v4	2026-07-31T11:27:57.6195851Z hint: 	git config --global init.defaultBranch <name>
+rodar	Run actions/checkout@v4	2026-07-31T11:27:57.6197232Z hint:
+rodar	Run actions/checkout@v4	2026-07-31T11:27:57.6198505Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+rodar	Run actions/checkout@v4	2026-07-31T11:27:57.6200847Z hint: 'development'. The just-created branch can be renamed via this command:
+rodar	Run actions/checkout@v4	2026-07-31T11:27:57.6202346Z hint:
+rodar	Run actions/checkout@v4	2026-07-31T11:27:57.6203204Z hint: 	git branch -m <name>
+rodar	Run actions/checkout@v4	2026-07-31T11:27:57.6204178Z hint:
+rodar	Run actions/checkout@v4	2026-07-31T11:27:57.6205583Z hint: Disable this message with "git config set advice.defaultBranchName false"
+rodar	Run actions/checkout@v4	2026-07-31T11:27:57.6207761Z Initialized empty Git repository in /home/runner/work/radar-vagas/radar-vagas/.git/
+rodar	Run actions/checkout@v4	2026-07-31T11:27:57.6212122Z [command]/usr/bin/git remote add origin https://github.com/al-ramos/radar-vagas
+rodar	Run actions/checkout@v4	2026-07-31T11:27:57.6309318Z ##[endgroup]
+rodar	Run actions/checkout@v4	2026-07-31T11:27:57.6311495Z ##[group]Disabling automatic garbage collection
+rodar	Run actions/checkout@v4	2026-07-31T11:27:57.6313929Z [command]/usr/bin/git config --local gc.auto 0
+rodar	Run actions/checkout@v4	2026-07-31T11:27:57.6348268Z ##[endgroup]
+rodar	Run actions/checkout@v4	2026-07-31T11:27:57.6349744Z ##[group]Setting up auth
+rodar	Run actions/checkout@v4	2026-07-31T11:27:57.6356213Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+rodar	Run actions/checkout@v4	2026-07-31T11:27:57.6397826Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+rodar	Run actions/checkout@v4	2026-07-31T11:27:57.6809893Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+rodar	Run actions/checkout@v4	2026-07-31T11:27:57.6845832Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+rodar	Run actions/checkout@v4	2026-07-31T11:27:57.7072649Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+rodar	Run actions/checkout@v4	2026-07-31T11:27:57.7108735Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+rodar	Run actions/checkout@v4	2026-07-31T11:27:57.7339335Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+rodar	Run actions/checkout@v4	2026-07-31T11:27:57.7380684Z ##[endgroup]
+rodar	Run actions/checkout@v4	2026-07-31T11:27:57.7382164Z ##[group]Fetching the repository
+rodar	Run actions/checkout@v4	2026-07-31T11:27:57.7392741Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +b32ccdd217ab8188796f5d6d235074a4563506e4:refs/remotes/origin/main
+rodar	Run actions/checkout@v4	2026-07-31T11:28:01.2798947Z From https://github.com/al-ramos/radar-vagas
+rodar	Run actions/checkout@v4	2026-07-31T11:28:01.2800448Z  * [new ref]         b32ccdd217ab8188796f5d6d235074a4563506e4 -> origin/main
+rodar	Run actions/checkout@v4	2026-07-31T11:28:01.2838038Z ##[endgroup]
+rodar	Run actions/checkout@v4	2026-07-31T11:28:01.2838799Z ##[group]Determining the checkout info
+rodar	Run actions/checkout@v4	2026-07-31T11:28:01.2840047Z ##[endgroup]
+rodar	Run actions/checkout@v4	2026-07-31T11:28:01.2846797Z [command]/usr/bin/git sparse-checkout disable
+rodar	Run actions/checkout@v4	2026-07-31T11:28:01.2896929Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+rodar	Run actions/checkout@v4	2026-07-31T11:28:01.2929464Z ##[group]Checking out the ref
+rodar	Run actions/checkout@v4	2026-07-31T11:28:01.2934724Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+rodar	Run actions/checkout@v4	2026-07-31T11:28:01.5118667Z Switched to a new branch 'main'
+rodar	Run actions/checkout@v4	2026-07-31T11:28:01.5120508Z branch 'main' set up to track 'origin/main'.
+rodar	Run actions/checkout@v4	2026-07-31T11:28:01.5127781Z ##[endgroup]
+rodar	Run actions/checkout@v4	2026-07-31T11:28:01.5184909Z [command]/usr/bin/git log -1 --format=%H
+rodar	Run actions/checkout@v4	2026-07-31T11:28:01.5212390Z b32ccdd217ab8188796f5d6d235074a4563506e4
+rodar	Run actions/setup-python@v5	﻿2026-07-31T11:28:01.5486140Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+rodar	Run actions/setup-python@v5	2026-07-31T11:28:01.5488232Z ##[group]Run actions/setup-python@v5
+rodar	Run actions/setup-python@v5	2026-07-31T11:28:01.5488567Z with:
+rodar	Run actions/setup-python@v5	2026-07-31T11:28:01.5488834Z   python-version: 3.12
+rodar	Run actions/setup-python@v5	2026-07-31T11:28:01.5489126Z   check-latest: false
+rodar	Run actions/setup-python@v5	2026-07-31T11:28:01.5492250Z   token: ***
+rodar	Run actions/setup-python@v5	2026-07-31T11:28:01.5492555Z   update-environment: true
+rodar	Run actions/setup-python@v5	2026-07-31T11:28:01.5492863Z   allow-prereleases: false
+rodar	Run actions/setup-python@v5	2026-07-31T11:28:01.5493167Z   freethreaded: false
+rodar	Run actions/setup-python@v5	2026-07-31T11:28:01.5493437Z ##[endgroup]
+rodar	Run actions/setup-python@v5	2026-07-31T11:28:01.6817007Z ##[group]Installed versions
+rodar	Run actions/setup-python@v5	2026-07-31T11:28:01.6921876Z (node:2262) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+rodar	Run actions/setup-python@v5	2026-07-31T11:28:01.6922861Z (Use `node --trace-deprecation ...` to show where the warning was created)
+rodar	Run actions/setup-python@v5	2026-07-31T11:28:01.6923853Z Successfully set up CPython (3.12.13)
+rodar	Run actions/setup-python@v5	2026-07-31T11:28:01.6924787Z ##[endgroup]
+rodar	Run pip install -r requirements.txt	﻿2026-07-31T11:28:01.7107030Z ##[group]Run pip install -r requirements.txt
+rodar	Run pip install -r requirements.txt	2026-07-31T11:28:01.7107616Z ^[[36;1mpip install -r requirements.txt^[[0m
+rodar	Run pip install -r requirements.txt	2026-07-31T11:28:01.7249294Z shell: /usr/bin/bash -e {0}
+rodar	Run pip install -r requirements.txt	2026-07-31T11:28:01.7249969Z env:
+rodar	Run pip install -r requirements.txt	2026-07-31T11:28:01.7250764Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.13/x64
+rodar	Run pip install -r requirements.txt	2026-07-31T11:28:01.7251709Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.13/x64/lib/pkgconfig
+rodar	Run pip install -r requirements.txt	2026-07-31T11:28:01.7252625Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.13/x64
+rodar	Run pip install -r requirements.txt	2026-07-31T11:28:01.7253445Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.13/x64
+rodar	Run pip install -r requirements.txt	2026-07-31T11:28:01.7254268Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.13/x64
+rodar	Run pip install -r requirements.txt	2026-07-31T11:28:01.7255121Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.13/x64/lib
+rodar	Run pip install -r requirements.txt	2026-07-31T11:28:01.7255825Z ##[endgroup]
+rodar	Run pip install -r requirements.txt	2026-07-31T11:28:05.9721931Z Collecting requests (from -r requirements.txt (line 1))
+rodar	Run pip install -r requirements.txt	2026-07-31T11:28:06.0213820Z   Downloading requests-2.34.2-py3-none-any.whl.metadata (4.8 kB)
+rodar	Run pip install -r requirements.txt	2026-07-31T11:28:06.0864926Z Collecting PyYAML (from -r requirements.txt (line 2))
+rodar	Run pip install -r requirements.txt	2026-07-31T11:28:06.0895722Z   Downloading pyyaml-6.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (2.4 kB)
+rodar	Run pip install -r requirements.txt	2026-07-31T11:28:06.2722609Z Collecting selectolax (from -r requirements.txt (line 3))
+rodar	Run pip install -r requirements.txt	2026-07-31T11:28:06.2763630Z   Downloading selectolax-0.4.11-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (8.2 kB)
+rodar	Run pip install -r requirements.txt	2026-07-31T11:28:06.3960666Z Collecting charset_normalizer<4,>=2 (from requests->-r requirements.txt (line 1))
+rodar	Run pip install -r requirements.txt	2026-07-31T11:28:06.3997508Z   Downloading charset_normalizer-3.4.9-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (41 kB)
+rodar	Run pip install -r requirements.txt	2026-07-31T11:28:06.4475549Z Collecting idna<4,>=2.5 (from requests->-r requirements.txt (line 1))
+rodar	Run pip install -r requirements.txt	2026-07-31T11:28:06.4508434Z   Downloading idna-3.18-py3-none-any.whl.metadata (6.1 kB)
+rodar	Run pip install -r requirements.txt	2026-07-31T11:28:06.4912920Z Collecting urllib3<3,>=1.26 (from requests->-r requirements.txt (line 1))
+rodar	Run pip install -r requirements.txt	2026-07-31T11:28:06.4941770Z   Downloading urllib3-2.7.0-py3-none-any.whl.metadata (6.9 kB)
+rodar	Run pip install -r requirements.txt	2026-07-31T11:28:06.5286654Z Collecting certifi>=2023.5.7 (from requests->-r requirements.txt (line 1))
+rodar	Run pip install -r requirements.txt	2026-07-31T11:28:06.5318667Z   Downloading certifi-2026.7.22-py3-none-any.whl.metadata (2.5 kB)
+rodar	Run pip install -r requirements.txt	2026-07-31T11:28:06.5398858Z Downloading requests-2.34.2-py3-none-any.whl (73 kB)
+rodar	Run pip install -r requirements.txt	2026-07-31T11:28:06.5475397Z Downloading charset_normalizer-3.4.9-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (224 kB)
+rodar	Run pip install -r requirements.txt	2026-07-31T11:28:06.5547588Z Downloading idna-3.18-py3-none-any.whl (65 kB)
+rodar	Run pip install -r requirements.txt	2026-07-31T11:28:06.5598243Z Downloading urllib3-2.7.0-py3-none-any.whl (131 kB)
+rodar	Run pip install -r requirements.txt	2026-07-31T11:28:06.5676084Z Downloading pyyaml-6.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (807 kB)
+rodar	Run pip install -r requirements.txt	2026-07-31T11:28:06.5754271Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 807.9/807.9 kB 128.0 MB/s  0:00:00
+rodar	Run pip install -r requirements.txt	2026-07-31T11:28:06.5799010Z Downloading selectolax-0.4.11-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (2.4 MB)
+rodar	Run pip install -r requirements.txt	2026-07-31T11:28:06.5945752Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.4/2.4 MB 187.5 MB/s  0:00:00
+rodar	Run pip install -r requirements.txt	2026-07-31T11:28:06.5974917Z Downloading certifi-2026.7.22-py3-none-any.whl (136 kB)
+rodar	Run pip install -r requirements.txt	2026-07-31T11:28:06.6676156Z Installing collected packages: urllib3, selectolax, PyYAML, idna, charset_normalizer, certifi, requests
+rodar	Run pip install -r requirements.txt	2026-07-31T11:28:07.0049300Z 
+rodar	Run pip install -r requirements.txt	2026-07-31T11:28:07.0065092Z Successfully installed PyYAML-6.0.3 certifi-2026.7.22 charset_normalizer-3.4.9 idna-3.18 requests-2.34.2 selectolax-0.4.11 urllib3-2.7.0
+rodar	Run pip install -r requirements.txt	2026-07-31T11:28:07.0074719Z 
+rodar	Run pip install -r requirements.txt	2026-07-31T11:28:07.0075126Z [notice] A new release of pip is available: 26.1.2 -> 26.2
+rodar	Run pip install -r requirements.txt	2026-07-31T11:28:07.0075872Z [notice] To update, run: pip install --upgrade pip
+rodar	Run mkdir -p data	﻿2026-07-31T11:28:07.0686433Z ##[group]Run mkdir -p data
+rodar	Run mkdir -p data	2026-07-31T11:28:07.0686770Z ^[[36;1mmkdir -p data^[[0m
+rodar	Run mkdir -p data	2026-07-31T11:28:07.0734230Z shell: /usr/bin/bash -e {0}
+rodar	Run mkdir -p data	2026-07-31T11:28:07.0734550Z env:
+rodar	Run mkdir -p data	2026-07-31T11:28:07.0734833Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.13/x64
+rodar	Run mkdir -p data	2026-07-31T11:28:07.0735299Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.13/x64/lib/pkgconfig
+rodar	Run mkdir -p data	2026-07-31T11:28:07.0735757Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.13/x64
+rodar	Run mkdir -p data	2026-07-31T11:28:07.0736175Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.13/x64
+rodar	Run mkdir -p data	2026-07-31T11:28:07.0736590Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.13/x64
+rodar	Run mkdir -p data	2026-07-31T11:28:07.0736996Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.13/x64/lib
+rodar	Run mkdir -p data	2026-07-31T11:28:07.0737333Z ##[endgroup]
+rodar	Run python radar/collect.py	﻿2026-07-31T11:28:07.0849956Z ##[group]Run python radar/collect.py
+rodar	Run python radar/collect.py	2026-07-31T11:28:07.0850702Z ^[[36;1mpython radar/collect.py^[[0m
+rodar	Run python radar/collect.py	2026-07-31T11:28:07.0893569Z shell: /usr/bin/bash -e {0}
+rodar	Run python radar/collect.py	2026-07-31T11:28:07.0893836Z env:
+rodar	Run python radar/collect.py	2026-07-31T11:28:07.0894112Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.13/x64
+rodar	Run python radar/collect.py	2026-07-31T11:28:07.0894574Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.13/x64/lib/pkgconfig
+rodar	Run python radar/collect.py	2026-07-31T11:28:07.0895042Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.13/x64
+rodar	Run python radar/collect.py	2026-07-31T11:28:07.0895446Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.13/x64
+rodar	Run python radar/collect.py	2026-07-31T11:28:07.0895849Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.13/x64
+rodar	Run python radar/collect.py	2026-07-31T11:28:07.0896256Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.13/x64/lib
+rodar	Run python radar/collect.py	2026-07-31T11:28:07.0896606Z ##[endgroup]
+rodar	Run python radar/collect.py	2026-07-31T11:28:07.4643295Z /home/runner/work/radar-vagas/radar-vagas/radar/collect.py:191: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+rodar	Run python radar/collect.py	2026-07-31T11:28:07.4645973Z   dt.datetime.utcnow().isoformat(),
+rodar	Run python radar/collect.py	2026-07-31T11:28:09.0212954Z /home/runner/work/radar-vagas/radar-vagas/radar/collect.py:50: DeprecationWarning: datetime.datetime.utcfromtimestamp() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.fromtimestamp(timestamp, datetime.UTC).
+rodar	Run python radar/collect.py	2026-07-31T11:28:09.0214808Z   data = dt.datetime.utcfromtimestamp(ts / 1000).date().isoformat() if ts else HOJE
+rodar	Run python radar/collect.py	2026-07-31T11:28:11.4031297Z BCG: 4 vagas
+rodar	Run python radar/collect.py	2026-07-31T11:28:11.4031717Z TCS: 82 vagas
+rodar	Run python radar/collect.py	2026-07-31T11:28:11.4031989Z Thoughtworks: 55 vagas
+rodar	Run python radar/collect.py	2026-07-31T11:28:11.4032302Z Nubank: 97 vagas
+rodar	Run python radar/collect.py	2026-07-31T11:28:11.4032536Z Stone: 392 vagas
+rodar	Run python radar/collect.py	2026-07-31T11:28:11.4032809Z C6 Bank: 159 vagas
+rodar	Run python radar/collect.py	2026-07-31T11:28:11.4033046Z QuintoAndar: 81 vagas
+rodar	Run python radar/collect.py	2026-07-31T11:28:11.4033338Z VTEX: 30 vagas
+rodar	Run python radar/collect.py	2026-07-31T11:28:11.4033568Z Gympass: 103 vagas
+rodar	Run python radar/collect.py	2026-07-31T11:28:11.4033848Z Neon: 15 vagas
+rodar	Run python radar/collect.py	2026-07-31T11:28:11.4034100Z Ebanx: 39 vagas
+rodar	Run python radar/collect.py	2026-07-31T11:28:11.4034398Z Wildlife Studios: 17 vagas
+rodar	Run python radar/collect.py	2026-07-31T11:28:11.4034705Z Arco Educacao: 1 vagas
+rodar	Run python radar/collect.py	2026-07-31T11:28:11.4034956Z Binance: 1 vagas
+rodar	Run python radar/collect.py	2026-07-31T11:28:11.4035226Z Azul: 14 vagas
+rodar	Run python radar/collect.py	2026-07-31T11:28:11.4035556Z Elo Group: 29 vagas
+rodar	Run python radar/collect.py	2026-07-31T11:28:11.4035805Z Cortex Intelligence: 5 vagas
+rodar	Run python radar/collect.py	2026-07-31T11:28:11.4036074Z Vitta: 2 vagas
+rodar	Run python radar/collect.py	2026-07-31T11:28:11.4036567Z BTG Pactual: 272 vagas
+rodar	Run python radar/collect.py	2026-07-31T11:28:11.4036808Z XP Inc: 186 vagas
+rodar	Run python radar/collect.py	2026-07-31T11:28:11.4037064Z Inter: 165 vagas
+rodar	Run python radar/collect.py	2026-07-31T11:28:11.4037281Z Via: 174 vagas
+rodar	Run python radar/collect.py	2026-07-31T11:28:11.4037495Z Braskem: 9 vagas
+rodar	Run python radar/collect.py	2026-07-31T11:28:11.4037729Z Minerva Foods: 8 vagas
+rodar	Run python radar/collect.py	2026-07-31T11:28:11.4037969Z Banco Pan: 50 vagas
+rodar	Run python radar/collect.py	2026-07-31T11:28:11.4038222Z Clear Corretora: 38 vagas
+rodar	Run python radar/collect.py	2026-07-31T11:28:11.4038488Z Warren Investimentos: 14 vagas
+rodar	Run python radar/collect.py	2026-07-31T11:28:11.4038753Z Nomad: 2 vagas
+rodar	Run python radar/collect.py	2026-07-31T11:28:11.4038974Z Insider Store: 14 vagas
+rodar	Run python radar/collect.py	2026-07-31T11:28:11.4039223Z Shein Brasil: 13 vagas
+rodar	Run python radar/collect.py	2026-07-31T11:28:11.4039467Z New Balance Brasil: 1 vagas
+rodar	Run python radar/collect.py	2026-07-31T11:28:11.4039733Z novas: 0 | fechadas: 0
+rodar	Run python radar/score.py	﻿2026-07-31T11:28:11.4271615Z ##[group]Run python radar/score.py
+rodar	Run python radar/score.py	2026-07-31T11:28:11.4271952Z ^[[36;1mpython radar/score.py^[[0m
+rodar	Run python radar/score.py	2026-07-31T11:28:11.4316455Z shell: /usr/bin/bash -e {0}
+rodar	Run python radar/score.py	2026-07-31T11:28:11.4316714Z env:
+rodar	Run python radar/score.py	2026-07-31T11:28:11.4316980Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.13/x64
+rodar	Run python radar/score.py	2026-07-31T11:28:11.4317454Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.13/x64/lib/pkgconfig
+rodar	Run python radar/score.py	2026-07-31T11:28:11.4317902Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.13/x64
+rodar	Run python radar/score.py	2026-07-31T11:28:11.4318288Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.13/x64
+rodar	Run python radar/score.py	2026-07-31T11:28:11.4318681Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.13/x64
+rodar	Run python radar/score.py	2026-07-31T11:28:11.4319065Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.13/x64/lib
+rodar	Run python radar/score.py	2026-07-31T11:28:11.4319390Z ##[endgroup]
+rodar	Run python radar/score.py	2026-07-31T11:28:12.4604044Z pontuadas: 2224
+rodar	Run python radar/notify.py	﻿2026-07-31T11:28:12.4729664Z ##[group]Run python radar/notify.py
+rodar	Run python radar/notify.py	2026-07-31T11:28:12.4730006Z ^[[36;1mpython radar/notify.py^[[0m
+rodar	Run python radar/notify.py	2026-07-31T11:28:12.4774670Z shell: /usr/bin/bash -e {0}
+rodar	Run python radar/notify.py	2026-07-31T11:28:12.4774933Z env:
+rodar	Run python radar/notify.py	2026-07-31T11:28:12.4775204Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.13/x64
+rodar	Run python radar/notify.py	2026-07-31T11:28:12.4775643Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.13/x64/lib/pkgconfig
+rodar	Run python radar/notify.py	2026-07-31T11:28:12.4776083Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.13/x64
+rodar	Run python radar/notify.py	2026-07-31T11:28:12.4776485Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.13/x64
+rodar	Run python radar/notify.py	2026-07-31T11:28:12.4776985Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.13/x64
+rodar	Run python radar/notify.py	2026-07-31T11:28:12.4777370Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.13/x64/lib
+rodar	Run python radar/notify.py	2026-07-31T11:28:12.4778843Z   WHATSAPP_TOKEN: ***
+rodar	Run python radar/notify.py	2026-07-31T11:28:12.4779104Z   WHATSAPP_PHONE_ID: ***
+rodar	Run python radar/notify.py	2026-07-31T11:28:12.4779349Z   WHATSAPP_TO: ***
+rodar	Run python radar/notify.py	2026-07-31T11:28:12.4779551Z ##[endgroup]
+rodar	Run python radar/notify.py	2026-07-31T11:28:13.5745457Z resposta da API: 200 {"messaging_product":"whatsapp","contacts":[{"input":"***","wa_id":"***"}],"messages":[{"id":"wamid.HBgNNTUxMTk1Mjg1MjYzNBUCABEYEkIyMjQzNDg2NEQxMjRGRkJFQgA="}]}
+rodar	Run python radar/notify.py	2026-07-31T11:28:13.5747279Z avisadas: 12
+rodar	gerar painel publico (docs/jobs.json)	﻿2026-07-31T11:28:13.5972955Z ##[group]Run mkdir -p docs
+rodar	gerar painel publico (docs/jobs.json)	2026-07-31T11:28:13.5973506Z ^[[36;1mmkdir -p docs^[[0m
+rodar	gerar painel publico (docs/jobs.json)	2026-07-31T11:28:13.5974177Z ^[[36;1mpython radar/export_json.py --out docs/jobs.json --somente-ativas^[[0m
+rodar	gerar painel publico (docs/jobs.json)	2026-07-31T11:28:13.6040648Z shell: /usr/bin/bash -e {0}
+rodar	gerar painel publico (docs/jobs.json)	2026-07-31T11:28:13.6041094Z env:
+rodar	gerar painel publico (docs/jobs.json)	2026-07-31T11:28:13.6041602Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.13/x64
+rodar	gerar painel publico (docs/jobs.json)	2026-07-31T11:28:13.6042446Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.13/x64/lib/pkgconfig
+rodar	gerar painel publico (docs/jobs.json)	2026-07-31T11:28:13.6043463Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.13/x64
+rodar	gerar painel publico (docs/jobs.json)	2026-07-31T11:28:13.6044158Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.13/x64
+rodar	gerar painel publico (docs/jobs.json)	2026-07-31T11:28:13.6044569Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.13/x64
+rodar	gerar painel publico (docs/jobs.json)	2026-07-31T11:28:13.6044965Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.13/x64/lib
+rodar	gerar painel publico (docs/jobs.json)	2026-07-31T11:28:13.6045289Z ##[endgroup]
+rodar	gerar painel publico (docs/jobs.json)	2026-07-31T11:28:13.6856068Z exportadas 2224 vagas para docs/jobs.json
+rodar	salvar banco e painel	﻿2026-07-31T11:28:13.6937476Z ##[group]Run git config user.name "radar-bot"
+rodar	salvar banco e painel	2026-07-31T11:28:13.6937848Z ^[[36;1mgit config user.name "radar-bot"^[[0m
+rodar	salvar banco e painel	2026-07-31T11:28:13.6938212Z ^[[36;1mgit config user.email "radar@users.noreply.github.com"^[[0m
+rodar	salvar banco e painel	2026-07-31T11:28:13.6938596Z ^[[36;1mgit add data/radar.db docs/jobs.json^[[0m
+rodar	salvar banco e painel	2026-07-31T11:28:13.6938964Z ^[[36;1mgit commit -m "coleta $(date +%F)" || echo "sem mudancas"^[[0m
+rodar	salvar banco e painel	2026-07-31T11:28:13.6939485Z ^[[36;1mgit push^[[0m
+rodar	salvar banco e painel	2026-07-31T11:28:13.6983628Z shell: /usr/bin/bash -e {0}
+rodar	salvar banco e painel	2026-07-31T11:28:13.6983885Z env:
+rodar	salvar banco e painel	2026-07-31T11:28:13.6984151Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.13/x64
+rodar	salvar banco e painel	2026-07-31T11:28:13.6984637Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.13/x64/lib/pkgconfig
+rodar	salvar banco e painel	2026-07-31T11:28:13.6985076Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.13/x64
+rodar	salvar banco e painel	2026-07-31T11:28:13.7004488Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.13/x64
+rodar	salvar banco e painel	2026-07-31T11:28:13.7005195Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.13/x64
+rodar	salvar banco e painel	2026-07-31T11:28:13.7005768Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.13/x64/lib
+rodar	salvar banco e painel	2026-07-31T11:28:13.7006141Z ##[endgroup]
+rodar	salvar banco e painel	2026-07-31T11:28:14.8834351Z [main 1975807] coleta 2026-07-31
+rodar	salvar banco e painel	2026-07-31T11:28:14.8835020Z  2 files changed, 12 insertions(+), 12 deletions(-)
+rodar	salvar banco e painel	2026-07-31T11:28:18.9859936Z remote: warning: See https://gh.io/lfs for more information.        
+rodar	salvar banco e painel	2026-07-31T11:28:18.9862198Z remote: warning: File data/radar.db is 81.94 MB; this is larger than GitHub's recommended maximum file size of 50.00 MB        
+rodar	salvar banco e painel	2026-07-31T11:28:18.9864284Z remote: warning: GH001: Large files detected. You may want to try Git Large File Storage - https://git-lfs.github.com.        
+rodar	salvar banco e painel	2026-07-31T11:28:18.9866292Z To https://github.com/al-ramos/radar-vagas
+rodar	salvar banco e painel	2026-07-31T11:28:18.9866916Z    b32ccdd..1975807  main -> main
+rodar	Post Run actions/setup-python@v5	﻿2026-07-31T11:28:19.0001044Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+rodar	Post Run actions/setup-python@v5	2026-07-31T11:28:19.0002344Z Post job cleanup.
+rodar	Post Run actions/setup-python@v5	2026-07-31T11:28:19.1207196Z (node:2324) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+rodar	Post Run actions/setup-python@v5	2026-07-31T11:28:19.1208184Z (Use `node --trace-deprecation ...` to show where the warning was created)
+rodar	Post Run actions/checkout@v4	﻿2026-07-31T11:28:19.1411479Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+rodar	Post Run actions/checkout@v4	2026-07-31T11:28:19.1412784Z Post job cleanup.
+rodar	Post Run actions/checkout@v4	2026-07-31T11:28:19.2332022Z [command]/usr/bin/git version
+rodar	Post Run actions/checkout@v4	2026-07-31T11:28:19.2377967Z git version 2.54.0
+rodar	Post Run actions/checkout@v4	2026-07-31T11:28:19.2425101Z Temporarily overriding HOME='/home/runner/work/_temp/f771f9e3-6738-478d-8a9a-6a7b5c1963a3' before making global git config changes
+rodar	Post Run actions/checkout@v4	2026-07-31T11:28:19.2427832Z Adding repository directory to the temporary git global config as a safe directory
+rodar	Post Run actions/checkout@v4	2026-07-31T11:28:19.2431945Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/radar-vagas/radar-vagas
+rodar	Post Run actions/checkout@v4	2026-07-31T11:28:19.2477590Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+rodar	Post Run actions/checkout@v4	2026-07-31T11:28:19.2517465Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+rodar	Post Run actions/checkout@v4	2026-07-31T11:28:19.2791983Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+rodar	Post Run actions/checkout@v4	2026-07-31T11:28:19.2824618Z http.https://github.com/.extraheader
+rodar	Post Run actions/checkout@v4	2026-07-31T11:28:19.2837214Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+rodar	Post Run actions/checkout@v4	2026-07-31T11:28:19.2883242Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+rodar	Post Run actions/checkout@v4	2026-07-31T11:28:19.3146135Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+rodar	Post Run actions/checkout@v4	2026-07-31T11:28:19.3192178Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+rodar	Complete job	﻿2026-07-31T11:28:19.3632877Z Cleaning up orphan processes
+rodar	Complete job	2026-07-31T11:28:19.3943679Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
