@@ -141,7 +141,7 @@ NIVEL_TERMOS = [
 
 
 def senioridade(titulo):
-    t = (titulo or "").lower()
+    t = titulo.lower()
     for termo, nivel in NIVEL_TERMOS:
         if termo in t:
             return nivel
@@ -153,7 +153,7 @@ def senioridade(titulo):
 
 
 def modalidade(texto):
-    t = (texto or "").lower()
+    t = texto.lower()
     if "remoto" in t or "remote" in t or "home office" in t or "anywhere" in t:
         return "remoto"
     if "hibrido" in t or "híbrido" in t or "hybrid" in t:
@@ -191,7 +191,7 @@ def main():
                 dt.datetime.utcnow().isoformat(),
                 200,
                 hashlib.sha1(corpo.encode()).hexdigest(),
-                corpo,
+                corpo[:2000],
             ),
         )
 
@@ -247,7 +247,13 @@ def main():
             (jid, "fechada", HOJE, "ausente na coleta"),
         )
 
+    # limpa capturas brutas antigas (raw_fetch e so auditoria, nao e lido em
+    # nenhum outro lugar - sem isso o banco estoura 100MB no git)
+    limite = HOJE
+    con.execute("DELETE FROM raw_fetch WHERE coletado_em < ?", (limite,))
+
     con.commit()
+    con.execute("VACUUM")
     print(f"novas: {novas} | fechadas: {len(sumidas)}")
 
 
