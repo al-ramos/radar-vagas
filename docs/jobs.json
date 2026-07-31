@@ -1677,7 +1677,7 @@
     "primeira_vez": "2026-07-31",
     "ultima_vez": "2026-07-31",
     "ativo": 1,
-    "avisado": 0
+    "avisado": 1
   },
   {
     "id": 871,
@@ -1693,7 +1693,7 @@
     "primeira_vez": "2026-07-31",
     "ultima_vez": "2026-07-31",
     "ativo": 1,
-    "avisado": 0
+    "avisado": 1
   },
   {
     "id": 1506,
@@ -1709,7 +1709,7 @@
     "primeira_vez": "2026-07-31",
     "ultima_vez": "2026-07-31",
     "ativo": 1,
-    "avisado": 0
+    "avisado": 1
   },
   {
     "id": 1454,
@@ -1725,7 +1725,7 @@
     "primeira_vez": "2026-07-31",
     "ultima_vez": "2026-07-31",
     "ativo": 1,
-    "avisado": 0
+    "avisado": 1
   },
   {
     "id": 1421,
@@ -1741,7 +1741,7 @@
     "primeira_vez": "2026-07-31",
     "ultima_vez": "2026-07-31",
     "ativo": 1,
-    "avisado": 0
+    "avisado": 1
   },
   {
     "id": 1329,
@@ -1757,7 +1757,7 @@
     "primeira_vez": "2026-07-31",
     "ultima_vez": "2026-07-31",
     "ativo": 1,
-    "avisado": 0
+    "avisado": 1
   },
   {
     "id": 1056,
@@ -1773,7 +1773,7 @@
     "primeira_vez": "2026-07-31",
     "ultima_vez": "2026-07-31",
     "ativo": 1,
-    "avisado": 0
+    "avisado": 1
   },
   {
     "id": 1219,
@@ -1789,7 +1789,7 @@
     "primeira_vez": "2026-07-31",
     "ultima_vez": "2026-07-31",
     "ativo": 1,
-    "avisado": 0
+    "avisado": 1
   },
   {
     "id": 1864,
@@ -1805,7 +1805,7 @@
     "primeira_vez": "2026-07-31",
     "ultima_vez": "2026-07-31",
     "ativo": 1,
-    "avisado": 0
+    "avisado": 1
   },
   {
     "id": 2141,
@@ -1821,7 +1821,7 @@
     "primeira_vez": "2026-07-31",
     "ultima_vez": "2026-07-31",
     "ativo": 1,
-    "avisado": 0
+    "avisado": 1
   },
   {
     "id": 479,
@@ -1837,7 +1837,7 @@
     "primeira_vez": "2026-07-31",
     "ultima_vez": "2026-07-31",
     "ativo": 1,
-    "avisado": 0
+    "avisado": 1
   },
   {
     "id": 436,
@@ -1853,7 +1853,7 @@
     "primeira_vez": "2026-07-31",
     "ultima_vez": "2026-07-31",
     "ativo": 1,
-    "avisado": 0
+    "avisado": 1
   },
   {
     "id": 2107,
@@ -5691,6 +5691,22 @@
     "url": "https://job-boards.eu.greenhouse.io/ebury/jobs/4939643101",
     "pontos": 40.8,
     "primeira_vez": "2026-07-30",
+    "ultima_vez": "2026-07-31",
+    "ativo": 1,
+    "avisado": 0
+  },
+  {
+    "id": 2261,
+    "empresa": "Stone",
+    "titulo": "Agente Stone - Consultor(a) Comercial Externo |  Colombo/PR",
+    "senioridade": "nao_informado",
+    "modalidade": "presencial",
+    "local": "Colombo, Parana, Brasil",
+    "stack": "",
+    "publicado_em": "2026-07-31",
+    "url": "https://job-boards.greenhouse.io/stone/jobs/7822673003",
+    "pontos": 40.5,
+    "primeira_vez": "2026-07-31",
     "ultima_vez": "2026-07-31",
     "ativo": 1,
     "avisado": 0
@@ -20816,6 +20832,22 @@
     "avisado": 0
   },
   {
+    "id": 2263,
+    "empresa": "XP Inc",
+    "titulo": "Analista Jr de FP&A | Vaga Afirmativa para Pessoas com Deficiência",
+    "senioridade": "junior",
+    "modalidade": "hibrido",
+    "local": "São Paulo, SP",
+    "stack": "",
+    "publicado_em": "2026-07-31",
+    "url": "https://job-boards.greenhouse.io/xpinc/jobs/8631215002",
+    "pontos": 20.0,
+    "primeira_vez": "2026-07-31",
+    "ultima_vez": "2026-07-31",
+    "ativo": 1,
+    "avisado": 0
+  },
+  {
     "id": 2209,
     "empresa": "Insider Store",
     "titulo": "Staff Product Manager, Subscriptions ",
@@ -28138,6 +28170,22 @@
     "publicado_em": "2026-07-15",
     "url": "https://job-boards.greenhouse.io/gympass/jobs/8592001002",
     "pontos": 14.0,
+    "primeira_vez": "2026-07-31",
+    "ultima_vez": "2026-07-31",
+    "ativo": 1,
+    "avisado": 0
+  },
+  {
+    "id": 2262,
+    "empresa": "XP Inc",
+    "titulo": "Analista Jr de Business Analytics | Vaga Afirmativa para Pessoas com Deficiência",
+    "senioridade": "junior",
+    "modalidade": "presencial",
+    "local": "São Paulo, SP",
+    "stack": "",
+    "publicado_em": "2026-07-31",
+    "url": "https://job-boards.greenhouse.io/xpinc/jobs/8660575002",
+    "pontos": 13.0,
     "primeira_vez": "2026-07-31",
     "ultima_vez": "2026-07-31",
     "ativo": 1,
