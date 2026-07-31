@@ -103,6 +103,8 @@ COLETORES = {
 
 # ------------------------------------------------------------ normalizacao
 def chave(empresa, titulo, local):
+    titulo = titulo or ""
+    local = local or ""
     t = re.sub(r"[^a-z0-9]+", "", titulo.lower())
     base = f"{empresa}|{t}|{local.lower()}"
     return hashlib.sha1(base.encode()).hexdigest()
@@ -123,7 +125,7 @@ NIVEL_TERMOS = [
 
 
 def senioridade(titulo):
-    t = titulo.lower()
+    t = (titulo or "").lower()
     for termo, nivel in NIVEL_TERMOS:
         if termo in t:
             return nivel
@@ -135,7 +137,7 @@ def senioridade(titulo):
 
 
 def modalidade(texto):
-    t = texto.lower()
+    t = (texto or "").lower()
     if "remoto" in t or "remote" in t or "home office" in t or "anywhere" in t:
         return "remoto"
     if "hibrido" in t or "híbrido" in t or "hybrid" in t:
@@ -178,6 +180,7 @@ def main():
         )
 
         for v in vagas:
+            v = {kk: (vv if vv is not None else "") for kk, vv in v.items()}
             if not v["titulo"]:
                 continue
             k = chave(f["empresa"], v["titulo"], v["local"])
