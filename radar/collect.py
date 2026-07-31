@@ -93,11 +93,27 @@ def jsonld(url):
             }
 
 
+def jsonfeed(url):
+    """Feed JSON generico (ex: Apps Script publicando e-mails de vagas).
+    Espera uma lista de objetos com titulo/empresa/local/url/publicado_em/descricao.
+    """
+    for j in get(url).json():
+        yield {
+            "empresa": j.get("empresa", ""),
+            "titulo": j.get("titulo", ""),
+            "local": j.get("local", ""),
+            "url": j.get("url", ""),
+            "publicado_em": (j.get("publicado_em") or "")[:10] or HOJE,
+            "descricao": limpa(j.get("descricao", "")),
+        }
+
+
 COLETORES = {
     "greenhouse": greenhouse,
     "lever": lever,
     "ashby": ashby,
     "jsonld": jsonld,
+    "jsonfeed": jsonfeed,
 }
 
 
@@ -183,7 +199,8 @@ def main():
             v = {kk: (vv if vv is not None else "") for kk, vv in v.items()}
             if not v["titulo"]:
                 continue
-            k = chave(f["empresa"], v["titulo"], v["local"])
+            empresa = v.get("empresa") or f["empresa"]
+            k = chave(empresa, v["titulo"], v["local"])
             texto = f"{v['titulo']} {v['local']} {v['descricao']}"
             linha = con.execute("SELECT id FROM job WHERE chave = ?", (k,)).fetchone()
             if linha:
@@ -198,7 +215,7 @@ def main():
                 " VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
                 (
                     k,
-                    f["empresa"],
+                    empresa,
                     v["titulo"],
                     senioridade(v["titulo"]),
                     modalidade(texto),
