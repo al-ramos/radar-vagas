@@ -1,9 +1,8 @@
-cat > .github/workflows/radar.yml << 'EOF'
 name: radar
 
 on:
   schedule:
-    - cron: "0 11 * * 1-5"   # 08h de Brasilia, dias uteis
+    - cron: "0 11 * * 1-5"
   workflow_dispatch:
 
 permissions:
@@ -45,8 +44,3 @@ jobs:
           git add data/radar.db docs/jobs.json
           git commit -m "coleta $(date +%F)" || echo "sem mudancas"
           git push
-EOF
-git add .github/workflows/radar.yml
-git commit -m "corrige workflow: inclui exportacao do painel"
-git push
-gh workflow run radar.yml --repo al-ramos/radar-vagas
