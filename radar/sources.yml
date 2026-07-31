@@ -1,260 +1,95 @@
-# tipo: greenhouse | lever | ashby | jsonld | pendente
-# id:   identificador na URL do ATS (ou URL completa da pagina de vagas, no caso jsonld)
-#
-# "pendente" = ATS conhecido (Workday/SuccessFactors) mas o coletor v0 nao
-# suporta ainda. Preencha "id" com a URL da pagina de carreiras mesmo assim,
-# para nao perder o dado quando o coletor for adicionado.
-#
-# Big Four e estrategia global
-- { empresa: "Accenture",            tipo: pendente, id: "https://www.accenture.com/br-pt/careers" }
-- { empresa: "Deloitte",              tipo: pendente, id: "https://www2.deloitte.com/br/pt/careers.html" }
-- { empresa: "PwC",                   tipo: pendente, id: "https://www.pwc.com.br/pt/carreiras.html" }
-- { empresa: "EY",                    tipo: pendente, id: "https://www.ey.com/pt_br/careers" }
-- { empresa: "KPMG",                  tipo: pendente, id: "https://kpmg.com/br/pt/home/careers.html" }
-- { empresa: "McKinsey & Company",    tipo: pendente, id: "https://www.mckinsey.com/careers" }
-- { empresa: "BCG",                   tipo: pendente, id: "https://careers.bcg.com/" }
-- { empresa: "Bain & Company",        tipo: pendente, id: "https://www.bain.com/careers/" }
+# gerado por discover.py - apenas empresas com board confirmado
 
-# Big tech / consultoria de TI global
-- { empresa: "IBM Consulting",        tipo: pendente, id: "https://www.ibm.com/br-pt/careers" }
-- { empresa: "Capgemini",             tipo: pendente, id: "https://www.capgemini.com/br-pt/carreiras/" }
-- { empresa: "TCS",                   tipo: pendente, id: "https://www.tcs.com/careers" }
-- { empresa: "Infosys",               tipo: pendente, id: "https://www.infosys.com/careers.html" }
-- { empresa: "Cognizant",             tipo: pendente, id: "https://careers.cognizant.com/" }
-- { empresa: "Wipro",                 tipo: pendente, id: "https://careers.wipro.com/" }
-- { empresa: "HCLTech",               tipo: pendente, id: "https://www.hcltech.com/careers" }
-- { empresa: "DXC Technology",        tipo: pendente, id: "https://dxc.com/br/pt/careers" }
-- { empresa: "Atos",                  tipo: pendente, id: "https://atos.net/en/worldgrid/careers" }
-- { empresa: "NTT Data",              tipo: pendente, id: "https://br.nttdata.com/carreiras" }
-- { empresa: "Globant",               tipo: pendente, id: "https://www.globant.com/careers" }
-- { empresa: "EPAM Systems",          tipo: pendente, id: "https://www.epam.com/careers" }
-- { empresa: "Endava",                tipo: pendente, id: "https://www.endava.com/careers" }
-
-# Grandes players nacionais e scale-ups tech
-- { empresa: "TOTVS",                 tipo: jsonld,   id: "https://carreiras.totvs.com/" }
-- { empresa: "Stefanini",             tipo: jsonld,   id: "https://www.stefanini.com/br/pt/carreiras" }
-- { empresa: "CI&T",                  tipo: greenhouse, id: "ciandt" }
-- { empresa: "Compass UOL",           tipo: jsonld,   id: "https://compass.uol/carreiras/" }
-- { empresa: "Semantix",              tipo: jsonld,   id: "https://semantix.gupy.io/" }
-- { empresa: "Neoway",                tipo: jsonld,   id: "https://neoway.gupy.io/" }
-- { empresa: "Resultados Digitais (RD Station)", tipo: jsonld, id: "https://rdstation.gupy.io/" }
-- { empresa: "Cesar",                 tipo: jsonld,   id: "https://cesar.gupy.io/" }
-- { empresa: "Dextra",                tipo: jsonld,   id: "https://dextra.gupy.io/" }
-- { empresa: "Zup Innovation",        tipo: jsonld,     id: "https://zup.gupy.io/" }
-- { empresa: "Avenue Code",           tipo: jsonld,   id: "https://avenuecode.gupy.io/" }
-- { empresa: "Encora",                tipo: pendente, id: "https://www.encora.com/careers" }
-- { empresa: "Daitan",                tipo: jsonld,   id: "https://daitan.gupy.io/" }
-- { empresa: "Thoughtworks",          tipo: pendente, id: "https://www.thoughtworks.com/en-br/careers" }
-- { empresa: "Nubank",                tipo: greenhouse, id: "nubank" }
-- { empresa: "iFood",                 tipo: jsonld,     id: "https://ifood.gupy.io/" }
-- { empresa: "Mercado Livre",         tipo: pendente, id: "https://www.mercadolivre.com.br/carreiras" }
-- { empresa: "Stone",                 tipo: jsonld,     id: "https://stone.gupy.io/" }
-- { empresa: "PagSeguro",             tipo: jsonld,     id: "https://pagbank.gupy.io/" }
-- { empresa: "Sicredi",               tipo: jsonld,     id: "https://sicredi.gupy.io/" }
-- { empresa: "C6 Bank",               tipo: jsonld,     id: "https://c6bank.gupy.io/" }
-- { empresa: "Loft",                  tipo: greenhouse, id: "loft" }
-- { empresa: "QuintoAndar",           tipo: greenhouse, id: "quintoandar" }
-- { empresa: "VTEX",                  tipo: greenhouse, id: "vtex" }
-- { empresa: "Movile",                tipo: jsonld,   id: "https://movile.gupy.io/" }
-- { empresa: "Locaweb",               tipo: jsonld,     id: "https://locaweb.gupy.io/" }
-- { empresa: "Sensedia",              tipo: jsonld,   id: "https://sensedia.gupy.io/" }
-- { empresa: "Elo7 / Vinted",         tipo: greenhouse, id: "elo7" }
-- { empresa: "Gympass / Wellhub",     tipo: greenhouse, id: "wellhub" }
-- { empresa: "Contabilizei",          tipo: jsonld,     id: "https://contabilizei.gupy.io/" }
-- { empresa: "Creditas",              tipo: greenhouse, id: "creditas" }
-- { empresa: "Neon",                  tipo: jsonld,     id: "https://neon.gupy.io/" }
-- { empresa: "Ebanx",                 tipo: greenhouse, id: "ebanx" }
-- { empresa: "Hotmart",               tipo: jsonld,     id: "https://hotmart.gupy.io/" }
-- { empresa: "Take Blip",             tipo: jsonld,   id: "https://takeblip.gupy.io/" }
-- { empresa: "Dock",                  tipo: jsonld,   id: "https://dock.gupy.io/" }
-
-# Recrutamento e RH/TI (fonte de vaga indireta, nao alvo direto)
-- { empresa: "Robert Half",           tipo: pendente, id: "https://www.roberthalf.com/br/pt/carreiras" }
-- { empresa: "Michael Page",          tipo: pendente, id: "https://www.michaelpage.com.br/carreira" }
-- { empresa: "Hays Brasil",           tipo: pendente, id: "https://www.hays.com.br/carreiras" }
-
-# --- lote 2: mais 50 empresas ---
-
-# Bancos e financeiras (TI interna, quase sempre pendente/Workday-SuccessFactors)
-- { empresa: "Itau Unibanco",         tipo: pendente, id: "https://www.itau.com.br/trabalhe-conosco/" }
-- { empresa: "Bradesco",              tipo: pendente, id: "https://banco.bradesco/html/carreiras/" }
-- { empresa: "Banco do Brasil",       tipo: pendente, id: "https://www.bb.com.br/pbb/carreiras" }
-- { empresa: "Santander Brasil",      tipo: pendente, id: "https://www.santander.com.br/carreiras" }
-- { empresa: "BTG Pactual",           tipo: pendente, id: "https://www.btgpactual.com/carreiras" }
-- { empresa: "XP Inc",                tipo: jsonld,     id: "https://xpinc.gupy.io/" }
-- { empresa: "Inter (Banco Inter)",   tipo: jsonld,     id: "https://bancointer.gupy.io/" }
-- { empresa: "Will Bank",             tipo: jsonld,     id: "https://willbank.gupy.io/" }
-- { empresa: "Cielo",                 tipo: jsonld,     id: "https://cielo.gupy.io/" }
-- { empresa: "Rede (Itau)",           tipo: pendente, id: "https://www.userede.com.br/carreiras" }
-
-# Varejo e marketplaces com times de tech proprios
-- { empresa: "Magazine Luiza (Magalu)", tipo: jsonld,   id: "https://magalu.gupy.io/" }
-- { empresa: "Via (Casas Bahia)",     tipo: jsonld,     id: "https://viavarejo.gupy.io/" }
-- { empresa: "Americanas S.A.",       tipo: jsonld,     id: "https://americanas.gupy.io/" }
-- { empresa: "Natura &Co",            tipo: pendente, id: "https://www.natura.com.br/carreiras" }
-- { empresa: "Renner",                tipo: jsonld,     id: "https://lojasrenner.gupy.io/" }
-- { empresa: "Raia Drogasil",         tipo: jsonld,     id: "https://raiadrogasil.gupy.io/" }
-- { empresa: "Ambev Tech",            tipo: pendente, id: "https://www.ambev.com.br/carreiras/" }
-- { empresa: "Carrefour Brasil",      tipo: jsonld,     id: "https://carrefour.gupy.io/" }
-- { empresa: "GPA (Pao de Acucar)",   tipo: jsonld,     id: "https://gpabr.gupy.io/" }
-- { empresa: "Vivara",                tipo: jsonld,     id: "https://vivara.gupy.io/" }
-
-# Telecom e infraestrutura
-- { empresa: "Vivo (Telefonica Brasil)", tipo: pendente, id: "https://www.telefonica.com.br/carreiras/" }
-- { empresa: "Claro Brasil",          tipo: pendente, id: "https://www.claro.com.br/institucional/carreiras" }
-- { empresa: "TIM Brasil",            tipo: jsonld,     id: "https://tim.gupy.io/" }
-- { empresa: "Algar Tech",            tipo: jsonld,   id: "https://algartech.gupy.io/" }
-- { empresa: "Embratel",              tipo: pendente, id: "https://www.embratel.com.br/carreiras" }
-
-# Scale-ups e nativas digitais adicionais
-- { empresa: "Wildlife Studios",      tipo: greenhouse, id: "wildlifestudios" }
-- { empresa: "Olist",                 tipo: jsonld,     id: "https://olist.gupy.io/" }
-- { empresa: "Arco Educacao",         tipo: jsonld,     id: "https://arcoeducacao.gupy.io/" }
-- { empresa: "Descomplica",           tipo: jsonld,     id: "https://descomplica.gupy.io/" }
-- { empresa: "Foxbit",                tipo: jsonld,   id: "https://foxbit.gupy.io/" }
-- { empresa: "Mercado Bitcoin",       tipo: jsonld,     id: "https://mercadobitcoin.gupy.io/" }
-- { empresa: "Binance Brasil",        tipo: pendente, id: "https://www.binance.com/en/careers" }
-- { empresa: "Nuvemshop",             tipo: greenhouse, id: "nuvemshop" }
-- { empresa: "ContaAzul",             tipo: jsonld,   id: "https://contaazul.gupy.io/" }
-- { empresa: "Omie",                  tipo: jsonld,   id: "https://omie.gupy.io/" }
-- { empresa: "Conta Simples",         tipo: greenhouse, id: "contasimples" }
-- { empresa: "Pipefy",                tipo: greenhouse, id: "pipefy" }
-- { empresa: "Runrun.it",             tipo: jsonld,   id: "https://runrunit.gupy.io/" }
-- { empresa: "Superlogica",           tipo: jsonld,     id: "https://superlogica.gupy.io/" }
-- { empresa: "Linx (Stone)",          tipo: jsonld,   id: "https://linx.gupy.io/" }
-- { empresa: "TIVIT",                 tipo: jsonld,   id: "https://tivit.gupy.io/" }
-- { empresa: "Positivo Tecnologia",   tipo: jsonld,     id: "https://positivo.gupy.io/" }
-- { empresa: "Softplan",              tipo: jsonld,   id: "https://softplan.gupy.io/" }
-- { empresa: "Sankhya",               tipo: jsonld,   id: "https://sankhya.gupy.io/" }
-- { empresa: "Senior Sistemas",       tipo: jsonld,     id: "https://senior.gupy.io/" }
-
-# Consultorias de nicho / dados / IA
-- { empresa: "Indicium",              tipo: greenhouse, id: "indicium" }
-- { empresa: "Alura",                 tipo: jsonld,     id: "https://alura.gupy.io/" }
-- { empresa: "DIO (Digital Innovation One)", tipo: jsonld, id: "https://dio.gupy.io/" }
-- { empresa: "Rocketseat",            tipo: jsonld,   id: "https://rocketseat.gupy.io/" }
-
-# --- lote 3: mais 91 empresas ---
-
-# Seguradoras e saude
-- { empresa: "Porto Seguro",          tipo: jsonld,   id: "https://portoseguro.gupy.io/" }
-- { empresa: "SulAmerica",            tipo: jsonld,   id: "https://sulamerica.gupy.io/" }
-- { empresa: "Bradesco Seguros",      tipo: pendente, id: "https://banco.bradesco/html/carreiras/" }
-- { empresa: "Hapvida",               tipo: jsonld,   id: "https://hapvida.gupy.io/" }
-- { empresa: "NotreDame Intermedica", tipo: jsonld,   id: "https://gndi.gupy.io/" }
-- { empresa: "Rede D'Or",             tipo: jsonld,   id: "https://rededorsaoluiz.gupy.io/" }
-- { empresa: "Fleury",                tipo: jsonld,   id: "https://grupofleury.gupy.io/" }
-- { empresa: "Dasa",                  tipo: jsonld,   id: "https://dasa.gupy.io/" }
-- { empresa: "Amil",                  tipo: pendente, id: "https://www.amil.com.br/carreiras" }
-- { empresa: "Alice (saude)",         tipo: greenhouse, id: "alicesaude" }
-- { empresa: "Sami Saude",            tipo: greenhouse, id: "samisaude" }
-
-# Agro e industria
-- { empresa: "JBS",                   tipo: pendente, id: "https://jbs.com.br/carreiras" }
-- { empresa: "BRF",                   tipo: jsonld,   id: "https://brf.gupy.io/" }
-- { empresa: "Suzano",                tipo: pendente, id: "https://www.suzano.com.br/carreiras" }
-- { empresa: "Klabin",                tipo: jsonld,   id: "https://klabin.gupy.io/" }
-- { empresa: "Vale",                  tipo: pendente, id: "https://vale.com/carreiras" }
-- { empresa: "Gerdau",                tipo: pendente, id: "https://www.gerdau.com/carreiras/" }
-- { empresa: "WEG",                   tipo: pendente, id: "https://www.weg.net/institutional/BR/pt/careers" }
-- { empresa: "Embraer",               tipo: pendente, id: "https://embraer.com/br/pt/carreiras" }
-- { empresa: "Raizen",                tipo: jsonld,   id: "https://raizen.gupy.io/" }
-- { empresa: "Cosan",                 tipo: jsonld,   id: "https://cosan.gupy.io/" }
-
-# Energia e utilities
-- { empresa: "Petrobras",             tipo: pendente, id: "https://petrobras.com.br/pt/quem-somos/trabalhe-conosco/" }
-- { empresa: "Eletrobras",            tipo: pendente, id: "https://eletrobras.com/pt/Paginas/Carreiras.aspx" }
-- { empresa: "Engie Brasil",          tipo: jsonld,   id: "https://engie.gupy.io/" }
-- { empresa: "Neoenergia",            tipo: jsonld,   id: "https://neoenergia.gupy.io/" }
-- { empresa: "CPFL Energia",          tipo: jsonld,   id: "https://cpfl.gupy.io/" }
-- { empresa: "Equatorial Energia",    tipo: jsonld,   id: "https://equatorialenergia.gupy.io/" }
-
-# Logistica e mobilidade
-- { empresa: "Rappi Brasil",          tipo: greenhouse, id: "rappi" }
-- { empresa: "99 (Didi)",             tipo: greenhouse, id: "99app" }
-- { empresa: "Loggi",                 tipo: greenhouse, id: "loggi" }
-- { empresa: "JadLog",                tipo: jsonld,   id: "https://jadlog.gupy.io/" }
-- { empresa: "Localiza",              tipo: jsonld,   id: "https://localiza.gupy.io/" }
-- { empresa: "Movida",                tipo: jsonld,   id: "https://movida.gupy.io/" }
-- { empresa: "Azul Linhas Aereas",    tipo: jsonld,   id: "https://voeazul.gupy.io/" }
-- { empresa: "Gol Linhas Aereas",     tipo: jsonld,   id: "https://voegol.gupy.io/" }
-- { empresa: "Latam Airlines Brasil", tipo: pendente, id: "https://www.latamairlinesgroup.net/pt/carreiras" }
-- { empresa: "Cargill Brasil",        tipo: pendente, id: "https://www.cargill.com.br/pt_br/carreiras" }
-
-# Educacao e edtechs
-- { empresa: "Cogna Educacao",        tipo: jsonld,   id: "https://cogna.gupy.io/" }
-- { empresa: "Yduqs",                 tipo: jsonld,   id: "https://yduqs.gupy.io/" }
-- { empresa: "Afya",                  tipo: jsonld,   id: "https://afya.gupy.io/" }
-- { empresa: "Ser Educacional",       tipo: jsonld,   id: "https://sereducacional.gupy.io/" }
-- { empresa: "Google Brasil",         tipo: pendente, id: "https://www.google.com/about/careers/applications/" }
-- { empresa: "Microsoft Brasil",      tipo: pendente, id: "https://careers.microsoft.com/" }
-- { empresa: "Amazon Brasil",         tipo: pendente, id: "https://www.amazon.jobs/en/locations/brazil" }
-- { empresa: "Meta Brasil",           tipo: pendente, id: "https://www.metacareers.com/" }
-- { empresa: "Oracle Brasil",         tipo: pendente, id: "https://www.oracle.com/br/careers/" }
-- { empresa: "SAP Brasil",            tipo: pendente, id: "https://jobs.sap.com/" }
-- { empresa: "Salesforce Brasil",     tipo: pendente, id: "https://www.salesforce.com/company/careers/" }
-- { empresa: "Cisco Brasil",          tipo: pendente, id: "https://jobs.cisco.com/" }
-- { empresa: "Dell Brasil",           tipo: pendente, id: "https://jobs.dell.com/" }
-- { empresa: "Huawei Brasil",         tipo: pendente, id: "https://career.huawei.com/" }
-- { empresa: "Samsung Brasil",        tipo: pendente, id: "https://www.samsung.com/br/careers/" }
-- { empresa: "Lenovo Brasil",         tipo: pendente, id: "https://jobs.lenovo.com/" }
-- { empresa: "Motorola Mobility Brasil", tipo: pendente, id: "https://motorola.wd1.myworkdayjobs.com/" }
-- { empresa: "Positivo Informatica",  tipo: jsonld,   id: "https://grupopositivo.gupy.io/" }
-
-# Integradoras / system integrators / BPO de TI
-- { empresa: "Elo Group",             tipo: jsonld,   id: "https://elogroup.gupy.io/" }
-- { empresa: "Zetta Health Analytics", tipo: greenhouse, id: "zetta" }
-- { empresa: "Sonda IT",              tipo: pendente, id: "https://www.sonda.com/pt/carreira" }
-- { empresa: "Serpro",                tipo: pendente, id: "https://www.serpro.gov.br/menu/carreira" }
-- { empresa: "Dataprev",              tipo: pendente, id: "https://www.gov.br/dataprev/pt-br/acesso-a-informacao/trabalhe-conosco" }
-- { empresa: "Prodam SP",             tipo: pendente, id: "https://www.prodam.sp.gov.br/carreiras" }
-- { empresa: "Padrao Sistemas",       tipo: jsonld,   id: "https://padrao.gupy.io/" }
-- { empresa: "Selbetti Tecnologia",   tipo: jsonld,   id: "https://selbetti.gupy.io/" }
-- { empresa: "Neurotech",             tipo: jsonld,   id: "https://neurotech.gupy.io/" }
-- { empresa: "SIDIA (Samsung R&D)",   tipo: jsonld,   id: "https://sidia.gupy.io/" }
-
-# Fintechs e pagamentos adicionais
-- { empresa: "Pismo",                 tipo: greenhouse, id: "pismo" }
-- { empresa: "Celcoin",               tipo: greenhouse, id: "celcoin" }
-- { empresa: "Klarna Brasil",         tipo: greenhouse, id: "klarna" }
-- { empresa: "Ripio Brasil",          tipo: greenhouse, id: "ripio" }
-- { empresa: "Mercado Pago",          tipo: pendente, id: "https://www.mercadolivre.com.br/carreiras" }
-- { empresa: "Getnet (Santander)",    tipo: pendente, id: "https://www.santander.com.br/carreiras" }
-- { empresa: "Ebury Brasil",          tipo: greenhouse, id: "ebury" }
-- { empresa: "Konduto",               tipo: jsonld,   id: "https://konduto.gupy.io/" }
-- { empresa: "Zenklub",               tipo: greenhouse, id: "zenklub" }
-
-# SaaS e devtools brasileiros
-- { empresa: "Blip (Take)",           tipo: jsonld,   id: "https://takeblip.gupy.io/" }
-- { empresa: "Tally / Docket",        tipo: greenhouse, id: "docket" }
-- { empresa: "Trybe",                 tipo: greenhouse, id: "betrybe" }
-- { empresa: "Hurb",                  tipo: greenhouse, id: "hurb" }
-- { empresa: "99Freelas",             tipo: jsonld,   id: "https://99freelas.gupy.io/" }
-- { empresa: "Beblue",                tipo: jsonld,   id: "https://beblue.gupy.io/" }
-- { empresa: "GetNinjas",             tipo: greenhouse, id: "getninjas" }
-- { empresa: "Justto",                tipo: greenhouse, id: "justto" }
-
-# Consultorias e recrutamento adicionais
-- { empresa: "Adecco Brasil",         tipo: pendente, id: "https://www.adecco.com.br/vagas" }
-- { empresa: "Randstad Brasil",       tipo: pendente, id: "https://www.randstad.com.br/candidatos/vagas/" }
-- { empresa: "ManpowerGroup Brasil",  tipo: pendente, id: "https://www.manpowergroup.com.br/vagas" }
-- { empresa: "LHH Brasil",            tipo: pendente, id: "https://www.lhh.com/br/pt/" }
-- { empresa: "Gi Group Brasil",       tipo: pendente, id: "https://www.gigroup.com.br/vagas/" }
-- { empresa: "Great Place to Work Brasil", tipo: jsonld, id: "https://gptw.gupy.io/" }
-- { empresa: "Falconi Consultores",   tipo: jsonld,   id: "https://falconi.gupy.io/" }
-- { empresa: "Grupo Solides",         tipo: jsonld,   id: "https://solides.gupy.io/" }
-- { empresa: "Ci&T Consulting (2a unidade)", tipo: greenhouse, id: "ciandtconsulting" }
-- { empresa: "DB1 Global Software",   tipo: jsonld,   id: "https://db1.gupy.io/" }
-
-# Mais scale-ups e startups de tech
-- { empresa: "Facily",                tipo: greenhouse, id: "facily" }
-- { empresa: "Shopper.com",           tipo: greenhouse, id: "shopper" }
-- { empresa: "Loft Labs",             tipo: greenhouse, id: "loftlabs" }
-- { empresa: "Kovi",                  tipo: greenhouse, id: "kovi" }
-- { empresa: "Cortex Intelligence",   tipo: jsonld,   id: "https://cortex.gupy.io/" }
-- { empresa: "Datarisk",              tipo: greenhouse, id: "datarisk" }
-- { empresa: "Recharge.com Brasil",   tipo: greenhouse, id: "recharge" }
-- { empresa: "Vitru Educacao",        tipo: jsonld,   id: "https://vitru.gupy.io/" }
-- { empresa: "Vitta (health)",        tipo: greenhouse, id: "vitta" }
-- { empresa: "Loomi",                 tipo: greenhouse, id: "loomi" }
-- { empresa: "Vindi",                 tipo: jsonld,   id: "https://vindi.gupy.io/" }
+- empresa: BCG
+  tipo: greenhouse
+  id: bcg
+- empresa: TCS
+  tipo: greenhouse
+  id: tcs
+- empresa: Thoughtworks
+  tipo: greenhouse
+  id: thoughtworks
+- empresa: Nubank
+  tipo: ashby
+  id: nubank
+- empresa: Stone
+  tipo: greenhouse
+  id: stone
+- empresa: C6 Bank
+  tipo: greenhouse
+  id: c6bank
+- empresa: QuintoAndar
+  tipo: greenhouse
+  id: quintoandar
+- empresa: VTEX
+  tipo: greenhouse
+  id: vtex
+- empresa: Gympass
+  tipo: greenhouse
+  id: gympass
+- empresa: Neon
+  tipo: lever
+  id: neon
+- empresa: Ebanx
+  tipo: greenhouse
+  id: ebanx
+- empresa: Wildlife Studios
+  tipo: greenhouse
+  id: wildlifestudios
+- empresa: Arco Educacao
+  tipo: greenhouse
+  id: arco
+- empresa: Binance
+  tipo: greenhouse
+  id: binance
+- empresa: Azul
+  tipo: lever
+  id: azul
+- empresa: Elo Group
+  tipo: greenhouse
+  id: elo
+- empresa: Cortex Intelligence
+  tipo: greenhouse
+  id: cortex
+- empresa: Vitta
+  tipo: greenhouse
+  id: vitta
+- empresa: BTG Pactual
+  tipo: greenhouse
+  id: btgpactual
+- empresa: XP Inc
+  tipo: greenhouse
+  id: xpinc
+- empresa: Inter
+  tipo: greenhouse
+  id: inter
+- empresa: Via
+  tipo: greenhouse
+  id: via
+- empresa: Braskem
+  tipo: greenhouse
+  id: braskem
+- empresa: Minerva Foods
+  tipo: ashby
+  id: minerva
+- empresa: Banco Pan
+  tipo: greenhouse
+  id: bancopan
+- empresa: Clear Corretora
+  tipo: greenhouse
+  id: clear
+- empresa: Warren Investimentos
+  tipo: ashby
+  id: warren
+- empresa: Nomad
+  tipo: ashby
+  id: nomad
+- empresa: Insider Store
+  tipo: greenhouse
+  id: insider
+- empresa: Shein Brasil
+  tipo: greenhouse
+  id: shein
+- empresa: New Balance Brasil
+  tipo: greenhouse
+  id: new
