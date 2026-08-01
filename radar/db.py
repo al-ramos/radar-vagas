@@ -28,12 +28,25 @@ class _CursorLibsql:
 class _ConexaoLibsql:
     def __init__(self, url, token):
         import libsql_experimental as libsql
+        self._url = url
+        self._token = token
+        self._libsql = libsql
         self._conn = libsql.connect(database=url, auth_token=token)
         self._conn.execute("PRAGMA foreign_keys = OFF")
+
+    def _reconectar(self):
+        self._conn = self._libsql.connect(database=self._url, auth_token=self._token)
         self._conn.execute("PRAGMA foreign_keys = OFF")
 
     def execute(self, sql, params=()):
-        result = self._conn.execute(sql, tuple(params) if params else ())
+        try:
+            result = self._conn.execute(sql, tuple(params) if params else ())
+        except ValueError as e:
+            if "stream not found" in str(e) or "Hrana" in str(e):
+                self._reconectar()
+                result = self._conn.execute(sql, tuple(params) if params else ())
+            else:
+                raise
         return _CursorLibsql(result)
 
     def executemany(self, sql, seq_params):
