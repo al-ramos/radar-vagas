@@ -136,8 +136,6 @@
     </select>
     <button id="limpar">Limpar filtros</button>
     <hr class="sep">
-    <label>Minhas stacks <span style="font-weight:400; color:var(--neutral-700);">(usado na análise de cada vaga)</span></label>
-    <input type="text" id="minhasStacks" placeholder="ex: python, aws, kubernetes">
     <label>E-mail para envio</label>
     <input type="email" id="emailDestino" placeholder="voce@exemplo.com">
     <button id="prepararEmail" class="primary" type="button">✉ Preparar e-mail das selecionadas</button>
@@ -309,7 +307,7 @@ function dataAbs(iso){
   if(!iso) return '';
   const d = new Date(iso+'T00:00:00');
   if (Number.isNaN(d.getTime())) return '';
-  return d.toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit' });
+  return d.toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit', year:'numeric' });
 }
 function dataRel(iso){
   if(!iso) return '-';
@@ -320,7 +318,7 @@ function dataRel(iso){
   return d+' dias';
 }
 function meuPerfil(){
-  return (document.getElementById('minhasStacks').value||'').split(',').map(s=>s.trim().toLowerCase()).filter(Boolean);
+  return Array.from(stacksAtivas || []).map(s=>s.trim().toLowerCase()).filter(Boolean);
 }
 function stackHtmlComMatch(j){
   const perfil = meuPerfil();
@@ -409,7 +407,7 @@ function render(){
   document.getElementById('stTopLabel').textContent = 'empresa com mais vagas (' + topN + ')';
 
   const ultima = JOBS.reduce((m,j)=> (j.ultima_vez>m ? j.ultima_vez : m), '');
-  document.getElementById('stAtt').textContent = ultima || '-';
+  document.getElementById('stAtt').textContent = ultima ? dataAbs(ultima) : '-';
 
   window.__filtradas = filtradas;
   document.getElementById('selTodas').checked = filtradas.length > 0 && filtradas.every(j => selecionadas.has(chaveJob(j)));
@@ -495,7 +493,6 @@ function atualizar(){
 ['fTexto','fCategoria','fFonte','fSenioridade','fModalidade','fCorte','fOrdenar'].forEach(id=>{
   document.getElementById(id).addEventListener('input', atualizar);
 });
-document.getElementById('minhasStacks').addEventListener('input', () => { localStorage.setItem('radar-vagas-minhas-stacks', document.getElementById('minhasStacks').value); render(); });
 document.querySelectorAll('th.sortable').forEach(th=>{
   th.addEventListener('click', () => {
     const campo = th.dataset.ord;
@@ -534,7 +531,6 @@ const EMAIL_KEY = 'radar-vagas-email-destino';
 const emailInput = document.getElementById('emailDestino');
 emailInput.value = localStorage.getItem(EMAIL_KEY) || '';
 emailInput.addEventListener('change', () => localStorage.setItem(EMAIL_KEY, emailInput.value.trim()));
-document.getElementById('minhasStacks').value = localStorage.getItem('radar-vagas-minhas-stacks') || '';
 
 document.getElementById('prepararEmail').addEventListener('click', () => {
   const destino = emailInput.value.trim();
