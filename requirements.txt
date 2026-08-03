@@ -1,4 +1,4 @@
 requests
 PyYAML
 selectolax
-libsql-experimental
+libsql-client
