@@ -3,14 +3,13 @@ import datetime as dt
 import os
 import re
 
-import yaml
+import perfil_remoto
 
 import db
 
 AQUI = os.path.dirname(os.path.abspath(__file__))
 
-with open(os.path.join(AQUI, "profile.yml")) as fh:
-    P = yaml.safe_load(fh)
+P = perfil_remoto.carregar()
 
 NIVEIS = {"estagio": 0, "junior": 1, "pleno": 2, "senior": 3, "especialista": 4}
 

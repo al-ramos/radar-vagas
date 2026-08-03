@@ -14,20 +14,28 @@ Setup (gratuito, tier de teste):
 import os
 
 import requests
-import yaml
+
+import perfil_remoto
 
 import db
 
 AQUI = os.path.dirname(os.path.abspath(__file__))
 
-with open(os.path.join(AQUI, "profile.yml")) as fh:
-    P = yaml.safe_load(fh)
+P = perfil_remoto.carregar()
 
 TOKEN = os.environ["WHATSAPP_TOKEN"]
 PHONE_ID = os.environ["WHATSAPP_PHONE_ID"]
 TO = os.environ["WHATSAPP_TO"]
 CORTE = P.get("corte", 55)
+DOMINIO = set((P.get("domino") or []))
 LIMITE_MSG = 4000  # margem de seguranca abaixo do limite de 4096 da API
+
+
+def bate_com_perfil(stack):
+    if not DOMINIO:
+        return True
+    itens = {s.strip().lower() for s in (stack or "").split(",") if s.strip()}
+    return bool(itens & DOMINIO)
 
 
 def main():
@@ -35,9 +43,10 @@ def main():
     linhas = con.execute(
         "SELECT id, empresa, titulo, local, stack, pontos, url FROM job"
         " WHERE ativo = 1 AND avisado = 0 AND pontos >= ?"
-        " ORDER BY pontos DESC LIMIT 12",
+        " ORDER BY pontos DESC LIMIT 40",
         (CORTE,),
     ).fetchall()
+    linhas = [l for l in linhas if bate_com_perfil(l[4])][:12]
 
     if not linhas:
         print("nada a avisar")
