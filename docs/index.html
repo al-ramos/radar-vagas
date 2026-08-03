@@ -186,11 +186,11 @@
       <div class="d-flex flex-wrap gap-2 mb-2" id="categoriaChips"></div>
       <div class="d-flex flex-wrap gap-2 mb-3" id="chips"></div>
 
-      <div class="d-flex justify-content-between align-items-center mb-2 sticky-top bg-white py-2" style="top:0; z-index:10;">
-        <div class="d-flex align-items-center gap-3">
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2 sticky-top bg-white py-2" style="top:0; z-index:10;">
+        <div class="d-flex align-items-center gap-3 flex-wrap">
           <div class="form-check mb-0">
             <input class="form-check-input" type="checkbox" id="selTodas">
-            <label class="form-check-label small" for="selTodas">selecionar todas as exibidas</label>
+            <label class="form-check-label small" for="selTodas">selecionar todas</label>
           </div>
           <span class="small text-muted" id="selContagem">0 selecionadas</span>
           <button class="btn btn-link btn-sm p-0" type="button" data-bs-toggle="collapse" data-bs-target="#areaProcessadas">
@@ -202,8 +202,13 @@
             <button type="button" class="btn btn-primary" id="btnViewTabela">📄 Tabela</button>
             <button type="button" class="btn btn-outline-primary" id="btnViewKanban">🗂️ Kanban</button>
           </div>
-          <button class="btn btn-outline-secondary btn-sm" id="btnExportarCsv" type="button">⬇ Exportar CSV</button>
-          <button class="btn btn-outline-secondary btn-sm" id="btnDiagnosticoLote" type="button">🤖 Diagnosticar selecionadas</button>
+          <div class="dropdown">
+            <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">⋯ Mais ações</button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><button class="dropdown-item" id="btnExportarCsv" type="button">⬇ Exportar CSV</button></li>
+              <li><button class="dropdown-item" id="btnDiagnosticoLote" type="button">🤖 Diagnosticar selecionadas</button></li>
+            </ul>
+          </div>
         </div>
       </div>
 
@@ -1295,11 +1300,12 @@ function montarCategoriaChips(){
   JOBS.forEach(j => { contagem[j._categoria] = (contagem[j._categoria]||0) + 1; });
   const catAtual = document.getElementById('fCategoria').value;
   el.innerHTML = '';
+  el.className = 'd-flex flex-nowrap gap-2 mb-2 overflow-auto pb-1';
   Object.keys(CATEGORIA_LABEL).forEach(cat => {
     if (!contagem[cat]) return;
     const b = document.createElement('button');
     b.type = 'button';
-    b.className = 'btn btn-sm ' + (catAtual === cat ? 'btn-primary' : 'btn-outline-secondary');
+    b.className = 'btn btn-sm flex-shrink-0 ' + (catAtual === cat ? 'btn-primary' : 'btn-outline-secondary');
     b.textContent = `${CATEGORIA_LABEL[cat]} (${contagem[cat]})`;
     b.addEventListener('click', () => {
       document.getElementById('fCategoria').value = (catAtual === cat) ? 'todas' : cat;
