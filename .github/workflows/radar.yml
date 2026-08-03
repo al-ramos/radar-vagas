@@ -23,6 +23,8 @@ jobs:
 
       - run: pip install -r requirements.txt
 
+      - run: python radar/migrar_status.py
+
       - run: python radar/collect.py
 
       - run: python radar/score.py
