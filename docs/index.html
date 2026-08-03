@@ -793,39 +793,41 @@ document.getElementById('abrirPerfil').addEventListener('click', () => new boots
 
 // --- IA: traducao e diagnostico ---
 const OPENAI_KEY_KEY = 'radar-vagas-openai-key';
+function openaiKeyKey(){ const u = usuarioAtual(); return OPENAI_KEY_KEY + ':' + (u ? u.email : 'anon'); }
 document.getElementById('abrirConfigIa').addEventListener('click', () => {
-  document.getElementById('cfgOpenaiKey').value = localStorage.getItem(OPENAI_KEY_KEY) || '';
+  document.getElementById('cfgOpenaiKey').value = localStorage.getItem(openaiKeyKey()) || '';
   new bootstrap.Modal('#modalConfigIa').show();
 });
 atualizarBadgeIa();
 document.getElementById('cfgOpenaiSalvar').addEventListener('click', () => {
   const k = document.getElementById('cfgOpenaiKey').value.trim();
-  if (k) localStorage.setItem(OPENAI_KEY_KEY, k);
+  if (k) localStorage.setItem(openaiKeyKey(), k);
   bootstrap.Modal.getInstance(document.getElementById('modalConfigIa')).hide();
 });
 document.getElementById('cfgOpenaiLimpar').addEventListener('click', () => {
-  localStorage.removeItem(OPENAI_KEY_KEY);
+  localStorage.removeItem(openaiKeyKey());
   document.getElementById('cfgOpenaiKey').value = '';
 });
-function iaConfigurada(){ return !!localStorage.getItem(OPENAI_KEY_KEY); }
+function iaConfigurada(){ return !!localStorage.getItem(openaiKeyKey()); }
 const IA_USO_KEY = 'radar-vagas-ia-uso';
+function iaUsoKey(){ const u = usuarioAtual(); return IA_USO_KEY + ':' + (u ? u.email : 'anon'); }
 function registrarUsoIa(){
   const hoje = new Date().toISOString().slice(0,10);
-  let d = {}; try { d = JSON.parse(localStorage.getItem(IA_USO_KEY) || '{}'); } catch { d = {}; }
+  let d = {}; try { d = JSON.parse(localStorage.getItem(iaUsoKey()) || '{}'); } catch { d = {}; }
   d[hoje] = (d[hoje]||0) + 1;
-  localStorage.setItem(IA_USO_KEY, JSON.stringify(d));
+  localStorage.setItem(iaUsoKey(), JSON.stringify(d));
   atualizarBadgeIa();
 }
 function usoIaHoje(){
   const hoje = new Date().toISOString().slice(0,10);
-  let d = {}; try { d = JSON.parse(localStorage.getItem(IA_USO_KEY) || '{}'); } catch { d = {}; }
+  let d = {}; try { d = JSON.parse(localStorage.getItem(iaUsoKey()) || '{}'); } catch { d = {}; }
   return d[hoje] || 0;
 }
 function atualizarBadgeIa(){
   document.getElementById('abrirConfigIa').textContent = `🤖 IA (${usoIaHoje()} hoje)`;
 }
 function chamarOpenAI(mensagens){
-  const key = localStorage.getItem(OPENAI_KEY_KEY);
+  const key = localStorage.getItem(openaiKeyKey());
   if (!key){ new bootstrap.Modal('#modalConfigIa').show(); return Promise.reject(new Error('sem chave')); }
   return fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
@@ -920,9 +922,9 @@ document.getElementById('btnExportarCsv').addEventListener('click', () => {
   if (!lista.length) lista = window.__filtradas || [];
   if (!lista.length){ alert('Nenhuma vaga para exportar.'); return; }
   const cab = ['titulo','empresa','local','modalidade','senioridade','pontos','status','url'];
-  const linhas = [cab.join(',')];
+  const linhas = [cab.join(';')];
   lista.forEach(j => {
-    linhas.push([j.titulo, j.empresa, j.local, j.modalidade, j.senioridade, Math.round(j.pontos||0), statusEfetivo(j)||'-', j.url].map(csvEscape).join(','));
+    linhas.push([j.titulo, j.empresa, j.local, j.modalidade, j.senioridade, Math.round(j.pontos||0), statusEfetivo(j)||'-', j.url].map(csvEscape).join(';'));
   });
   const blob = new Blob(['\ufeff' + linhas.join('\n')], { type: 'text/csv;charset=utf-8;' });
   const a = document.createElement('a');
