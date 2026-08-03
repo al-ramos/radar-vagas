@@ -417,7 +417,7 @@
     <div class="modal-content">
       <div class="modal-header"><h5 class="modal-title">Sincronizar com o banco (Turso)</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
       <div class="modal-body">
-        <p class="small text-muted">Grava lida/candidatei/descartei direto no Turso, além do navegador.</p>
+        <p class="small text-muted">Usado só pra sincronizar "Meu perfil" entre dispositivos (necessário pra pontuação e alerta funcionarem certo). Marcar lida/candidatei/descartar e diagnóstico de IA ficam só neste navegador.</p>
         <div class="alert alert-warning small">⚠ O token fica salvo só neste navegador, mas dá acesso de escrita ao banco. Evite compartilhar este link enquanto a sincronização estiver ativa.</div>
         <label class="form-label small fw-bold">URL do banco (TURSO_DATABASE_URL)</label>
         <input type="text" class="form-control mb-2" id="syncUrl" placeholder="libsql://radar-vagas-....turso.io">
@@ -475,16 +475,20 @@ let statusMap = new Map(Object.entries(JSON.parse(localStorage.getItem(STATUS_KE
 let lidaMap = new Map(Object.entries(JSON.parse(localStorage.getItem(LIDA_KEY) || '{}')));
 let msalInstance = null;
 let analisadasSet = new Set();
+const DIAGNOSTICO_LOCAL_KEY = 'radar-vagas-diagnosticos';
+function diagnosticosLocais(){ try { return JSON.parse(localStorage.getItem(DIAGNOSTICO_LOCAL_KEY) || '{}'); } catch { return {}; } }
+function salvarDiagnosticoLocal(k, texto){
+  const d = diagnosticosLocais();
+  d[k] = { texto, gerado_em: new Date().toISOString() };
+  localStorage.setItem(DIAGNOSTICO_LOCAL_KEY, JSON.stringify(d));
+  analisadasSet.add(k);
+}
 function ehProcessada(j){
   return lidaEfetiva(j) || !!statusEfetivo(j) || analisadasSet.has(chaveJob(j));
 }
 function carregarAnalisadas(){
-  const u = usuarioAtual();
-  if (!u || !syncConfigurada()) return;
-  tursoQuery('SELECT job_id FROM diagnostico_ia WHERE usuario_email = ?', [u.email]).then(linhas => {
-    analisadasSet = new Set(linhas.map(l => String(l.job_id)));
-    render();
-  });
+  analisadasSet = new Set(Object.keys(diagnosticosLocais()));
+  render();
 }
 
 // --- login / cadastro ---
@@ -657,19 +661,10 @@ function tursoQuery(sql, args){
     return result.rows.map(row => { const obj={}; cols.forEach((c,i)=>obj[c]=tursoValor(row[i])); return obj; });
   }).catch(err => { console.warn('leitura turso falhou', err); return []; });
 }
-function atualizarStatusRemoto(j){
-  const id = j.id;
-  if (id == null) return;
-  const u = usuarioAtual();
-  tursoExec(
-    'UPDATE job SET lida = ?, status_usuario = ?, status_atualizado_em = ?, usuario_email = ? WHERE id = ?',
-    [getLida(chaveJob(j)) ? 1 : 0, getStatus(chaveJob(j)), new Date().toISOString(), u ? u.email : null, id]
-  );
-}
 function atualizarBadgeSync(){
   const b = document.getElementById('syncBadge');
-  if (syncConfigurada()){ b.textContent = '☁ Sincronizado com o banco'; b.className = 'btn btn-success btn-sm w-100 mb-3'; }
-  else { b.textContent = '☁ Sincronização desligada'; b.className = 'btn btn-outline-secondary btn-sm w-100 mb-3'; }
+  if (syncConfigurada()){ b.textContent = '☁ Perfil sincronizado com o banco'; b.className = 'btn btn-success btn-sm w-100 mb-3'; }
+  else { b.textContent = '☁ Sincronização do perfil desligada'; b.className = 'btn btn-outline-secondary btn-sm w-100 mb-3'; }
 }
 
 // --- status / lida ---
@@ -681,7 +676,6 @@ function setStatus(k, valor, j){
   else if (valor) statusMap.set(k, valor);
   else statusMap.delete(k);
   persistirStatus();
-  if (j) atualizarStatusRemoto(j);
   render();
 }
 function persistirLida(){ localStorage.setItem(LIDA_KEY, JSON.stringify(Object.fromEntries(lidaMap))); }
@@ -690,7 +684,6 @@ function marcarLida(k, valor, j, silencioso){
   if (!silencioso && !exigirLogin()) return;
   if (valor) lidaMap.set(k, true); else lidaMap.delete(k);
   persistirLida();
-  if (j) atualizarStatusRemoto(j);
   render();
 }
 
@@ -971,10 +964,8 @@ document.getElementById('btnDiagnosticoIa').addEventListener('click', () => {
     box.classList.remove('d-none');
     box.dataset.textoAtual = resultado;
     if (exigirLogin() && j.id != null){
-      const u = usuarioAtual();
-      tursoExec('INSERT INTO diagnostico_ia (usuario_email, job_id, texto, gerado_em) VALUES (?, ?, ?, ?) ON CONFLICT(usuario_email, job_id) DO UPDATE SET texto=excluded.texto, gerado_em=excluded.gerado_em',
-        [u.email, j.id, resultado, new Date().toISOString()]);
-      analisadasSet.add(chaveJob(j));
+      const k = chaveJob(j);
+      salvarDiagnosticoLocal(k, resultado);
       render();
     }
   }).catch(err => alert('Falha no diagnóstico: ' + err.message))
@@ -985,9 +976,7 @@ document.getElementById('btnSalvarDiagnostico').addEventListener('click', () => 
   const j = __vagaAtualAnalise;
   const texto = document.getElementById('diagnosticoIaBox').dataset.textoAtual;
   if (!j || !texto || j.id == null) return;
-  const u = usuarioAtual();
-  tursoExec('INSERT INTO diagnostico_ia (usuario_email, job_id, texto, gerado_em) VALUES (?, ?, ?, ?) ON CONFLICT(usuario_email, job_id) DO UPDATE SET texto=excluded.texto, gerado_em=excluded.gerado_em',
-    [u.email, j.id, texto, new Date().toISOString()]);
+  salvarDiagnosticoLocal(chaveJob(j), texto);
   const b = document.getElementById('btnSalvarDiagnostico');
   const orig = b.textContent; b.textContent = '✓ Salvo'; setTimeout(()=>{ b.textContent = orig; }, 1500);
 });
@@ -1049,8 +1038,7 @@ document.getElementById('btnDiagnosticoLote').addEventListener('click', async ()
         { role: 'user', content: `Perfil do candidato: ${textoPerfilResumo()}\n\nVaga: ${j.titulo} - ${j.empresa} (${j.local||''}, ${j.modalidade||''})\nDescricao: ${(j.descricao||'').replace(/<[^>]+>/g,' ').slice(0,3000)}\n\nDe um diagnostico curto e pratico: 1) adesao real ao perfil (nota 0-10 e por que), 2) principais pontos fortes do candidato pra essa vaga, 3) lacunas ou riscos, 4) recomendacao final (vale a pena se candidatar ou nao).` },
       ]);
       if (u && j.id != null){
-        await tursoExec('INSERT INTO diagnostico_ia (usuario_email, job_id, texto, gerado_em) VALUES (?, ?, ?, ?) ON CONFLICT(usuario_email, job_id) DO UPDATE SET texto=excluded.texto, gerado_em=excluded.gerado_em',
-          [u.email, j.id, resultado, new Date().toISOString()]);
+        salvarDiagnosticoLocal(chaveJob(j), resultado);
       }
     } catch (err) { console.warn('falhou diagnostico de', j.titulo, err); }
   }
@@ -1265,14 +1253,11 @@ function abrirAnalise(j){
   document.getElementById('btnTraduzir').textContent = '🌐 Traduzir'; document.getElementById('btnTraduzir').dataset.traduzido = '0';
   document.getElementById('diagnosticoIaBox').classList.add('d-none');
   const u2 = usuarioAtual();
-  if (u2 && syncConfigurada() && j.id != null){
-    tursoQuery('SELECT texto FROM diagnostico_ia WHERE usuario_email = ? AND job_id = ?', [u2.email, j.id]).then(linhas => {
-      if (linhas.length && linhas[0].texto){
-        document.getElementById('diagnosticoIaTexto').textContent = linhas[0].texto;
-        document.getElementById('diagnosticoIaBox').dataset.textoAtual = linhas[0].texto;
-        document.getElementById('diagnosticoIaBox').classList.remove('d-none');
-      }
-    });
+  const diagLocal = diagnosticosLocais()[chaveJob(j)];
+  if (diagLocal && diagLocal.texto){
+    document.getElementById('diagnosticoIaTexto').textContent = diagLocal.texto;
+    document.getElementById('diagnosticoIaBox').dataset.textoAtual = diagLocal.texto;
+    document.getElementById('diagnosticoIaBox').classList.remove('d-none');
   }
   new bootstrap.Modal(document.getElementById('modalAnalise')).show();
 }
