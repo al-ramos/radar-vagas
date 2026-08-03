@@ -42,6 +42,7 @@ CREATE TABLE IF NOT EXISTS job_event (
 CREATE TABLE IF NOT EXISTS perfil (
   usuario_email TEXT PRIMARY KEY,
   stacks TEXT,
+  config_json TEXT,
   atualizado_em TEXT
 );
 
@@ -49,6 +50,14 @@ CREATE TABLE IF NOT EXISTS usuario_conta (
   usuario TEXT PRIMARY KEY,
   senha_hash TEXT NOT NULL,
   criado_em TEXT
+);
+
+CREATE TABLE IF NOT EXISTS diagnostico_ia (
+  usuario_email TEXT NOT NULL,
+  job_id INTEGER NOT NULL,
+  texto TEXT,
+  gerado_em TEXT,
+  PRIMARY KEY (usuario_email, job_id)
 );
 
 CREATE INDEX IF NOT EXISTS ix_job_empresa ON job(empresa, publicado_em);

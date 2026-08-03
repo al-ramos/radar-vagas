@@ -39,6 +39,22 @@ def main():
         print("tabela usuario_conta: ok")
     except Exception as e:
         print(f"tabela usuario_conta: {e}")
+    try:
+        con.execute("ALTER TABLE perfil ADD COLUMN config_json TEXT")
+        con.commit()
+        print("coluna perfil.config_json: adicionada")
+    except Exception as e:
+        print(f"coluna perfil.config_json: {e}")
+    try:
+        con.execute(
+            "CREATE TABLE IF NOT EXISTS diagnostico_ia ("
+            " usuario_email TEXT NOT NULL, job_id INTEGER NOT NULL,"
+            " texto TEXT, gerado_em TEXT, PRIMARY KEY (usuario_email, job_id))"
+        )
+        con.commit()
+        print("tabela diagnostico_ia: ok")
+    except Exception as e:
+        print(f"tabela diagnostico_ia: {e}")
 
 
 if __name__ == "__main__":

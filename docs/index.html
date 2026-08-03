@@ -155,12 +155,8 @@
       </div>
       <button class="btn btn-outline-dark btn-sm w-100 mb-3" id="limpar">Limpar filtros</button>
       <hr>
-      <div class="mb-3">
-        <label class="form-label small fw-bold">Meu perfil (stacks que domino)</label>
-        <textarea id="perfilStacksInput" class="form-control form-control-sm mb-1" rows="2" placeholder="python, aws, kubernetes, react"></textarea>
-        <button class="btn btn-outline-primary btn-sm w-100" id="btnSalvarPerfil" type="button">💾 Salvar perfil</button>
-        <p class="small text-muted mt-1">Usado na análise de cada vaga e no e-mail — salvo no banco, associado à sua conta.</p>
-      </div>
+      <button class="btn btn-outline-primary btn-sm w-100 mb-3" id="abrirPerfil" type="button">👤 Meu perfil</button>
+      <button class="btn btn-outline-secondary btn-sm w-100 mb-3" id="abrirConfigIa" type="button">🤖 Configurar IA</button>
       <hr>
       <button class="btn btn-outline-secondary btn-sm w-100 mb-3" id="syncBadge" type="button">☁ Sincronização</button>
       <div class="mb-2">
@@ -219,6 +215,83 @@
 </div>
 </div>
 
+<div class="modal fade" id="modalConfigIa" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header"><h5 class="modal-title">Configurar IA</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body">
+        <p class="small text-muted">Usada para traduzir descrições e gerar diagnóstico de aderência com seu perfil.</p>
+        <div class="alert alert-warning small">⚠ A chave fica salva só neste navegador, mas é enviada direto à OpenAI a cada chamada. Não compartilhe este link enquanto estiver configurada.</div>
+        <label class="form-label small fw-bold">OpenAI API Key</label>
+        <input type="text" class="form-control mb-1" id="cfgOpenaiKey" placeholder="sk-...">
+        <p class="small text-muted">Crie em <a href="https://platform.openai.com/api-keys" target="_blank">platform.openai.com/api-keys</a>. Custo por chamada é baixo (modelo gpt-4o-mini).</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline-danger" id="cfgOpenaiLimpar">Remover chave</button>
+        <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button class="btn btn-primary" id="cfgOpenaiSalvar">Salvar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="modalPerfil" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div><h5 class="modal-title mb-0">👤 Meu perfil</h5><small class="text-muted">Usado para pontuar aderência e priorizar vagas na análise</small></div>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row g-4">
+          <div class="col-md-6">
+            <div class="card h-100">
+              <div class="card-body">
+                <h6 class="card-title text-primary">Preferências de vaga</h6>
+                <label class="form-label small fw-bold mt-2">Senioridade</label>
+                <select id="perfilSenioridade" class="form-select form-select-sm">
+                  <option value="junior">Júnior</option>
+                  <option value="pleno">Pleno</option>
+                  <option value="senior">Sênior</option>
+                  <option value="especialista">Especialista</option>
+                </select>
+                <label class="form-label small fw-bold mt-3">Modalidade preferida</label>
+                <select id="perfilModalidade" class="form-select form-select-sm">
+                  <option value="remoto">Remoto</option>
+                  <option value="hibrido">Híbrido</option>
+                  <option value="presencial">Presencial</option>
+                </select>
+                <label class="form-label small fw-bold mt-3">Cidades / regiões aceitáveis</label>
+                <input type="text" id="perfilCidades" class="form-control form-control-sm" placeholder="Remoto, Brasil, São Paulo">
+                <label class="form-label small fw-bold mt-3">Corte mínimo de alerta: <span id="perfilCorteLabel">55</span> pts</label>
+                <input type="range" class="form-range" id="perfilCorte" min="0" max="100" step="5" value="55">
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card h-100">
+              <div class="card-body">
+                <h6 class="card-title text-primary">Stacks e interesses</h6>
+                <label class="form-label small fw-bold mt-2">Domino (usado na aderência)</label>
+                <textarea id="perfilStacksInput" class="form-control form-control-sm" rows="2" placeholder="python, aws, kubernetes, react"></textarea>
+                <label class="form-label small fw-bold mt-3">Quero atuar em</label>
+                <textarea id="perfilQuero" class="form-control form-control-sm" rows="2" placeholder="arquitetura, plataforma, llm, mlops"></textarea>
+                <label class="form-label small fw-bold mt-3">Evitar</label>
+                <textarea id="perfilEvitar" class="form-control form-control-sm" rows="2" placeholder="estagio, trainee, suporte tecnico"></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="small text-muted mt-3 mb-0" id="perfilStatusTexto">Salvo no banco, associado à sua conta — disponível em qualquer dispositivo com sincronização ligada.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Fechar</button>
+        <button class="btn btn-primary" id="btnSalvarPerfil" type="button">💾 Salvar perfil</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="modal fade" id="modalEmail" tabindex="-1">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -249,7 +322,16 @@
       <div class="modal-body">
         <div id="analiseCorpo"></div>
         <label class="form-label small fw-bold mt-3">Descrição da vaga (salva na coleta)</label>
+        <div class="d-flex gap-2 mb-2">
+          <button class="btn btn-outline-secondary btn-sm" id="btnTraduzir" type="button">🌐 Traduzir</button>
+          <button class="btn btn-outline-secondary btn-sm" id="btnDiagnosticoIa" type="button">🤖 Diagnóstico com IA</button>
+        </div>
         <div id="analiseDescricao" class="border rounded p-3 bg-light small" style="max-height:280px; overflow-y:auto; line-height:1.5;"></div>
+        <div id="diagnosticoIaBox" class="d-none mt-3">
+          <label class="form-label small fw-bold">Diagnóstico da IA (com base no seu perfil)</label>
+          <div id="diagnosticoIaTexto" class="border rounded p-3 bg-primary-subtle small" style="max-height:280px; overflow-y:auto; line-height:1.5; white-space:pre-wrap;"></div>
+          <button class="btn btn-outline-primary btn-sm mt-2" id="btnSalvarDiagnostico">💾 Salvar diagnóstico para esta vaga</button>
+        </div>
       </div>
       <div class="modal-footer">
         <button class="btn btn-outline-secondary" id="analiseCopiarDescricao">📋 Copiar descrição</button>
@@ -645,33 +727,143 @@ function meuPerfil(){
   if (window.__perfilPersistido && window.__perfilPersistido.length) return window.__perfilPersistido;
   return Array.from(stacksAtivas || []).map(s=>s.trim().toLowerCase()).filter(Boolean);
 }
-const PERFIL_LOCAL_KEY = 'radar-vagas-perfil-stacks';
+const PERFIL_LOCAL_KEY = 'radar-vagas-perfil-config';
+function perfilPadrao(){
+  return { stacks: '', quero: '', evitar: '', senioridade: 'senior', modalidade: 'remoto', cidades: '', corte: 55 };
+}
+function preencherFormPerfil(cfg){
+  document.getElementById('perfilStacksInput').value = cfg.stacks || '';
+  document.getElementById('perfilQuero').value = cfg.quero || '';
+  document.getElementById('perfilEvitar').value = cfg.evitar || '';
+  document.getElementById('perfilSenioridade').value = cfg.senioridade || 'senior';
+  document.getElementById('perfilModalidade').value = cfg.modalidade || 'remoto';
+  document.getElementById('perfilCidades').value = cfg.cidades || '';
+  document.getElementById('perfilCorte').value = cfg.corte || 55;
+  document.getElementById('perfilCorteLabel').textContent = cfg.corte || 55;
+  window.__perfilPersistido = (cfg.stacks || '').split(',').map(s=>s.trim().toLowerCase()).filter(Boolean);
+}
 function carregarPerfil(){
-  const local = (localStorage.getItem(PERFIL_LOCAL_KEY) || '').split(',').map(s=>s.trim().toLowerCase()).filter(Boolean);
-  window.__perfilPersistido = local;
-  document.getElementById('perfilStacksInput').value = local.join(', ');
+  let local = {};
+  try { local = JSON.parse(localStorage.getItem(PERFIL_LOCAL_KEY) || 'null') || perfilPadrao(); } catch { local = perfilPadrao(); }
+  preencherFormPerfil(local);
   const u = usuarioAtual();
   if (!u || !syncConfigurada()) return;
-  tursoQuery('SELECT stacks FROM perfil WHERE usuario_email = ?', [u.email]).then(linhas => {
-    if (linhas.length && linhas[0].stacks){
-      const remoto = linhas[0].stacks.split(',').map(s=>s.trim().toLowerCase()).filter(Boolean);
-      window.__perfilPersistido = remoto;
-      document.getElementById('perfilStacksInput').value = remoto.join(', ');
-      render();
+  tursoQuery('SELECT stacks, config_json FROM perfil WHERE usuario_email = ?', [u.email]).then(linhas => {
+    if (linhas.length){
+      let cfg = {};
+      try { cfg = JSON.parse(linhas[0].config_json || 'null') || {}; } catch { cfg = {}; }
+      if (!cfg.stacks && linhas[0].stacks) cfg.stacks = linhas[0].stacks;
+      if (Object.keys(cfg).length){ preencherFormPerfil({ ...perfilPadrao(), ...cfg }); render(); }
     }
   });
 }
+document.getElementById('perfilCorte').addEventListener('input', (e) => { document.getElementById('perfilCorteLabel').textContent = e.target.value; });
 function salvarPerfil(){
   if (!exigirLogin()) return;
-  const stacks = document.getElementById('perfilStacksInput').value.trim();
-  localStorage.setItem(PERFIL_LOCAL_KEY, stacks);
-  window.__perfilPersistido = stacks.split(',').map(s=>s.trim().toLowerCase()).filter(Boolean);
+  const cfg = {
+    stacks: document.getElementById('perfilStacksInput').value.trim(),
+    quero: document.getElementById('perfilQuero').value.trim(),
+    evitar: document.getElementById('perfilEvitar').value.trim(),
+    senioridade: document.getElementById('perfilSenioridade').value,
+    modalidade: document.getElementById('perfilModalidade').value,
+    cidades: document.getElementById('perfilCidades').value.trim(),
+    corte: Number(document.getElementById('perfilCorte').value),
+  };
+  localStorage.setItem(PERFIL_LOCAL_KEY, JSON.stringify(cfg));
+  window.__perfilPersistido = cfg.stacks.split(',').map(s=>s.trim().toLowerCase()).filter(Boolean);
   const u = usuarioAtual();
-  tursoExec('INSERT INTO perfil (usuario_email, stacks, atualizado_em) VALUES (?, ?, ?) ON CONFLICT(usuario_email) DO UPDATE SET stacks=excluded.stacks, atualizado_em=excluded.atualizado_em',
-    [u.email, stacks, new Date().toISOString()]);
+  tursoExec('INSERT INTO perfil (usuario_email, stacks, config_json, atualizado_em) VALUES (?, ?, ?, ?) ON CONFLICT(usuario_email) DO UPDATE SET stacks=excluded.stacks, config_json=excluded.config_json, atualizado_em=excluded.atualizado_em',
+    [u.email, cfg.stacks, JSON.stringify(cfg), new Date().toISOString()]);
   render();
   const b = document.getElementById('btnSalvarPerfil');
   const orig = b.textContent; b.textContent = '✓ Salvo'; setTimeout(()=>{ b.textContent = orig; }, 1500);
+}
+document.getElementById('abrirPerfil').addEventListener('click', () => new bootstrap.Modal('#modalPerfil').show());
+
+// --- IA: traducao e diagnostico ---
+const OPENAI_KEY_KEY = 'radar-vagas-openai-key';
+document.getElementById('abrirConfigIa').addEventListener('click', () => {
+  document.getElementById('cfgOpenaiKey').value = localStorage.getItem(OPENAI_KEY_KEY) || '';
+  new bootstrap.Modal('#modalConfigIa').show();
+});
+document.getElementById('cfgOpenaiSalvar').addEventListener('click', () => {
+  const k = document.getElementById('cfgOpenaiKey').value.trim();
+  if (k) localStorage.setItem(OPENAI_KEY_KEY, k);
+  bootstrap.Modal.getInstance(document.getElementById('modalConfigIa')).hide();
+});
+document.getElementById('cfgOpenaiLimpar').addEventListener('click', () => {
+  localStorage.removeItem(OPENAI_KEY_KEY);
+  document.getElementById('cfgOpenaiKey').value = '';
+});
+function iaConfigurada(){ return !!localStorage.getItem(OPENAI_KEY_KEY); }
+function chamarOpenAI(mensagens){
+  const key = localStorage.getItem(OPENAI_KEY_KEY);
+  if (!key){ new bootstrap.Modal('#modalConfigIa').show(); return Promise.reject(new Error('sem chave')); }
+  return fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer ' + key, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ model: 'gpt-4o-mini', temperature: 0.4, messages: mensagens }),
+  }).then(r => r.json()).then(data => {
+    if (data.error) throw new Error(data.error.message);
+    return data.choices[0].message.content;
+  });
+}
+function textoPerfilResumo(){
+  const cfg = JSON.parse(localStorage.getItem(PERFIL_LOCAL_KEY) || 'null') || perfilPadrao();
+  return `Senioridade desejada: ${cfg.senioridade}. Modalidade preferida: ${cfg.modalidade}. Cidades aceitas: ${cfg.cidades || 'qualquer'}. Domina: ${cfg.stacks || '-'}. Quer atuar em: ${cfg.quero || '-'}. Quer evitar: ${cfg.evitar || '-'}.`;
+}
+let __vagaAtualAnalise = null;
+document.getElementById('btnTraduzir').addEventListener('click', () => {
+  const j = __vagaAtualAnalise;
+  if (!j) return;
+  const box = document.getElementById('analiseDescricao');
+  const btn = document.getElementById('btnTraduzir');
+  if (btn.dataset.traduzido === '1'){
+    box.innerHTML = descricaoLimpa(j.descricao);
+    btn.textContent = '🌐 Traduzir'; btn.dataset.traduzido = '0';
+    return;
+  }
+  btn.textContent = 'Traduzindo...'; btn.disabled = true;
+  chamarOpenAI([
+    { role: 'system', content: 'Traduza a descricao de vaga a seguir para portugues do Brasil, mantendo formatacao em paragrafos e listas simples. Responda so com a traducao.' },
+    { role: 'user', content: box.innerText },
+  ]).then(texto => {
+    box.innerHTML = texto.split('\n').filter(Boolean).map(l => `<p>${l}</p>`).join('');
+    btn.textContent = '🌐 Ver original'; btn.dataset.traduzido = '1';
+  }).catch(err => alert('Falha ao traduzir: ' + err.message))
+  .finally(() => { btn.disabled = false; });
+});
+document.getElementById('btnDiagnosticoIa').addEventListener('click', () => {
+  const j = __vagaAtualAnalise;
+  if (!j) return;
+  const btn = document.getElementById('btnDiagnosticoIa');
+  const box = document.getElementById('diagnosticoIaBox');
+  const texto = document.getElementById('diagnosticoIaTexto');
+  btn.textContent = 'Analisando...'; btn.disabled = true;
+  chamarOpenAI([
+    { role: 'system', content: 'Voce e um consultor de carreira em TI. Responda em portugues do Brasil, direto e objetivo, sem enrolacao.' },
+    { role: 'user', content: `Perfil do candidato: ${textoPerfilResumo()}\n\nVaga: ${j.titulo} - ${j.empresa} (${j.local||''}, ${j.modalidade||''})\nDescricao: ${document.getElementById('analiseDescricao').innerText.slice(0,3000)}\n\nDe um diagnostico curto e pratico: 1) adesão real ao perfil (nota 0-10 e por que), 2) principais pontos fortes do candidato pra essa vaga, 3) lacunas ou riscos, 4) recomendacao final (vale a pena se candidatar ou nao).` },
+  ]).then(resultado => {
+    texto.textContent = resultado;
+    box.classList.remove('d-none');
+    box.dataset.textoAtual = resultado;
+  }).catch(err => alert('Falha no diagnóstico: ' + err.message))
+  .finally(() => { btn.textContent = '🤖 Diagnóstico com IA'; btn.disabled = false; });
+});
+document.getElementById('btnSalvarDiagnostico').addEventListener('click', () => {
+  if (!exigirLogin()) return;
+  const j = __vagaAtualAnalise;
+  const texto = document.getElementById('diagnosticoIaBox').dataset.textoAtual;
+  if (!j || !texto || j.id == null) return;
+  const u = usuarioAtual();
+  tursoExec('INSERT INTO diagnostico_ia (usuario_email, job_id, texto, gerado_em) VALUES (?, ?, ?, ?) ON CONFLICT(usuario_email, job_id) DO UPDATE SET texto=excluded.texto, gerado_em=excluded.gerado_em',
+    [u.email, j.id, texto, new Date().toISOString()]);
+  const b = document.getElementById('btnSalvarDiagnostico');
+  const orig = b.textContent; b.textContent = '✓ Salvo'; setTimeout(()=>{ b.textContent = orig; }, 1500);
+});
+function descricaoLimpa(desc){
+  const d = desc || '<p>Sem descrição salva para esta vaga.</p>';
+  return d.replace(/<script[\s\S]*?<\/script>/gi, '').replace(/<style[\s\S]*?<\/style>/gi, '').replace(/ on\w+="[^"]*"/gi, '');
 }
 function lidaEfetiva(j){
   const k = chaveJob(j);
@@ -862,8 +1054,20 @@ function abrirAnalise(j){
     </table>
   `;
   document.getElementById('analiseAbrirVaga').href = j.url || '#';
-  const desc = j.descricao || '<p>Sem descrição salva para esta vaga.</p>';
-  document.getElementById('analiseDescricao').innerHTML = desc.replace(/<script[\s\S]*?<\/script>/gi, '').replace(/<style[\s\S]*?<\/style>/gi, '').replace(/ on\w+="[^"]*"/gi, '');
+  __vagaAtualAnalise = j;
+  document.getElementById('analiseDescricao').innerHTML = descricaoLimpa(j.descricao);
+  document.getElementById('btnTraduzir').textContent = '🌐 Traduzir'; document.getElementById('btnTraduzir').dataset.traduzido = '0';
+  document.getElementById('diagnosticoIaBox').classList.add('d-none');
+  const u2 = usuarioAtual();
+  if (u2 && syncConfigurada() && j.id != null){
+    tursoQuery('SELECT texto FROM diagnostico_ia WHERE usuario_email = ? AND job_id = ?', [u2.email, j.id]).then(linhas => {
+      if (linhas.length && linhas[0].texto){
+        document.getElementById('diagnosticoIaTexto').textContent = linhas[0].texto;
+        document.getElementById('diagnosticoIaBox').dataset.textoAtual = linhas[0].texto;
+        document.getElementById('diagnosticoIaBox').classList.remove('d-none');
+      }
+    });
+  }
   new bootstrap.Modal(document.getElementById('modalAnalise')).show();
 }
 document.getElementById('analiseCopiarDescricao').addEventListener('click', () => {
