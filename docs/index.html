@@ -30,6 +30,8 @@
   .stackpicker{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:18px; }
   .stackchip{ padding:5px 10px; border-radius:999px; border:1px solid var(--divider); background:var(--surface); font-size:11.5px; font-weight:700; color:var(--neutral-800); cursor:pointer; }
   .stackchip.on{ background:var(--accent); border-color:var(--accent); color:#fff; }
+  .checkline{ display:flex; align-items:center; gap:8px; font-weight:400; margin-bottom:18px; }
+  .checkline input{ width:auto; margin:0; }
   main{ flex:1 1 auto; min-width:0; padding:24px 40px; }
   .buscaGoogle{ display:flex; justify-content:center; margin-bottom:22px; }
   .buscaGoogle .caixa{ position:relative; width:100%; max-width:640px; }
@@ -57,6 +59,7 @@
   td a{ font-weight:700; color:var(--text); text-decoration:none; }
   td a:hover{ color:var(--accent-800); }
   td.sel, th.sel{ padding-left:14px; padding-right:0; width:20px; }
+  tr.descartada-row{ opacity:.45; }
   .empresa{ font-size:12px; color:var(--neutral-700); margin-top:2px; }
   .fonte{ font-size:10.5px; color:var(--sage-700); margin-top:2px; }
   .cat{ display:inline-block; font-size:10.5px; font-weight:700; padding:2px 8px; border-radius:999px; margin-top:4px; background:var(--neutral-200); color:var(--neutral-800); }
@@ -65,6 +68,12 @@
   .data-abs{ font-size:11px; color:var(--neutral-700); }
   .stackmatch{ color:var(--accent-800); font-weight:700; }
   .btnAnalisar{ width:auto; padding:4px 10px; font-size:11px; margin-top:6px; }
+  .statusbtns{ display:flex; gap:4px; margin-top:6px; }
+  .statusbtns button{ width:auto; padding:3px 8px; font-size:10.5px; }
+  .statusbtns button.on.candidatei{ background:var(--sage-100); border-color:var(--sage-700); color:var(--sage-700); }
+  .statusbtns button.on.descartada{ background:var(--neutral-200); border-color:var(--neutral-700); color:var(--neutral-700); }
+  .dias-abertos{ font-weight:700; }
+  .dias-abertos.antiga{ color:var(--accent-800); }
   #vazio{ text-align:center; color:var(--neutral-700); padding:60px 0; }
   #erro{ color:#a33; padding:12px; }
   .modal-bg{ position:fixed; inset:0; background:rgba(32,30,29,.5); display:flex; align-items:center; justify-content:center; z-index:50; }
@@ -107,6 +116,13 @@
       <option value="ats">ATS direto (Gupy/Greenhouse/etc)</option>
       <option value="jsonfeed">E-mails (LinkedIn/Infojobs/Catho)</option>
     </select>
+    <label>Status</label>
+    <select id="fStatus">
+      <option value="padrao">Ocultar descartadas</option>
+      <option value="todas">Todas</option>
+      <option value="candidatei">Só candidatei-me</option>
+      <option value="descartadas">Só descartadas</option>
+    </select>
     <label>Senioridade</label>
     <select id="fSenioridade">
       <option value="todas">Todas</option>
@@ -124,6 +140,7 @@
       <option value="hibrido">Híbrido</option>
       <option value="presencial">Presencial</option>
     </select>
+    <label class="checkline"><input type="checkbox" id="fRegiaoBr"> Somente Brasil / remoto BR</label>
     <label>Stack (clique para filtrar)</label>
     <div class="stackpicker" id="stackPicker"></div>
     <label>Corte mínimo: <span id="corteLabel">0</span> pts</label>
@@ -132,6 +149,7 @@
     <select id="fOrdenar">
       <option value="publicado_em">Mais recente</option>
       <option value="pontos">Pontuação</option>
+      <option value="dias_aberta">Aberta há mais tempo</option>
       <option value="empresa">Empresa (A-Z)</option>
     </select>
     <button id="limpar">Limpar filtros</button>
@@ -168,6 +186,7 @@
       <thead><tr>
         <th class="sel"></th>
         <th>Vaga</th><th>Local / modalidade</th><th>Senioridade</th><th>Stack</th>
+        <th class="sortable" data-ord="dias_aberta" style="text-align:center;">Aberta há<span class="arrow">▾</span></th>
         <th class="sortable" data-ord="pontos" style="text-align:center;">Pontos<span class="arrow">▾</span></th>
         <th class="sortable" data-ord="publicado_em" style="text-align:right;">Publicada<span class="arrow">▾</span></th>
       </tr></thead>
@@ -214,13 +233,32 @@
 const SENIOR_LABEL = { estagio:'Estágio', junior:'Júnior', pleno:'Pleno', senior:'Sênior', especialista:'Especialista', nao_informado:'Não informada' };
 const FONTE_LABEL = { jsonfeed:'E-mail (LinkedIn/Infojobs/Catho)' };
 const CATEGORIA_LABEL = { dev_front:'Dev · Front-end', dev_back:'Dev · Back-end', dev_full:'Dev · Full-stack', dev_outro:'Dev · Outro', infra:'Infra / DevOps', suporte:'Suporte', outro:'Outro' };
+const STATUS_KEY = 'radar-vagas-status';
+const REGIAO_ESTRANGEIRA = /vietnam|thailand|tailandia|philippines|filipinas|indonesia|malaysia|malasia|singapore|singapura|india\b|pakistan|bangladesh|united states|estados unidos|\busa\b|canada|australia|new zealand|nova zelandia|united kingdom|\buk\b|england|germany|alemanha|france|franca\b|spain|espanha|portugal(?!.{0,20}brasil)|poland|polonia|ireland|irlanda|netherlands|holanda|mexico|argentina|chile\b|colombia|peru\b|china\b|japan|japao|south korea|coreia do sul/i;
 let JOBS = [];
 let stacksAtivas = new Set();
 let selecionadas = new Set();
+let statusMap = new Map(Object.entries(JSON.parse(localStorage.getItem(STATUS_KEY) || '{}')));
+
+function persistirStatus(){ localStorage.setItem(STATUS_KEY, JSON.stringify(Object.fromEntries(statusMap))); }
+function getStatus(k){ return statusMap.get(k) || ''; }
+function setStatus(k, valor){
+  if (getStatus(k) === valor) statusMap.delete(k);
+  else if (valor) statusMap.set(k, valor);
+  else statusMap.delete(k);
+  persistirStatus();
+  render();
+}
 
 function chaveJob(j){ return String(j.id != null ? j.id : j.url); }
 function ehFonteEmail(j){ return j.fonte === 'jsonfeed'; }
 function listaStacks(j){ return (j.stack||'').split(',').map(s=>s.trim()).filter(Boolean); }
+function diasAbertaCalc(j){
+  const base = j.primeira_vez || j.publicado_em;
+  if (!base) return null;
+  const d = Math.floor((Date.now() - new Date(base+'T00:00:00').getTime())/86400000);
+  return Number.isNaN(d) ? null : Math.max(d, 0);
+}
 
 const PADROES = {
   suporte: /suporte|helpdesk|help desk|service desk|atendimento ao usu[aá]rio|\bn1\b|\bn2\b|\bn3\b|t[eé]cnico de ti/gi,
@@ -274,6 +312,8 @@ function lerFiltrosDaUrl(){
   if (p.has('mod')) document.getElementById('fModalidade').value = p.get('mod');
   if (p.has('corte')) document.getElementById('fCorte').value = p.get('corte');
   if (p.has('ord')) document.getElementById('fOrdenar').value = p.get('ord');
+  if (p.has('status')) document.getElementById('fStatus').value = p.get('status');
+  if (p.has('br')) document.getElementById('fRegiaoBr').checked = p.get('br') === '1';
   if (p.has('stack')) p.get('stack').split(',').filter(Boolean).forEach(s => stacksAtivas.add(s));
 }
 
@@ -286,6 +326,8 @@ function escreverFiltrosNaUrl(){
   const mod = document.getElementById('fModalidade').value;
   const corte = document.getElementById('fCorte').value;
   const ord = document.getElementById('fOrdenar').value;
+  const status = document.getElementById('fStatus').value;
+  const br = document.getElementById('fRegiaoBr').checked;
   if (texto) p.set('q', texto);
   if (cat !== 'todas') p.set('cat', cat);
   if (fonte !== 'todas') p.set('fonte', fonte);
@@ -293,6 +335,8 @@ function escreverFiltrosNaUrl(){
   if (mod !== 'todas') p.set('mod', mod);
   if (Number(corte) > 0) p.set('corte', corte);
   if (ord !== 'publicado_em') p.set('ord', ord);
+  if (status !== 'padrao') p.set('status', status);
+  if (br) p.set('br', '1');
   if (stacksAtivas.size) p.set('stack', Array.from(stacksAtivas).join(','));
   const qs = p.toString();
   history.replaceState(null, '', qs ? '?' + qs : location.pathname);
@@ -343,12 +387,16 @@ function renderChips(){
   const sen = document.getElementById('fSenioridade').value;
   const mod = document.getElementById('fModalidade').value;
   const corte = Number(document.getElementById('fCorte').value);
+  const status = document.getElementById('fStatus').value;
+  const br = document.getElementById('fRegiaoBr').checked;
   if (texto) add('busca: "' + texto + '"', () => document.getElementById('fTexto').value = '');
   if (cat !== 'todas') add(CATEGORIA_LABEL[cat] || cat, () => document.getElementById('fCategoria').value = 'todas');
   if (fonte !== 'todas') add(fonte === 'jsonfeed' ? 'fonte: e-mail' : 'fonte: ATS direto', () => document.getElementById('fFonte').value = 'todas');
   if (sen !== 'todas') add(SENIOR_LABEL[sen] || sen, () => document.getElementById('fSenioridade').value = 'todas');
   if (mod !== 'todas') add(mod, () => document.getElementById('fModalidade').value = 'todas');
   if (corte > 0) add('≥ ' + corte + ' pts', () => document.getElementById('fCorte').value = 0);
+  if (status !== 'padrao') add(status === 'todas' ? 'status: todas' : status === 'candidatei' ? 'só candidatei-me' : 'só descartadas', () => document.getElementById('fStatus').value = 'padrao');
+  if (br) add('somente Brasil/remoto BR', () => document.getElementById('fRegiaoBr').checked = false);
   stacksAtivas.forEach(s => add('stack: ' + s, () => stacksAtivas.delete(s)));
 }
 
@@ -362,6 +410,8 @@ function render(){
   const mod = document.getElementById('fModalidade').value;
   const corte = Number(document.getElementById('fCorte').value);
   const ord = document.getElementById('fOrdenar').value;
+  const status = document.getElementById('fStatus').value;
+  const br = document.getElementById('fRegiaoBr').checked;
   document.getElementById('corteLabel').textContent = corte;
 
   let filtradas = JOBS.filter(j=>{
@@ -371,6 +421,11 @@ function render(){
     if (fonte === 'ats' && ehFonteEmail(j)) return false;
     if (cat !== 'todas' && j._categoria !== cat) return false;
     if ((j.pontos||0) < corte) return false;
+    const st = getStatus(chaveJob(j));
+    if (status === 'padrao' && st === 'descartada') return false;
+    if (status === 'candidatei' && st !== 'candidatei') return false;
+    if (status === 'descartadas' && st !== 'descartada') return false;
+    if (br && j.local && REGIAO_ESTRANGEIRA.test(j.local)) return false;
     if (stacksAtivas.size){
       const stacksJob = listaStacks(j);
       if (!stacksJob.some(s => stacksAtivas.has(s))) return false;
@@ -386,6 +441,7 @@ function render(){
   filtradas.sort((a,b)=>{
     if (campo==='empresa') return sortState.dir * (a.empresa||'').localeCompare(b.empresa||'') * -1;
     if (campo==='publicado_em') return sortState.dir * ((a.publicado_em||'').localeCompare(b.publicado_em||''));
+    if (campo==='dias_aberta') return sortState.dir * ((diasAbertaCalc(a)||0) - (diasAbertaCalc(b)||0));
     return sortState.dir * ((a.pontos||0)-(b.pontos||0));
   });
 
@@ -418,14 +474,22 @@ function render(){
   filtradas.forEach(j=>{
     const cor = corPontos(j.pontos||0);
     const k = chaveJob(j);
+    const st = getStatus(k);
+    const dias = diasAbertaCalc(j);
     const tr = document.createElement('tr');
+    if (st === 'descartada') tr.className = 'descartada-row';
     const fonteTag = ehFonteEmail(j) ? `<div class="fonte">${FONTE_LABEL.jsonfeed}</div>` : '';
     tr.innerHTML = `
       <td class="sel"><input type="checkbox" data-k="${k}" ${selecionadas.has(k)?'checked':''}></td>
-      <td><a href="${j.url||'#'}" target="_blank" rel="noopener">${j.titulo||''}</a><div class="empresa">${j.empresa||''}</div>${fonteTag}<span class="cat">${CATEGORIA_LABEL[j._categoria]||''}</span><br><button type="button" class="btnAnalisar" data-k="${k}">🔍 Analisar</button></td>
+      <td><a href="${j.url||'#'}" target="_blank" rel="noopener">${j.titulo||''}</a><div class="empresa">${j.empresa||''}</div>${fonteTag}<span class="cat">${CATEGORIA_LABEL[j._categoria]||''}</span><br><button type="button" class="btnAnalisar" data-k="${k}">🔍 Analisar</button>
+      <div class="statusbtns">
+        <button type="button" class="btnStatus ${st==='candidatei'?'on candidatei':''}" data-k="${k}" data-v="candidatei">✓ Candidatei</button>
+        <button type="button" class="btnStatus ${st==='descartada'?'on descartada':''}" data-k="${k}" data-v="descartada">✕ Descartar</button>
+      </div></td>
       <td>${j.local||'-'}<div style="font-size:11.5px;color:var(--neutral-700);text-transform:capitalize;">${j.modalidade||''}</div></td>
       <td style="text-transform:capitalize;">${SENIOR_LABEL[j.senioridade]||j.senioridade||'-'}</td>
       <td style="font-size:12.5px;max-width:220px;">${stackHtmlComMatch(j)}</td>
+      <td style="text-align:center;"><span class="dias-abertos ${dias!=null && dias>=30 ? 'antiga':''}">${dias!=null ? dias+'d' : '-'}</span></td>
       <td style="text-align:center;"><span class="pts" style="background:${cor.bg};color:${cor.tx};">${Math.round(j.pontos||0)}</span></td>
       <td style="text-align:right;font-size:12.5px;color:var(--neutral-700);"><div class="data-rel">${dataRel(j.publicado_em)}</div><div class="data-abs">${dataAbs(j.publicado_em)}</div></td>`;
     tr.querySelector('input[type=checkbox]').addEventListener('change', (e) => {
@@ -434,6 +498,7 @@ function render(){
       document.getElementById('selTodas').checked = (window.__filtradas||[]).every(j => selecionadas.has(chaveJob(j)));
     });
     tr.querySelector('.btnAnalisar').addEventListener('click', () => abrirAnalise(j));
+    tr.querySelectorAll('.btnStatus').forEach(b => b.addEventListener('click', () => setStatus(k, b.dataset.v)));
     corpo.appendChild(tr);
   });
   document.getElementById('vazio').style.display = filtradas.length ? 'none' : 'block';
@@ -454,6 +519,7 @@ function abrirAnalise(j){
   let aderencia = 'baixa', aderenciaLabel = 'Baixa';
   if (pontos >= 70 || pctMatch >= 60) { aderencia = 'alta'; aderenciaLabel = 'Alta'; }
   else if (pontos >= 40 || pctMatch >= 30) { aderencia = 'media'; aderenciaLabel = 'Média'; }
+  const dias = diasAbertaCalc(j);
 
   document.getElementById('analiseTitulo').textContent = j.titulo || 'Vaga';
   document.getElementById('analiseEmpresa').textContent = j.empresa + (j.local ? ' · ' + j.local : '');
@@ -462,10 +528,11 @@ function abrirAnalise(j){
     <div class="analise-linha"><span>Categoria detectada</span><b>${CATEGORIA_LABEL[j._categoria] || '-'}</b></div>
     <div class="analise-linha"><span>Por que essa categoria</span><b style="text-align:right; max-width:60%;">${motivos.length ? motivos.join(' · ') : 'sem palavras-chave claras no título'}</b></div>
     <div class="analise-linha"><span>Pontuação do radar</span><b>${Math.round(pontos)} pts</b></div>
+    <div class="analise-linha"><span>Aberta há</span><b>${dias!=null ? dias+' dias' : '-'}</b></div>
     <div class="analise-linha"><span>Senioridade</span><b>${SENIOR_LABEL[j.senioridade] || '-'}</b></div>
     <div class="analise-linha"><span>Modalidade</span><b style="text-transform:capitalize;">${j.modalidade || '-'}</b></div>
     <div class="analise-linha"><span>Stacks da vaga</span><b style="text-align:right; max-width:60%;">${stacksJob.join(', ') || '-'}</b></div>
-    <div class="analise-linha"><span>Combinam com seu perfil</span><b style="text-align:right; max-width:60%;">${match.length ? match.join(', ') : 'nenhuma — preencha "Minhas stacks"'}</b></div>
+    <div class="analise-linha"><span>Combinam com seu perfil</span><b style="text-align:right; max-width:60%;">${match.length ? match.join(', ') : 'nenhuma — clique em stacks no filtro lateral para marcar seu perfil'}</b></div>
   `;
   document.getElementById('analiseAbrirVaga').href = j.url || '#';
   document.getElementById('analiseDescricao').value = j.descricao || 'Sem descrição salva para esta vaga (coletada antes deste campo existir, ou a fonte não fornece descrição).';
@@ -490,7 +557,7 @@ function atualizar(){
   escreverFiltrosNaUrl();
 }
 
-['fTexto','fCategoria','fFonte','fSenioridade','fModalidade','fCorte','fOrdenar'].forEach(id=>{
+['fTexto','fCategoria','fFonte','fSenioridade','fModalidade','fCorte','fOrdenar','fStatus','fRegiaoBr'].forEach(id=>{
   document.getElementById(id).addEventListener('input', atualizar);
 });
 document.querySelectorAll('th.sortable').forEach(th=>{
@@ -514,6 +581,8 @@ document.getElementById('limpar').addEventListener('click', ()=>{
   document.getElementById('fModalidade').value='todas';
   document.getElementById('fCorte').value=0;
   document.getElementById('fOrdenar').value='publicado_em';
+  document.getElementById('fStatus').value='padrao';
+  document.getElementById('fRegiaoBr').checked=false;
   stacksAtivas.clear();
   atualizar();
 });
