@@ -186,13 +186,16 @@
       <div class="d-flex flex-wrap gap-2 mb-2" id="categoriaChips"></div>
       <div class="d-flex flex-wrap gap-2 mb-3" id="chips"></div>
 
-      <div class="d-flex justify-content-between align-items-center mb-2">
+      <div class="d-flex justify-content-between align-items-center mb-2 sticky-top bg-white py-2" style="top:0; z-index:10;">
         <div class="d-flex align-items-center gap-3">
           <div class="form-check mb-0">
             <input class="form-check-input" type="checkbox" id="selTodas">
             <label class="form-check-label small" for="selTodas">selecionar todas as exibidas</label>
           </div>
           <span class="small text-muted" id="selContagem">0 selecionadas</span>
+          <button class="btn btn-link btn-sm p-0" type="button" data-bs-toggle="collapse" data-bs-target="#areaProcessadas">
+            ✅ Já processadas (<span id="contagemProcessadas">0</span>) ▾
+          </button>
         </div>
         <div class="d-flex gap-2">
           <div class="btn-group btn-group-sm" role="group">
@@ -201,6 +204,24 @@
           </div>
           <button class="btn btn-outline-secondary btn-sm" id="btnExportarCsv" type="button">⬇ Exportar CSV</button>
           <button class="btn btn-outline-secondary btn-sm" id="btnDiagnosticoLote" type="button">🤖 Diagnosticar selecionadas</button>
+        </div>
+      </div>
+
+      <div class="collapse mb-3" id="areaProcessadas">
+        <div class="alert alert-light border small mb-2">Lidas, candidatadas, descartadas ou já diagnosticadas</div>
+        <div class="table-responsive">
+          <table class="table table-hover align-middle bg-white">
+            <thead class="table-light">
+              <tr>
+                <th style="width:20px;"></th>
+                <th>Vaga</th><th>Local / modalidade</th><th>Senioridade</th><th>Stack</th>
+                <th class="text-center">Aberta há</th>
+                <th class="text-center">Pontos</th>
+                <th class="text-end">Publicada</th>
+              </tr>
+            </thead>
+            <tbody id="corpoProcessadas"></tbody>
+          </table>
         </div>
       </div>
 
@@ -220,26 +241,6 @@
         </table>
       </div>
       <p id="vazio" class="text-center text-muted py-5 d-none">Nenhuma vaga corresponde aos filtros atuais.</p>
-
-      <button class="btn btn-link btn-sm p-0 mt-4 mb-2" type="button" data-bs-toggle="collapse" data-bs-target="#areaProcessadas">
-        ✅ Já processadas (<span id="contagemProcessadas">0</span>) — lidas, candidatadas, descartadas ou já diagnosticadas ▾
-      </button>
-      <div class="collapse" id="areaProcessadas">
-        <div class="table-responsive">
-          <table class="table table-hover align-middle bg-white">
-            <thead class="table-light">
-              <tr>
-                <th style="width:20px;"></th>
-                <th>Vaga</th><th>Local / modalidade</th><th>Senioridade</th><th>Stack</th>
-                <th class="text-center">Aberta há</th>
-                <th class="text-center">Pontos</th>
-                <th class="text-end">Publicada</th>
-              </tr>
-            </thead>
-            <tbody id="corpoProcessadas"></tbody>
-          </table>
-        </div>
-      </div>
       </div>
 
       <div id="viewKanban" class="d-none">
