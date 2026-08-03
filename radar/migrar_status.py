@@ -21,6 +21,24 @@ def main():
             print(f"coluna {nome}: adicionada")
         except Exception as e:
             print(f"coluna {nome}: {e}")
+    try:
+        con.execute(
+            "CREATE TABLE IF NOT EXISTS perfil ("
+            " usuario_email TEXT PRIMARY KEY, stacks TEXT, atualizado_em TEXT)"
+        )
+        con.commit()
+        print("tabela perfil: ok")
+    except Exception as e:
+        print(f"tabela perfil: {e}")
+    try:
+        con.execute(
+            "CREATE TABLE IF NOT EXISTS usuario_conta ("
+            " usuario TEXT PRIMARY KEY, senha_hash TEXT NOT NULL, criado_em TEXT)"
+        )
+        con.commit()
+        print("tabela usuario_conta: ok")
+    except Exception as e:
+        print(f"tabela usuario_conta: {e}")
 
 
 if __name__ == "__main__":

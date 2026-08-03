@@ -39,6 +39,18 @@ CREATE TABLE IF NOT EXISTS job_event (
   detalhe TEXT
 );
 
+CREATE TABLE IF NOT EXISTS perfil (
+  usuario_email TEXT PRIMARY KEY,
+  stacks TEXT,
+  atualizado_em TEXT
+);
+
+CREATE TABLE IF NOT EXISTS usuario_conta (
+  usuario TEXT PRIMARY KEY,
+  senha_hash TEXT NOT NULL,
+  criado_em TEXT
+);
+
 CREATE INDEX IF NOT EXISTS ix_job_empresa ON job(empresa, publicado_em);
 CREATE INDEX IF NOT EXISTS ix_job_ativo ON job(ativo, pontos);
 CREATE INDEX IF NOT EXISTS ix_event_job ON job_event(job_id, ocorrido_em);

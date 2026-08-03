@@ -23,6 +23,45 @@
 </style>
 </head>
 <body>
+<div id="telaLogin" class="d-flex align-items-center justify-content-center" style="min-height:100vh;">
+  <div class="card shadow-sm" style="width:380px;">
+    <div class="card-body p-4">
+      <h4 class="text-center mb-1">📡 Radar de vagas</h4>
+      <p class="text-center text-muted small mb-4">Entre ou crie sua conta para continuar</p>
+      <ul class="nav nav-pills nav-justified mb-3" id="tabsLogin">
+        <li class="nav-item"><button class="nav-link active w-100" id="tabEntrar" type="button">Entrar</button></li>
+        <li class="nav-item"><button class="nav-link w-100" id="tabCriar" type="button">Criar conta</button></li>
+      </ul>
+
+      <div id="painelEntrar">
+        <label class="form-label small fw-bold">Usuário</label>
+        <input type="text" class="form-control mb-2" id="entrarUser" autocomplete="username">
+        <label class="form-label small fw-bold">Senha</label>
+        <input type="password" class="form-control mb-2" id="entrarPass" autocomplete="current-password">
+        <p class="small text-danger d-none" id="entrarErro">Usuário ou senha incorretos.</p>
+        <button class="btn btn-primary w-100 mb-3" id="btnEntrar">Entrar</button>
+      </div>
+
+      <div id="painelCriar" class="d-none">
+        <label class="form-label small fw-bold">Escolha um usuário</label>
+        <input type="text" class="form-control mb-2" id="criarUser" autocomplete="username">
+        <label class="form-label small fw-bold">Escolha uma senha</label>
+        <input type="password" class="form-control mb-2" id="criarPass" autocomplete="new-password">
+        <label class="form-label small fw-bold">Confirme a senha</label>
+        <input type="password" class="form-control mb-2" id="criarPass2" autocomplete="new-password">
+        <p class="small text-danger d-none" id="criarErro"></p>
+        <button class="btn btn-primary w-100 mb-3" id="btnCriar">Criar conta e entrar</button>
+      </div>
+
+      <div class="text-center small text-muted mb-2">ou</div>
+      <div class="d-flex flex-column align-items-center gap-2" id="areaLoginApi"></div>
+      <p class="text-center small mt-3"><button class="btn btn-link btn-sm p-0" id="btnConfigLoginTela" type="button">Configurar login com Google/Microsoft</button></p>
+      <p class="text-center small text-muted">Contas ficam salvas no banco (Turso) se a sincronização estiver configurada; sem ela, ficam só neste navegador.</p>
+    </div>
+  </div>
+</div>
+
+<div id="appConteudo" class="d-none">
 <nav class="navbar navbar-dark bg-dark px-3">
   <span class="navbar-brand mb-0 h5">📡 Radar de vagas</span>
   <div class="d-flex align-items-center gap-2" id="areaLogin"></div>
@@ -134,7 +173,6 @@
 
     <main class="col-12 col-md-9 col-lg-10 p-3 p-md-4">
       <div id="erro" class="alert alert-danger d-none"></div>
-      <div class="alert alert-info d-none" id="avisoLogin">Entre com Google ou Microsoft (canto superior direito) para marcar, candidatar ou sincronizar vagas. Ver a lista não exige login.</div>
 
       <div class="d-flex justify-content-center mb-4">
         <div class="w-100" style="max-width:640px;">
@@ -178,6 +216,7 @@
       <p id="vazio" class="text-center text-muted py-5 d-none">Nenhuma vaga corresponde aos filtros atuais.</p>
     </main>
   </div>
+</div>
 </div>
 
 <div class="modal fade" id="modalEmail" tabindex="-1">
@@ -263,24 +302,6 @@
   </div>
 </div>
 
-<div class="modal fade" id="modalLoginLocal" tabindex="-1">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header"><h5 class="modal-title">Entrar</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
-      <div class="modal-body">
-        <label class="form-label small fw-bold">Usuário</label>
-        <input type="text" class="form-control mb-2" id="loginUser" autocomplete="username">
-        <label class="form-label small fw-bold">Senha</label>
-        <input type="password" class="form-control" id="loginPass" autocomplete="current-password">
-        <p class="small text-danger mt-2 d-none" id="loginErro">Usuário ou senha incorretos.</p>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-        <button class="btn btn-primary" id="btnLoginLocal">Entrar</button>
-      </div>
-    </div>
-  </div>
-</div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
@@ -302,68 +323,113 @@ let statusMap = new Map(Object.entries(JSON.parse(localStorage.getItem(STATUS_KE
 let lidaMap = new Map(Object.entries(JSON.parse(localStorage.getItem(LIDA_KEY) || '{}')));
 let msalInstance = null;
 
-// --- login ---
+// --- login / cadastro ---
 function usuarioAtual(){ try { return JSON.parse(localStorage.getItem(USER_KEY) || 'null'); } catch { return null; } }
-function setUsuario(u){ localStorage.setItem(USER_KEY, JSON.stringify(u)); renderLogin(); render(); carregarPerfil(); }
-function sairUsuario(){ localStorage.removeItem(USER_KEY); renderLogin(); render(); }
+function setUsuario(u){
+  localStorage.setItem(USER_KEY, JSON.stringify(u));
+  document.getElementById('telaLogin').classList.add('d-none');
+  document.getElementById('appConteudo').classList.remove('d-none');
+  iniciarApp();
+}
+function sairUsuario(){ localStorage.removeItem(USER_KEY); location.reload(); }
 function parseJwt(token){
   try { return JSON.parse(decodeURIComponent(escape(atob(token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))))); }
   catch { return {}; }
 }
-const ADMIN_HASH = '67e7f6c0866240c01ba7216229e5545420e4d8f3b3d9a49ebdbba05f76e1fa3f';
 async function sha256Hex(txt){
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(txt));
   return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
 }
-async function tentarLoginLocal(){
-  const u = document.getElementById('loginUser').value.trim();
-  const p = document.getElementById('loginPass').value;
+const CONTAS_LOCAIS_KEY = 'radar-vagas-contas-locais';
+function contasLocais(){ try { return JSON.parse(localStorage.getItem(CONTAS_LOCAIS_KEY) || '{}'); } catch { return {}; } }
+
+document.getElementById('tabEntrar').addEventListener('click', () => {
+  document.getElementById('tabEntrar').classList.add('active');
+  document.getElementById('tabCriar').classList.remove('active');
+  document.getElementById('painelEntrar').classList.remove('d-none');
+  document.getElementById('painelCriar').classList.add('d-none');
+});
+document.getElementById('tabCriar').addEventListener('click', () => {
+  document.getElementById('tabCriar').classList.add('active');
+  document.getElementById('tabEntrar').classList.remove('active');
+  document.getElementById('painelCriar').classList.remove('d-none');
+  document.getElementById('painelEntrar').classList.add('d-none');
+});
+
+async function tentarEntrar(){
+  const u = document.getElementById('entrarUser').value.trim();
+  const p = document.getElementById('entrarPass').value;
+  const erro = document.getElementById('entrarErro');
+  erro.classList.add('d-none');
+  if (!u || !p) return;
   const hash = await sha256Hex(u.toLowerCase() + ':' + p);
-  if (hash === ADMIN_HASH){
-    setUsuario({ email: 'admin@local', nome: 'Admin', provedor: 'local' });
-    bootstrap.Modal.getInstance(document.getElementById('modalLoginLocal')).hide();
-    document.getElementById('loginErro').classList.add('d-none');
-  } else {
-    document.getElementById('loginErro').classList.remove('d-none');
+  if (syncConfigurada()){
+    const linhas = await tursoQuery('SELECT senha_hash FROM usuario_conta WHERE usuario = ?', [u.toLowerCase()]);
+    if (linhas.length && linhas[0].senha_hash === hash){
+      setUsuario({ email: u.toLowerCase(), nome: u, provedor: 'conta' });
+      return;
+    }
   }
+  const locais = contasLocais();
+  if (locais[u.toLowerCase()] === hash){
+    setUsuario({ email: u.toLowerCase(), nome: u, provedor: 'conta-local' });
+    return;
+  }
+  erro.classList.remove('d-none');
 }
-document.getElementById('btnLoginLocal').addEventListener('click', tentarLoginLocal);
-document.getElementById('loginPass').addEventListener('keydown', (e) => { if (e.key === 'Enter') tentarLoginLocal(); });
+async function tentarCriar(){
+  const u = document.getElementById('criarUser').value.trim();
+  const p = document.getElementById('criarPass').value;
+  const p2 = document.getElementById('criarPass2').value;
+  const erro = document.getElementById('criarErro');
+  erro.classList.add('d-none');
+  if (!u || u.length < 3){ erro.textContent = 'Usuário precisa ter ao menos 3 caracteres.'; erro.classList.remove('d-none'); return; }
+  if (p.length < 6){ erro.textContent = 'Senha precisa ter ao menos 6 caracteres.'; erro.classList.remove('d-none'); return; }
+  if (p !== p2){ erro.textContent = 'As senhas não coincidem.'; erro.classList.remove('d-none'); return; }
+  const hash = await sha256Hex(u.toLowerCase() + ':' + p);
+  if (syncConfigurada()){
+    const existentes = await tursoQuery('SELECT usuario FROM usuario_conta WHERE usuario = ?', [u.toLowerCase()]);
+    if (existentes.length){ erro.textContent = 'Esse usuário já existe.'; erro.classList.remove('d-none'); return; }
+    await tursoExec('INSERT INTO usuario_conta (usuario, senha_hash, criado_em) VALUES (?, ?, ?)', [u.toLowerCase(), hash, new Date().toISOString()]);
+    setUsuario({ email: u.toLowerCase(), nome: u, provedor: 'conta' });
+    return;
+  }
+  const locais = contasLocais();
+  if (locais[u.toLowerCase()]){ erro.textContent = 'Esse usuário já existe neste navegador.'; erro.classList.remove('d-none'); return; }
+  locais[u.toLowerCase()] = hash;
+  localStorage.setItem(CONTAS_LOCAIS_KEY, JSON.stringify(locais));
+  setUsuario({ email: u.toLowerCase(), nome: u, provedor: 'conta-local' });
+}
+document.getElementById('btnEntrar').addEventListener('click', tentarEntrar);
+document.getElementById('btnCriar').addEventListener('click', tentarCriar);
+document.getElementById('entrarPass').addEventListener('keydown', (e) => { if (e.key === 'Enter') tentarEntrar(); });
+document.getElementById('btnConfigLoginTela').addEventListener('click', () => new bootstrap.Modal('#modalLoginConfig').show());
+
 function exigirLogin(){
   const u = usuarioAtual();
-  if (!u){ alert('Entre com Google ou Microsoft (canto superior direito) para usar esta ação.'); return false; }
+  if (!u){ alert('Entre na sua conta para usar esta ação.'); return false; }
   return true;
 }
 function renderLogin(){
   const area = document.getElementById('areaLogin');
   const u = usuarioAtual();
-  const googleId = localStorage.getItem(GOOGLE_ID_KEY);
-  const msId = localStorage.getItem(MS_ID_KEY);
-  document.getElementById('avisoLogin').classList.toggle('d-none', !!u);
   if (u){
     area.innerHTML = `<span class="text-white small">Olá, ${u.nome || u.email} <span class="badge bg-secondary">${u.provedor}</span></span> <button class="btn btn-sm btn-outline-light" id="btnSair">Sair</button>`;
     document.getElementById('btnSair').addEventListener('click', sairUsuario);
-    return;
   }
-  if (!googleId && !msId){
-    area.innerHTML = `<button class="btn btn-sm btn-light" id="btnLoginLocalAbrir">Entrar</button>`;
-    document.getElementById('btnLoginLocalAbrir').addEventListener('click', () => new bootstrap.Modal('#modalLoginLocal').show());
-    return;
-  }
-  area.innerHTML = `
-    ${googleId ? '<div id="googleBtnHolder"></div>' : ''}
-    ${msId ? '<button class="btn btn-sm btn-light" id="btnMs">Entrar com Microsoft</button>' : ''}
-    <button class="btn btn-sm btn-light" id="btnLoginLocalAbrir">Entrar</button>
-    <button class="btn btn-sm btn-outline-light" id="btnConfigLogin" title="Configurar login">⚙</button>
-  `;
-  document.getElementById('btnLoginLocalAbrir').addEventListener('click', () => new bootstrap.Modal('#modalLoginLocal').show());
-  document.getElementById('btnConfigLogin').addEventListener('click', () => new bootstrap.Modal('#modalLoginConfig').show());
+}
+function renderLoginApi(){
+  const area = document.getElementById('areaLoginApi');
+  const googleId = localStorage.getItem(GOOGLE_ID_KEY);
+  const msId = localStorage.getItem(MS_ID_KEY);
+  if (!area) return;
+  area.innerHTML = `${googleId ? '<div id="googleBtnHolder"></div>' : ''} ${msId ? '<button class="btn btn-sm btn-light w-100" id="btnMs">Entrar com Microsoft</button>' : ''}`;
   if (googleId && window.google && google.accounts){
     google.accounts.id.initialize({ client_id: googleId, callback: (resp) => {
       const p = parseJwt(resp.credential);
       setUsuario({ email: p.email, nome: p.name, provedor: 'google' });
     }});
-    google.accounts.id.renderButton(document.getElementById('googleBtnHolder'), { theme:'filled_blue', size:'medium' });
+    google.accounts.id.renderButton(document.getElementById('googleBtnHolder'), { theme:'outline', size:'medium' });
   }
   if (msId){
     document.getElementById('btnMs').addEventListener('click', () => {
@@ -913,22 +979,30 @@ document.getElementById('syncSalvar').addEventListener('click', () => {
   });
 });
 
-lerFiltrosDaUrl();
-renderLogin();
-atualizarBadgeSync();
-carregarPerfil();
-document.getElementById('btnSalvarPerfil').addEventListener('click', salvarPerfil);
-
-fetch('./jobs.json', { cache: 'no-store' })
-  .then(r=>{ if(!r.ok) throw new Error('jobs.json ainda não existe neste endereço'); return r.json(); })
-  .then(data=>{
-    JOBS = (Array.isArray(data)?data:[]).map(j => ({ ...j, _categoria: classificarVaga(j) }));
-    atualizar();
-  })
-  .catch(err=>{
-    document.getElementById('erro').classList.remove('d-none');
-    document.getElementById('erro').textContent = 'Não consegui carregar jobs.json: ' + err.message + '. Rode o workflow ao menos uma vez para gerar este arquivo.';
-  });
+// tudo abaixo só roda depois do login (ver iniciarApp)
+function iniciarApp(){
+  lerFiltrosDaUrl();
+  renderLogin();
+  atualizarBadgeSync();
+  carregarPerfil();
+  document.getElementById('btnSalvarPerfil').addEventListener('click', salvarPerfil);
+  fetch('./jobs.json', { cache: 'no-store' })
+    .then(r=>{ if(!r.ok) throw new Error('jobs.json ainda não existe neste endereço'); return r.json(); })
+    .then(data=>{
+      JOBS = (Array.isArray(data)?data:[]).map(j => ({ ...j, _categoria: classificarVaga(j) }));
+      atualizar();
+    })
+    .catch(err=>{
+      document.getElementById('erro').classList.remove('d-none');
+      document.getElementById('erro').textContent = 'Não consegui carregar jobs.json: ' + err.message + '. Rode o workflow ao menos uma vez para gerar este arquivo.';
+    });
+}
+renderLoginApi();
+if (usuarioAtual()){
+  document.getElementById('telaLogin').classList.add('d-none');
+  document.getElementById('appConteudo').classList.remove('d-none');
+  iniciarApp();
+}
 </script>
 </body>
 </html>
