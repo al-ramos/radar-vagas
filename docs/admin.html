@@ -14,16 +14,21 @@
   <span class="navbar-brand mb-0 h5">📡 Radar de vagas — <span class="text-warning">admin</span></span>
   <div class="d-flex align-items-center gap-2">
     <a href="./index.html" class="btn btn-sm btn-outline-light">← Voltar ao painel</a>
-    <div id="areaLogin"></div>
   </div>
 </nav>
 
 <div class="container py-4">
-  <div id="bloqueado" class="d-none">
-    <div class="alert alert-warning">
-      <h5>Acesso restrito</h5>
-      <p id="msgBloqueado">Entre com Google ou Microsoft para continuar.</p>
-      <button class="btn btn-primary d-none" id="btnTornarAdmin">Tornar-me administrador (só funciona uma vez, neste navegador)</button>
+  <div id="bloqueado">
+    <div class="card mx-auto" style="max-width:360px;">
+      <div class="card-body">
+        <h5 class="card-title">Acesso restrito</h5>
+        <label class="form-label small fw-bold">Usuário</label>
+        <input type="text" class="form-control mb-2" id="loginUser" autocomplete="username">
+        <label class="form-label small fw-bold">Senha</label>
+        <input type="password" class="form-control mb-2" id="loginPass" autocomplete="current-password">
+        <p class="small text-danger d-none" id="loginErro">Usuário ou senha incorretos.</p>
+        <button class="btn btn-primary w-100" id="btnEntrar">Entrar</button>
+      </div>
     </div>
   </div>
 
@@ -50,81 +55,33 @@
 </div>
 
 <script>
-const USER_KEY = 'radar-vagas-usuario';
-const ADMIN_EMAIL_KEY = 'radar-vagas-admin-email';
-const GOOGLE_ID_KEY = 'radar-vagas-google-client-id';
-const MS_ID_KEY = 'radar-vagas-ms-client-id';
 const SYNC_URL_KEY = 'radar-vagas-turso-url';
 const SYNC_TOKEN_KEY = 'radar-vagas-turso-token';
-let msalInstance = null;
-
-function usuarioAtual(){ try { return JSON.parse(localStorage.getItem(USER_KEY) || 'null'); } catch { return null; } }
-function setUsuario(u){ localStorage.setItem(USER_KEY, JSON.stringify(u)); avaliarAcesso(); }
-function sairUsuario(){ localStorage.removeItem(USER_KEY); avaliarAcesso(); }
-function parseJwt(token){
-  try { return JSON.parse(decodeURIComponent(escape(atob(token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))))); }
-  catch { return {}; }
+const ADMIN_HASH = '67e7f6c0866240c01ba7216229e5545420e4d8f3b3d9a49ebdbba05f76e1fa3f';
+const SESSAO_KEY = 'radar-vagas-admin-sessao';
+async function sha256Hex(txt){
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(txt));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
 }
-function renderLogin(){
-  const area = document.getElementById('areaLogin');
-  const u = usuarioAtual();
-  const googleId = localStorage.getItem(GOOGLE_ID_KEY);
-  const msId = localStorage.getItem(MS_ID_KEY);
-  if (u){
-    area.innerHTML = `<span class="text-white small">Olá, ${u.nome || u.email}</span> <button class="btn btn-sm btn-outline-light" id="btnSair">Sair</button>`;
-    document.getElementById('btnSair').addEventListener('click', sairUsuario);
-    return;
-  }
-  if (!googleId && !msId){
-    area.innerHTML = `<a href="./index.html" class="btn btn-sm btn-outline-light">Configure o login no painel principal</a>`;
-    return;
-  }
-  area.innerHTML = `${googleId ? '<div id="googleBtnHolder"></div>' : ''} ${msId ? '<button class="btn btn-sm btn-light" id="btnMs">Entrar com Microsoft</button>' : ''}`;
-  if (googleId && window.google && google.accounts){
-    google.accounts.id.initialize({ client_id: googleId, callback: (resp) => {
-      const p = parseJwt(resp.credential);
-      setUsuario({ email: p.email, nome: p.name, provedor: 'google' });
-    }});
-    google.accounts.id.renderButton(document.getElementById('googleBtnHolder'), { theme:'filled_blue', size:'medium' });
-  }
-  if (msId){
-    document.getElementById('btnMs').addEventListener('click', () => {
-      if (!msalInstance) msalInstance = new msal.PublicClientApplication({ auth: { clientId: msId, authority: 'https://login.microsoftonline.com/common', redirectUri: window.location.origin + window.location.pathname } });
-      msalInstance.loginPopup({ scopes: ['User.Read'] }).then(resp => {
-        setUsuario({ email: resp.account.username, nome: resp.account.name, provedor: 'microsoft' });
-      }).catch(err => alert('Falha no login: ' + err.message));
-    });
+async function tentarLogin(){
+  const u = document.getElementById('loginUser').value.trim();
+  const p = document.getElementById('loginPass').value;
+  const hash = await sha256Hex(u.toLowerCase() + ':' + p);
+  if (hash === ADMIN_HASH){
+    sessionStorage.setItem(SESSAO_KEY, '1');
+    avaliarAcesso();
+  } else {
+    document.getElementById('loginErro').classList.remove('d-none');
   }
 }
+document.getElementById('btnEntrar').addEventListener('click', tentarLogin);
+document.getElementById('loginPass').addEventListener('keydown', (e) => { if (e.key === 'Enter') tentarLogin(); });
 
 function avaliarAcesso(){
-  renderLogin();
-  const u = usuarioAtual();
-  const adminEmail = localStorage.getItem(ADMIN_EMAIL_KEY);
-  const bloqueado = document.getElementById('bloqueado');
-  const conteudo = document.getElementById('conteudoAdmin');
-  const btnTornar = document.getElementById('btnTornarAdmin');
-  if (!u){
-    bloqueado.classList.remove('d-none'); conteudo.classList.add('d-none');
-    document.getElementById('msgBloqueado').textContent = 'Entre com Google ou Microsoft para continuar.';
-    btnTornar.classList.add('d-none');
-    return;
-  }
-  if (!adminEmail){
-    bloqueado.classList.remove('d-none'); conteudo.classList.add('d-none');
-    document.getElementById('msgBloqueado').textContent = 'Ninguém foi definido como administrador neste navegador ainda.';
-    btnTornar.classList.remove('d-none');
-    btnTornar.onclick = () => { localStorage.setItem(ADMIN_EMAIL_KEY, u.email); avaliarAcesso(); };
-    return;
-  }
-  if (u.email !== adminEmail){
-    bloqueado.classList.remove('d-none'); conteudo.classList.add('d-none');
-    document.getElementById('msgBloqueado').textContent = 'Esta conta (' + u.email + ') não é a administradora deste painel.';
-    btnTornar.classList.add('d-none');
-    return;
-  }
-  bloqueado.classList.add('d-none'); conteudo.classList.remove('d-none');
-  carregarRelatorio();
+  const logado = sessionStorage.getItem(SESSAO_KEY) === '1';
+  document.getElementById('bloqueado').classList.toggle('d-none', logado);
+  document.getElementById('conteudoAdmin').classList.toggle('d-none', !logado);
+  if (logado) carregarRelatorio();
 }
 
 // --- turso read ---

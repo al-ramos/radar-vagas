@@ -26,7 +26,6 @@
 <nav class="navbar navbar-dark bg-dark px-3">
   <span class="navbar-brand mb-0 h5">📡 Radar de vagas</span>
   <div class="d-flex align-items-center gap-2" id="areaLogin"></div>
-  <a href="./admin.html" class="btn btn-sm btn-outline-light">Admin</a>
 </nav>
 
 <div class="container-fluid">
@@ -264,6 +263,25 @@
   </div>
 </div>
 
+<div class="modal fade" id="modalLoginLocal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header"><h5 class="modal-title">Entrar</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body">
+        <label class="form-label small fw-bold">Usuário</label>
+        <input type="text" class="form-control mb-2" id="loginUser" autocomplete="username">
+        <label class="form-label small fw-bold">Senha</label>
+        <input type="password" class="form-control" id="loginPass" autocomplete="current-password">
+        <p class="small text-danger mt-2 d-none" id="loginErro">Usuário ou senha incorretos.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button class="btn btn-primary" id="btnLoginLocal">Entrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 const SENIOR_LABEL = { estagio:'Estágio', junior:'Júnior', pleno:'Pleno', senior:'Sênior', especialista:'Especialista', nao_informado:'Não informada' };
@@ -292,6 +310,25 @@ function parseJwt(token){
   try { return JSON.parse(decodeURIComponent(escape(atob(token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))))); }
   catch { return {}; }
 }
+const ADMIN_HASH = '67e7f6c0866240c01ba7216229e5545420e4d8f3b3d9a49ebdbba05f76e1fa3f';
+async function sha256Hex(txt){
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(txt));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+async function tentarLoginLocal(){
+  const u = document.getElementById('loginUser').value.trim();
+  const p = document.getElementById('loginPass').value;
+  const hash = await sha256Hex(u.toLowerCase() + ':' + p);
+  if (hash === ADMIN_HASH){
+    setUsuario({ email: 'admin@local', nome: 'Admin', provedor: 'local' });
+    bootstrap.Modal.getInstance(document.getElementById('modalLoginLocal')).hide();
+    document.getElementById('loginErro').classList.add('d-none');
+  } else {
+    document.getElementById('loginErro').classList.remove('d-none');
+  }
+}
+document.getElementById('btnLoginLocal').addEventListener('click', tentarLoginLocal);
+document.getElementById('loginPass').addEventListener('keydown', (e) => { if (e.key === 'Enter') tentarLoginLocal(); });
 function exigirLogin(){
   const u = usuarioAtual();
   if (!u){ alert('Entre com Google ou Microsoft (canto superior direito) para usar esta ação.'); return false; }
@@ -309,15 +346,17 @@ function renderLogin(){
     return;
   }
   if (!googleId && !msId){
-    area.innerHTML = `<button class="btn btn-sm btn-outline-light" id="btnConfigLogin">Configurar login</button>`;
-    document.getElementById('btnConfigLogin').addEventListener('click', () => new bootstrap.Modal('#modalLoginConfig').show());
+    area.innerHTML = `<button class="btn btn-sm btn-light" id="btnLoginLocalAbrir">Entrar</button>`;
+    document.getElementById('btnLoginLocalAbrir').addEventListener('click', () => new bootstrap.Modal('#modalLoginLocal').show());
     return;
   }
   area.innerHTML = `
     ${googleId ? '<div id="googleBtnHolder"></div>' : ''}
     ${msId ? '<button class="btn btn-sm btn-light" id="btnMs">Entrar com Microsoft</button>' : ''}
+    <button class="btn btn-sm btn-light" id="btnLoginLocalAbrir">Entrar</button>
     <button class="btn btn-sm btn-outline-light" id="btnConfigLogin" title="Configurar login">⚙</button>
   `;
+  document.getElementById('btnLoginLocalAbrir').addEventListener('click', () => new bootstrap.Modal('#modalLoginLocal').show());
   document.getElementById('btnConfigLogin').addEventListener('click', () => new bootstrap.Modal('#modalLoginConfig').show());
   if (googleId && window.google && google.accounts){
     google.accounts.id.initialize({ client_id: googleId, callback: (resp) => {
