@@ -331,6 +331,7 @@
         <div class="d-flex gap-2 mb-2">
           <button class="btn btn-outline-secondary btn-sm" id="btnTraduzir" type="button">🌐 Traduzir</button>
           <button class="btn btn-outline-secondary btn-sm" id="btnDiagnosticoIa" type="button">🤖 Diagnóstico com IA</button>
+          <button class="btn btn-outline-secondary btn-sm" id="btnAbrirClaude" type="button">🔗 Analisar no Claude</button>
         </div>
         <div id="analiseDescricao" class="border rounded p-3 bg-light small" style="max-height:280px; overflow-y:auto; line-height:1.5;"></div>
         <div id="diagnosticoIaBox" class="d-none mt-3">
@@ -843,6 +844,21 @@ function textoPerfilResumo(){
   const cfg = JSON.parse(localStorage.getItem(PERFIL_LOCAL_KEY) || 'null') || perfilPadrao();
   return `Senioridade desejada: ${cfg.senioridade || 'n\u00e3o informada'}. Modalidade preferida: ${cfg.modalidade || 'n\u00e3o informada'}. Cidades aceitas: ${cfg.cidades || 'qualquer'}. Domina: ${cfg.stacks || '-'}. Quer atuar em: ${cfg.quero || '-'}. Quer evitar: ${cfg.evitar || '-'}.`;
 }
+function montarPromptDiagnostico(j){
+  return `Aja como consultor de carreira em TI. Responda em portugu\u00eas do Brasil, direto e objetivo.\n\nPerfil do candidato: ${textoPerfilResumo()}\n\nVaga: ${j.titulo} \u2014 ${j.empresa} (${j.local||''}, ${j.modalidade||''})\nDescri\u00e7\u00e3o: ${(document.getElementById('analiseDescricao').innerText || '').slice(0,3000)}\n\nD\u00ea um diagn\u00f3stico curto e pr\u00e1tico: 1) ader\u00eancia real ao perfil (nota 0-10 e por qu\u00ea), 2) principais pontos fortes do candidato pra essa vaga, 3) lacunas ou riscos, 4) recomenda\u00e7\u00e3o final (vale a pena se candidatar ou n\u00e3o).`;
+}
+document.getElementById('btnAbrirClaude').addEventListener('click', () => {
+  const j = __vagaAtualAnalise;
+  if (!j) return;
+  const prompt = montarPromptDiagnostico(j);
+  navigator.clipboard.writeText(prompt).then(() => {
+    window.open('https://claude.ai/new', '_blank', 'noopener');
+    const b = document.getElementById('btnAbrirClaude');
+    const orig = b.textContent;
+    b.textContent = '\u2713 Prompt copiado \u2014 cole no Claude';
+    setTimeout(() => { b.textContent = orig; }, 3000);
+  });
+});
 let __vagaAtualAnalise = null;
 document.getElementById('btnTraduzir').addEventListener('click', () => {
   const j = __vagaAtualAnalise;
