@@ -186,7 +186,7 @@ def main():
 
         corpo = json.dumps(vagas, ensure_ascii=False)
         con.execute(
-            "INSERT OR IGNORE INTO raw_fetch (fonte, url, coletado_em, status, hash, corpo)"
+            "INSERT INTO raw_fetch (fonte, url, coletado_em, status, hash, corpo)"
             " VALUES (?,?,?,?,?,?)",
             (
                 f["tipo"],
@@ -198,6 +198,8 @@ def main():
             ),
         )
 
+        atualizacoes = []
+        insercoes = []  # (sql, params, tipo_evento) so pras novas
         for v in vagas:
             v = {kk: (vv if vv is not None else "") for kk, vv in v.items()}
             if not v["titulo"]:
@@ -207,49 +209,44 @@ def main():
             texto = f"{v['titulo']} {v['local']} {v['descricao']}"
             jid_existente = existentes.get(k)
             if jid_existente:
-                con.execute(
-                    "UPDATE job SET ultima_vez = ?, ativo = 1 WHERE id = ?",
-                    (HOJE, jid_existente),
+                atualizacoes.append(
+                    ("UPDATE job SET ultima_vez = ?, ativo = 1 WHERE id = ?", (HOJE, jid_existente))
                 )
                 continue
-            cur = con.execute(
-                "INSERT OR IGNORE INTO job (chave, empresa, titulo, senioridade, modalidade,"
+            insercoes.append((
+                "INSERT INTO job (chave, empresa, titulo, senioridade, modalidade,"
                 " local, stack, publicado_em, url, descricao, primeira_vez, ultima_vez)"
                 " VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
                 (
-                    k,
-                    empresa,
-                    v["titulo"],
-                    senioridade(v["titulo"]),
-                    modalidade(texto),
-                    v["local"],
-                    "",
-                    v["publicado_em"],
-                    v["url"],
-                    v["descricao"],
-                    HOJE,
-                    HOJE,
+                    k, empresa, v["titulo"], senioridade(v["titulo"]), modalidade(texto),
+                    v["local"], "", v["publicado_em"], v["url"], v["descricao"], HOJE, HOJE,
                 ),
+            ))
+
+        db.lote(con, atualizacoes)
+        cursores = db.lote(con, insercoes)
+        eventos = [
+            (
+                "INSERT INTO job_event (job_id, tipo, ocorrido_em, detalhe) VALUES (?,?,?,?)",
+                (cur.lastrowid, "nova", HOJE, f["tipo"]),
             )
-            if cur.lastrowid:
-                con.execute(
-                    "INSERT OR IGNORE INTO job_event (job_id, tipo, ocorrido_em, detalhe)"
-                    " VALUES (?,?,?,?)",
-                    (cur.lastrowid, "nova", HOJE, f["tipo"]),
-                )
-                novas += 1
+            for cur in cursores
+        ]
+        db.lote(con, eventos)
+        novas += len(insercoes)
         print(f"{f['empresa']}: {len(vagas)} vagas")
 
     sumidas = con.execute(
         "SELECT id FROM job WHERE ativo = 1 AND ultima_vez != ?", (HOJE,)
     ).fetchall()
-    for (jid,) in sumidas:
-        con.execute("UPDATE job SET ativo = 0 WHERE id = ?", (jid,))
-        con.execute(
-            "INSERT OR IGNORE INTO job_event (job_id, tipo, ocorrido_em, detalhe)"
-            " VALUES (?,?,?,?)",
-            (jid, "fechada", HOJE, "ausente na coleta"),
-        )
+    db.lote(con, [
+        ("UPDATE job SET ativo = 0 WHERE id = ?", (jid,)) for (jid,) in sumidas
+    ])
+    db.lote(con, [
+        ("INSERT INTO job_event (job_id, tipo, ocorrido_em, detalhe) VALUES (?,?,?,?)",
+         (jid, "fechada", HOJE, "ausente na coleta"))
+        for (jid,) in sumidas
+    ])
 
     # limpa capturas brutas antigas (raw_fetch e so auditoria, nao e lido em
     # nenhum outro lugar - mantem o banco pequeno)

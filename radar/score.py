@@ -81,10 +81,12 @@ def main():
         "SELECT id, titulo, descricao, senioridade, modalidade, local, publicado_em"
         " FROM job WHERE ativo = 1"
     ).fetchall()
+    atualizacoes = []
     for jid, tit, desc, sen, mod, loc, pub in linhas:
         pts, _ = pontuar(tit, desc or "", sen, mod, loc, pub)
         dom = ", ".join(achados(f"{tit} {desc}", P.get("domino")))
-        con.execute("UPDATE job SET pontos = ?, stack = ? WHERE id = ?", (pts, dom, jid))
+        atualizacoes.append(("UPDATE job SET pontos = ?, stack = ? WHERE id = ?", (pts, dom, jid)))
+    db.lote(con, atualizacoes)
     con.commit()
     print(f"pontuadas: {len(linhas)}")
 
