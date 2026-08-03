@@ -117,6 +117,13 @@
       </div>
       <button class="btn btn-outline-dark btn-sm w-100 mb-3" id="limpar">Limpar filtros</button>
       <hr>
+      <div class="mb-3">
+        <label class="form-label small fw-bold">Meu perfil (stacks que domino)</label>
+        <textarea id="perfilStacksInput" class="form-control form-control-sm mb-1" rows="2" placeholder="python, aws, kubernetes, react"></textarea>
+        <button class="btn btn-outline-primary btn-sm w-100" id="btnSalvarPerfil" type="button">💾 Salvar perfil</button>
+        <p class="small text-muted mt-1">Usado na análise de cada vaga e no e-mail — salvo no banco, associado à sua conta.</p>
+      </div>
+      <hr>
       <button class="btn btn-outline-secondary btn-sm w-100 mb-3" id="syncBadge" type="button">☁ Sincronização</button>
       <div class="mb-2">
         <label class="form-label small fw-bold">E-mail para envio</label>
@@ -204,7 +211,7 @@
       <div class="modal-body">
         <div id="analiseCorpo"></div>
         <label class="form-label small fw-bold mt-3">Descrição da vaga (salva na coleta)</label>
-        <textarea id="analiseDescricao" readonly class="form-control bg-light" style="min-height:140px; font-size:12px;"></textarea>
+        <div id="analiseDescricao" class="border rounded p-3 bg-light small" style="max-height:280px; overflow-y:auto; line-height:1.5;"></div>
       </div>
       <div class="modal-footer">
         <button class="btn btn-outline-secondary" id="analiseCopiarDescricao">📋 Copiar descrição</button>
@@ -279,7 +286,7 @@ let msalInstance = null;
 
 // --- login ---
 function usuarioAtual(){ try { return JSON.parse(localStorage.getItem(USER_KEY) || 'null'); } catch { return null; } }
-function setUsuario(u){ localStorage.setItem(USER_KEY, JSON.stringify(u)); renderLogin(); render(); }
+function setUsuario(u){ localStorage.setItem(USER_KEY, JSON.stringify(u)); renderLogin(); render(); carregarPerfil(); }
 function sairUsuario(){ localStorage.removeItem(USER_KEY); renderLogin(); render(); }
 function parseJwt(token){
   try { return JSON.parse(decodeURIComponent(escape(atob(token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))))); }
@@ -358,6 +365,28 @@ function tursoExec(sql, args){
     headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
     body: JSON.stringify({ requests: [{ type: 'execute', stmt: { sql, args: (args||[]).map(tursoArg) } }, { type: 'close' }] }),
   }).catch(err => { console.warn('sync turso falhou', err); return null; });
+}
+function tursoValor(cel){
+  if (!cel || cel.type === 'null') return null;
+  if (cel.type === 'integer' || cel.type === 'float') return Number(cel.value);
+  return cel.value;
+}
+function tursoQuery(sql, args){
+  if (!syncConfigurada()) return Promise.resolve([]);
+  let url = localStorage.getItem(SYNC_URL_KEY).trim();
+  if (url.startsWith('libsql://')) url = 'https://' + url.slice('libsql://'.length);
+  const token = localStorage.getItem(SYNC_TOKEN_KEY).trim();
+  return fetch(url.replace(/\/$/, '') + '/v2/pipeline', {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ requests: [{ type: 'execute', stmt: { sql, args: (args||[]).map(tursoArg) } }, { type: 'close' }] }),
+  }).then(r => r.json()).then(data => {
+    const res = data.results && data.results[0];
+    if (!res || res.type !== 'ok') return [];
+    const result = res.response.result;
+    const cols = result.cols.map(c => c.name);
+    return result.rows.map(row => { const obj={}; cols.forEach((c,i)=>obj[c]=tursoValor(row[i])); return obj; });
+  }).catch(err => { console.warn('leitura turso falhou', err); return []; });
 }
 function atualizarStatusRemoto(j){
   const id = j.id;
@@ -508,7 +537,36 @@ function dataRel(iso){
   return d+' dias';
 }
 function meuPerfil(){
+  if (window.__perfilPersistido && window.__perfilPersistido.length) return window.__perfilPersistido;
   return Array.from(stacksAtivas || []).map(s=>s.trim().toLowerCase()).filter(Boolean);
+}
+const PERFIL_LOCAL_KEY = 'radar-vagas-perfil-stacks';
+function carregarPerfil(){
+  const local = (localStorage.getItem(PERFIL_LOCAL_KEY) || '').split(',').map(s=>s.trim().toLowerCase()).filter(Boolean);
+  window.__perfilPersistido = local;
+  document.getElementById('perfilStacksInput').value = local.join(', ');
+  const u = usuarioAtual();
+  if (!u || !syncConfigurada()) return;
+  tursoQuery('SELECT stacks FROM perfil WHERE usuario_email = ?', [u.email]).then(linhas => {
+    if (linhas.length && linhas[0].stacks){
+      const remoto = linhas[0].stacks.split(',').map(s=>s.trim().toLowerCase()).filter(Boolean);
+      window.__perfilPersistido = remoto;
+      document.getElementById('perfilStacksInput').value = remoto.join(', ');
+      render();
+    }
+  });
+}
+function salvarPerfil(){
+  if (!exigirLogin()) return;
+  const stacks = document.getElementById('perfilStacksInput').value.trim();
+  localStorage.setItem(PERFIL_LOCAL_KEY, stacks);
+  window.__perfilPersistido = stacks.split(',').map(s=>s.trim().toLowerCase()).filter(Boolean);
+  const u = usuarioAtual();
+  tursoExec('INSERT INTO perfil (usuario_email, stacks, atualizado_em) VALUES (?, ?, ?) ON CONFLICT(usuario_email) DO UPDATE SET stacks=excluded.stacks, atualizado_em=excluded.atualizado_em',
+    [u.email, stacks, new Date().toISOString()]);
+  render();
+  const b = document.getElementById('btnSalvarPerfil');
+  const orig = b.textContent; b.textContent = '✓ Salvo'; setTimeout(()=>{ b.textContent = orig; }, 1500);
 }
 function lidaEfetiva(j){
   const k = chaveJob(j);
@@ -699,11 +757,12 @@ function abrirAnalise(j){
     </table>
   `;
   document.getElementById('analiseAbrirVaga').href = j.url || '#';
-  document.getElementById('analiseDescricao').value = j.descricao || 'Sem descrição salva para esta vaga.';
+  const desc = j.descricao || '<p>Sem descrição salva para esta vaga.</p>';
+  document.getElementById('analiseDescricao').innerHTML = desc.replace(/<script[\s\S]*?<\/script>/gi, '').replace(/<style[\s\S]*?<\/style>/gi, '').replace(/ on\w+="[^"]*"/gi, '');
   new bootstrap.Modal(document.getElementById('modalAnalise')).show();
 }
 document.getElementById('analiseCopiarDescricao').addEventListener('click', () => {
-  const txt = document.getElementById('analiseDescricao').value;
+  const txt = document.getElementById('analiseDescricao').innerText;
   navigator.clipboard.writeText(txt).then(() => {
     const b = document.getElementById('analiseCopiarDescricao');
     const orig = b.textContent;
@@ -818,6 +877,8 @@ document.getElementById('syncSalvar').addEventListener('click', () => {
 lerFiltrosDaUrl();
 renderLogin();
 atualizarBadgeSync();
+carregarPerfil();
+document.getElementById('btnSalvarPerfil').addEventListener('click', salvarPerfil);
 
 fetch('./jobs.json', { cache: 'no-store' })
   .then(r=>{ if(!r.ok) throw new Error('jobs.json ainda não existe neste endereço'); return r.json(); })
