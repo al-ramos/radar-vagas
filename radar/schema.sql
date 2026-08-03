@@ -27,7 +27,8 @@ CREATE TABLE IF NOT EXISTS job (
   avisado INTEGER DEFAULT 0,
   lida INTEGER DEFAULT 0,
   status_usuario TEXT DEFAULT '',
-  status_atualizado_em TEXT
+  status_atualizado_em TEXT,
+  usuario_email TEXT
 );
 
 CREATE TABLE IF NOT EXISTS job_event (

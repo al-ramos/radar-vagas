@@ -8,6 +8,7 @@ COLUNAS = [
     ("lida", "INTEGER DEFAULT 0"),
     ("status_usuario", "TEXT DEFAULT ''"),
     ("status_atualizado_em", "TEXT"),
+    ("usuario_email", "TEXT"),
 ]
 
 

@@ -15,7 +15,7 @@ CAMPOS = [
     "id", "empresa", "titulo", "senioridade", "modalidade", "local",
     "stack", "publicado_em", "url", "pontos", "primeira_vez",
     "ultima_vez", "ativo", "avisado", "descricao",
-    "lida", "status_usuario", "status_atualizado_em",
+    "lida", "status_usuario", "status_atualizado_em", "usuario_email",
 ]
 
 

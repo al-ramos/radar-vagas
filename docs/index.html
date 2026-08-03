@@ -4,257 +4,256 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Radar de vagas — painel</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
 <style>
-  :root{
-    --bg:#f5ead8; --text:#201e1d; --surface:#ffffff; --divider:#e4d7bf;
-    --accent:#c67139; --accent-100:#f3ddc9; --accent-700:#8a4a22; --accent-800:#6e3a1b;
-    --sage-100:#e6ebde; --sage-700:#4f5d3c; --neutral-200:#ece2cd; --neutral-700:#6b5f4c; --neutral-800:#4a4136;
-  }
-  *{ box-sizing:border-box; }
-  body{ margin:0; font-family:-apple-system,Segoe UI,Roboto,sans-serif; background:var(--bg); color:var(--text); }
-  .wrap{ display:flex; min-height:100vh; }
-  aside{ flex:0 0 270px; padding:24px 16px; border-right:1px solid var(--divider); position:sticky; top:0; align-self:flex-start; height:100vh; overflow-y:auto; }
-  aside p.kick{ font-size:10.5px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--accent-700); margin:0 0 4px; }
-  aside p.brand{ font-size:20px; font-weight:700; margin:0 0 24px; }
-  label{ display:block; font-size:12px; font-weight:700; color:var(--neutral-800); margin-bottom:6px; }
-  select, input[type=text], input[type=email]{ width:100%; padding:9px 12px; border-radius:10px; border:1px solid var(--divider); font-size:13px; background:var(--surface); color:var(--text); margin-bottom:18px; }
-  input[type=range]{ width:100%; margin-bottom:18px; }
-  button{ width:100%; padding:9px 12px; border-radius:999px; border:1px solid var(--divider); background:var(--surface); color:var(--neutral-800); font-size:12.5px; font-weight:700; cursor:pointer; }
-  button:hover{ background:var(--accent-100); }
-  button:focus-visible, select:focus-visible, input:focus-visible, textarea:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
-  button.primary{ background:var(--accent); border-color:var(--accent); color:#fff; }
-  button.primary:hover{ background:var(--accent-800); }
-  button.ghost{ background:transparent; }
-  #copiarLink{ display:flex; align-items:center; justify-content:center; gap:6px; margin-bottom:10px; color:var(--accent-800); }
-  hr.sep{ border:none; border-top:1px solid var(--divider); margin:4px 0 18px; }
-  .stackpicker{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:18px; }
-  .stackchip{ padding:5px 10px; border-radius:999px; border:1px solid var(--divider); background:var(--surface); font-size:11.5px; font-weight:700; color:var(--neutral-800); cursor:pointer; }
-  .stackchip.on{ background:var(--accent); border-color:var(--accent); color:#fff; }
-  .checkline{ display:flex; align-items:center; gap:8px; font-weight:400; margin-bottom:18px; }
-  .checkline input{ width:auto; margin:0; }
-  main{ flex:1 1 auto; min-width:0; padding:24px 40px; }
-  .buscaGoogle{ display:flex; justify-content:center; margin-bottom:22px; }
-  .buscaGoogle .caixa{ position:relative; width:100%; max-width:640px; }
-  .buscaGoogle input{ width:100%; padding:15px 20px 15px 46px; border-radius:999px; border:1px solid var(--divider); background:var(--surface); font-size:15px; box-shadow:0 2px 10px rgba(32,30,29,.06); margin:0; }
-  .buscaGoogle .icone{ position:absolute; left:18px; top:50%; transform:translateY(-50%); color:var(--neutral-700); font-size:15px; }
-  .stats{ display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:24px; }
-  .stat{ border-radius:16px; padding:16px; background:var(--neutral-200); }
-  .stat.a{ background:var(--accent-100); } .stat.b{ background:var(--sage-100); }
-  .stat b{ display:block; font-size:26px; }
-  .stat span{ font-size:12px; color:var(--neutral-800); }
-  .chips{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:14px; min-height:1px; }
-  .chip{ display:inline-flex; align-items:center; gap:6px; padding:5px 10px 5px 12px; border-radius:999px; background:var(--accent-100); color:var(--accent-800); font-size:12px; font-weight:700; }
-  .chip button{ all:unset; cursor:pointer; line-height:1; font-size:13px; padding:0 2px; width:auto; }
-  .toolbar{ display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; gap:12px; }
-  .toolbar .esq{ display:flex; align-items:center; gap:10px; font-size:12.5px; color:var(--neutral-800); }
-  .toolbar button{ width:auto; padding:8px 16px; }
-  table{ width:100%; border-collapse:collapse; font-size:13.5px; background:var(--surface); border-radius:16px; overflow:hidden; }
-  thead tr{ background:var(--neutral-200); }
-  th{ text-align:left; padding:12px 14px; font-size:11px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--neutral-700); user-select:none; }
-  th.sortable{ cursor:pointer; }
-  th.sortable:hover{ color:var(--accent-800); }
-  th .arrow{ opacity:.5; margin-left:3px; }
-  th.active .arrow{ opacity:1; color:var(--accent-700); }
-  td{ padding:12px 14px; border-top:1px solid var(--divider); vertical-align:top; }
-  td a{ font-weight:700; color:var(--text); text-decoration:none; }
-  td a:hover{ color:var(--accent-800); }
-  td.sel, th.sel{ padding-left:14px; padding-right:0; width:20px; }
+  body{ background:#f5f6f8; }
+  .naolida-dot{ display:inline-block; width:8px; height:8px; border-radius:999px; background:#0d6efd; margin-right:6px; }
+  tr.naolida td a{ font-weight:700; }
   tr.descartada-row{ opacity:.45; }
-  .empresa{ font-size:12px; color:var(--neutral-700); margin-top:2px; }
-  .fonte{ font-size:10.5px; color:var(--sage-700); margin-top:2px; }
-  .cat{ display:inline-block; font-size:10.5px; font-weight:700; padding:2px 8px; border-radius:999px; margin-top:4px; background:var(--neutral-200); color:var(--neutral-800); }
-  .pts{ display:inline-block; min-width:34px; padding:5px 10px; border-radius:999px; font-weight:700; font-size:12.5px; text-align:center; }
-  .data-rel{ font-weight:700; }
-  .data-abs{ font-size:11px; color:var(--neutral-700); }
-  .stackmatch{ color:var(--accent-800); font-weight:700; }
-  .btnAnalisar{ width:auto; padding:4px 10px; font-size:11px; margin-top:6px; }
-  .statusbtns{ display:flex; gap:4px; margin-top:6px; }
-  .statusbtns button{ width:auto; padding:3px 8px; font-size:10.5px; }
-  .statusbtns button.on.candidatei{ background:var(--sage-100); border-color:var(--sage-700); color:var(--sage-700); }
-  .statusbtns button.on.descartada{ background:var(--neutral-200); border-color:var(--neutral-700); color:var(--neutral-700); }
-  .dias-abertos{ font-weight:700; }
-  .dias-abertos.antiga{ color:var(--accent-800); }
-  #vazio{ text-align:center; color:var(--neutral-700); padding:60px 0; }
-  #erro{ color:#a33; padding:12px; }
-  .modal-bg{ position:fixed; inset:0; background:rgba(32,30,29,.5); display:flex; align-items:center; justify-content:center; z-index:50; }
-  .modal{ background:var(--surface); border-radius:16px; padding:24px; width:560px; max-width:92vw; max-height:86vh; overflow-y:auto; }
-  .modal h2{ font-size:17px; margin:0 0 6px; }
-  .modal p.sub{ font-size:12.5px; color:var(--neutral-700); margin:0 0 16px; }
-  .modal textarea{ width:100%; min-height:260px; padding:10px 12px; border-radius:10px; border:1px solid var(--divider); font-size:12.5px; font-family:inherit; line-height:1.5; }
-  .modal .acoes{ display:flex; gap:10px; margin-top:14px; }
-  .analise-linha{ display:flex; justify-content:space-between; gap:12px; padding:10px 0; border-top:1px solid var(--divider); font-size:13px; }
-  .analise-linha:first-child{ border-top:none; }
-  .analise-linha b{ color:var(--neutral-800); }
-  .aderencia{ display:inline-block; padding:4px 12px; border-radius:999px; font-weight:700; font-size:13px; }
-  .aderencia.alta{ background:var(--sage-100); color:var(--sage-700); }
-  .aderencia.media{ background:var(--accent-100); color:var(--accent-800); }
-  .aderencia.baixa{ background:var(--neutral-200); color:var(--neutral-700); }
-  .syncbadge{ display:block; width:100%; text-align:center; padding:8px 10px; border-radius:999px; font-size:11px; font-weight:700; cursor:pointer; margin-bottom:18px; border:1px solid var(--divider); }
-  .syncbadge.on{ background:var(--sage-100); color:var(--sage-700); border-color:var(--sage-700); }
-  .syncbadge.off{ background:var(--neutral-200); color:var(--neutral-700); }
-  .naolida-dot{ display:inline-block; width:8px; height:8px; border-radius:999px; background:var(--accent); margin-right:6px; vertical-align:1px; }
-  tr.naolida td a{ font-weight:800; }
-  .modal label{ margin-top:10px; }
-  .modal p.aviso{ font-size:11.5px; color:var(--accent-800); background:var(--accent-100); border-radius:10px; padding:10px 12px; line-height:1.5; margin:6px 0 14px; }
+  .stackchip{ cursor:pointer; }
+  .data-abs{ font-size:11px; color:#6c757d; }
+  .stat-card b{ font-size:1.6rem; display:block; }
+  #sidebar{ min-height:100vh; }
+  .btn-xs{ padding:.15rem .5rem; font-size:.72rem; }
+  .aderencia-alta{ background:#198754; }
+  .aderencia-media{ background:#ffc107; color:#212529; }
+  .aderencia-baixa{ background:#6c757d; }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <aside>
-    <p class="kick">Radar de vagas</p>
-    <p class="brand">Painel</p>
-    <button class="syncbadge" id="syncBadge" type="button"></button>
-    <button id="copiarLink" type="button">🔗 Copiar link com filtros</button>
-    <label>Categoria</label>
-    <select id="fCategoria">
-      <option value="todas">Todas</option>
-      <optgroup label="Dev">
-        <option value="dev_front">Dev · Front-end</option>
-        <option value="dev_back">Dev · Back-end</option>
-        <option value="dev_full">Dev · Full-stack</option>
-        <option value="dev_outro">Dev · Outro</option>
-      </optgroup>
-      <option value="infra">Infra / DevOps</option>
-      <option value="suporte">Suporte</option>
-      <option value="outro">Outro</option>
-    </select>
-    <label>Fonte</label>
-    <select id="fFonte">
-      <option value="todas">Todas</option>
-      <option value="ats">ATS direto (Gupy/Greenhouse/etc)</option>
-      <option value="jsonfeed">E-mails (LinkedIn/Infojobs/Catho)</option>
-    </select>
-    <label>Status</label>
-    <select id="fStatus">
-      <option value="padrao">Ocultar descartadas</option>
-      <option value="todas">Todas</option>
-      <option value="candidatei">Só candidatei-me</option>
-      <option value="descartadas">Só descartadas</option>
-    </select>
-    <label>Senioridade</label>
-    <select id="fSenioridade">
-      <option value="todas">Todas</option>
-      <option value="estagio">Estágio</option>
-      <option value="junior">Júnior</option>
-      <option value="pleno">Pleno</option>
-      <option value="senior">Sênior</option>
-      <option value="especialista">Especialista</option>
-      <option value="nao_informado">Não informada</option>
-    </select>
-    <label>Modalidade</label>
-    <select id="fModalidade">
-      <option value="todas">Todas</option>
-      <option value="remoto">Remoto</option>
-      <option value="hibrido">Híbrido</option>
-      <option value="presencial">Presencial</option>
-    </select>
-    <label class="checkline"><input type="checkbox" id="fRegiaoBr"> Somente Brasil / remoto BR</label>
-    <label class="checkline"><input type="checkbox" id="fNaoLidas"> Somente não lidas</label>
-    <label>Stack (clique para filtrar)</label>
-    <div class="stackpicker" id="stackPicker"></div>
-    <label>Corte mínimo: <span id="corteLabel">0</span> pts</label>
-    <input type="range" id="fCorte" min="0" max="100" step="5" value="0">
-    <label>Ordenar por</label>
-    <select id="fOrdenar">
-      <option value="publicado_em">Mais recente</option>
-      <option value="pontos">Pontuação</option>
-      <option value="dias_aberta">Aberta há mais tempo</option>
-      <option value="empresa">Empresa (A-Z)</option>
-    </select>
-    <button id="limpar">Limpar filtros</button>
-    <hr class="sep">
-    <label>E-mail para envio</label>
-    <input type="email" id="emailDestino" placeholder="voce@exemplo.com">
-    <button id="prepararEmail" class="primary" type="button">✉ Preparar e-mail das selecionadas</button>
-    <p style="font-size:11px; color:var(--neutral-700); line-height:1.5; margin:8px 0 0;">Marque as vagas na tabela (checkbox) e clique aqui: abre uma prévia editável do e-mail antes de enviar pelo seu cliente de e-mail.</p>
-  </aside>
-  <main>
-    <div id="erro" style="display:none;"></div>
-    <div class="buscaGoogle">
-      <div class="caixa">
-        <span class="icone">🔎</span>
-        <input type="text" id="fTexto" placeholder="Buscar vagas — empresa, título, local, stack...">
+<nav class="navbar navbar-dark bg-dark px-3">
+  <span class="navbar-brand mb-0 h5">📡 Radar de vagas</span>
+  <div class="d-flex align-items-center gap-2" id="areaLogin"></div>
+</nav>
+
+<div class="container-fluid">
+  <div class="row">
+    <aside id="sidebar" class="col-12 col-md-3 col-lg-2 bg-white border-end p-3">
+      <button class="btn btn-outline-secondary btn-sm w-100 mb-3" id="copiarLink" type="button">🔗 Copiar link com filtros</button>
+
+      <div class="mb-3">
+        <label class="form-label small fw-bold">Categoria</label>
+        <select id="fCategoria" class="form-select form-select-sm">
+          <option value="todas">Todas</option>
+          <optgroup label="Dev">
+            <option value="dev_front">Dev · Front-end</option>
+            <option value="dev_back">Dev · Back-end</option>
+            <option value="dev_full">Dev · Full-stack</option>
+            <option value="dev_outro">Dev · Outro</option>
+          </optgroup>
+          <option value="infra">Infra / DevOps</option>
+          <option value="suporte">Suporte</option>
+          <option value="outro">Outro</option>
+        </select>
+      </div>
+      <div class="mb-3">
+        <label class="form-label small fw-bold">Fonte</label>
+        <select id="fFonte" class="form-select form-select-sm">
+          <option value="todas">Todas</option>
+          <option value="ats">ATS direto (Gupy/Greenhouse/etc)</option>
+          <option value="jsonfeed">E-mails (LinkedIn/Infojobs/Catho)</option>
+        </select>
+      </div>
+      <div class="mb-3">
+        <label class="form-label small fw-bold">Status</label>
+        <select id="fStatus" class="form-select form-select-sm">
+          <option value="padrao">Ocultar descartadas</option>
+          <option value="todas">Todas</option>
+          <option value="candidatei">Só candidatei-me</option>
+          <option value="descartadas">Só descartadas</option>
+        </select>
+      </div>
+      <div class="mb-3">
+        <label class="form-label small fw-bold">Senioridade</label>
+        <select id="fSenioridade" class="form-select form-select-sm">
+          <option value="todas">Todas</option>
+          <option value="estagio">Estágio</option>
+          <option value="junior">Júnior</option>
+          <option value="pleno">Pleno</option>
+          <option value="senior">Sênior</option>
+          <option value="especialista">Especialista</option>
+          <option value="nao_informado">Não informada</option>
+        </select>
+      </div>
+      <div class="mb-3">
+        <label class="form-label small fw-bold">Modalidade</label>
+        <select id="fModalidade" class="form-select form-select-sm">
+          <option value="todas">Todas</option>
+          <option value="remoto">Remoto</option>
+          <option value="hibrido">Híbrido</option>
+          <option value="presencial">Presencial</option>
+        </select>
+      </div>
+      <div class="form-check mb-2">
+        <input class="form-check-input" type="checkbox" id="fRegiaoBr">
+        <label class="form-check-label small" for="fRegiaoBr">Somente Brasil / remoto BR</label>
+      </div>
+      <div class="form-check mb-3">
+        <input class="form-check-input" type="checkbox" id="fNaoLidas">
+        <label class="form-check-label small" for="fNaoLidas">Somente não lidas</label>
+      </div>
+      <div class="mb-3">
+        <label class="form-label small fw-bold">Stack (clique para filtrar)</label>
+        <div class="d-flex flex-wrap gap-1" id="stackPicker"></div>
+      </div>
+      <div class="mb-3">
+        <label class="form-label small fw-bold">Corte mínimo: <span id="corteLabel">0</span> pts</label>
+        <input type="range" class="form-range" id="fCorte" min="0" max="100" step="5" value="0">
+      </div>
+      <div class="mb-3">
+        <label class="form-label small fw-bold">Ordenar por</label>
+        <select id="fOrdenar" class="form-select form-select-sm">
+          <option value="publicado_em">Mais recente</option>
+          <option value="pontos">Pontuação</option>
+          <option value="dias_aberta">Aberta há mais tempo</option>
+          <option value="empresa">Empresa (A-Z)</option>
+        </select>
+      </div>
+      <button class="btn btn-outline-dark btn-sm w-100 mb-3" id="limpar">Limpar filtros</button>
+      <hr>
+      <button class="btn btn-outline-secondary btn-sm w-100 mb-3" id="syncBadge" type="button">☁ Sincronização</button>
+      <div class="mb-2">
+        <label class="form-label small fw-bold">E-mail para envio</label>
+        <input type="email" class="form-control form-control-sm" id="emailDestino" placeholder="voce@exemplo.com">
+      </div>
+      <button class="btn btn-primary btn-sm w-100" id="prepararEmail" type="button">✉ Preparar e-mail das selecionadas</button>
+      <p class="small text-muted mt-2">Marque as vagas na tabela (checkbox) e clique aqui: abre uma prévia editável do e-mail.</p>
+    </aside>
+
+    <main class="col-12 col-md-9 col-lg-10 p-3 p-md-4">
+      <div id="erro" class="alert alert-danger d-none"></div>
+      <div class="alert alert-info d-none" id="avisoLogin">Entre com Google ou Microsoft (canto superior direito) para marcar, candidatar ou sincronizar vagas. Ver a lista não exige login.</div>
+
+      <div class="d-flex justify-content-center mb-4">
+        <div class="w-100" style="max-width:640px;">
+          <input type="text" id="fTexto" class="form-control form-control-lg rounded-pill" placeholder="🔎 Buscar vagas — empresa, título, local, stack...">
+        </div>
+      </div>
+
+      <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3"><div class="card stat-card bg-primary-subtle"><div class="card-body py-2"><b id="stTotal">-</b><span class="small" id="stTotalLabel">vagas exibidas</span></div></div></div>
+        <div class="col-6 col-md-3"><div class="card stat-card bg-success-subtle"><div class="card-body py-2"><b id="stMedia">-</b><span class="small">pontuação média</span></div></div></div>
+        <div class="col-6 col-md-3"><div class="card stat-card bg-light"><div class="card-body py-2"><b id="stTop" style="font-size:1.05rem;">-</b><span class="small" id="stTopLabel">empresa com mais vagas</span></div></div></div>
+        <div class="col-6 col-md-3"><div class="card stat-card bg-light"><div class="card-body py-2"><b id="stAtt" style="font-size:1.05rem;">-</b><span class="small">última coleta</span></div></div></div>
+      </div>
+
+      <div class="d-flex flex-wrap gap-2 mb-3" id="chips"></div>
+
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <div class="d-flex align-items-center gap-3">
+          <div class="form-check mb-0">
+            <input class="form-check-input" type="checkbox" id="selTodas">
+            <label class="form-check-label small" for="selTodas">selecionar todas as exibidas</label>
+          </div>
+          <span class="small text-muted" id="selContagem">0 selecionadas</span>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-hover align-middle bg-white">
+          <thead class="table-light">
+            <tr>
+              <th style="width:20px;"></th>
+              <th>Vaga</th><th>Local / modalidade</th><th>Senioridade</th><th>Stack</th>
+              <th class="sortable text-center" data-ord="dias_aberta" style="cursor:pointer;">Aberta há</th>
+              <th class="sortable text-center" data-ord="pontos" style="cursor:pointer;">Pontos</th>
+              <th class="sortable text-end" data-ord="publicado_em" style="cursor:pointer;">Publicada</th>
+            </tr>
+          </thead>
+          <tbody id="corpo"></tbody>
+        </table>
+      </div>
+      <p id="vazio" class="text-center text-muted py-5 d-none">Nenhuma vaga corresponde aos filtros atuais.</p>
+    </main>
+  </div>
+</div>
+
+<div class="modal fade" id="modalEmail" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header"><h5 class="modal-title">Prévia do e-mail</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body">
+        <label class="form-label small fw-bold">Para</label>
+        <input type="email" class="form-control mb-2" id="modalPara">
+        <label class="form-label small fw-bold">Assunto</label>
+        <input type="text" class="form-control mb-2" id="modalAssunto">
+        <label class="form-label small fw-bold">Corpo</label>
+        <textarea class="form-control" id="modalCorpo" style="min-height:220px;"></textarea>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button class="btn btn-primary" id="modalEnviar">Abrir no meu e-mail para enviar</button>
       </div>
     </div>
-    <div class="stats">
-      <div class="stat a"><b id="stTotal">-</b><span id="stTotalLabel">vagas exibidas</span></div>
-      <div class="stat b"><b id="stMedia">-</b><span>pontuação média</span></div>
-      <div class="stat"><b id="stTop" style="font-size:18px;">-</b><span id="stTopLabel">empresa com mais vagas</span></div>
-      <div class="stat"><b id="stAtt" style="font-size:18px;">-</b><span>última coleta</span></div>
-    </div>
-    <div class="chips" id="chips"></div>
-    <div class="toolbar">
-      <div class="esq">
-        <label style="display:flex; align-items:center; gap:6px; margin:0; font-weight:400;">
-          <input type="checkbox" id="selTodas" style="width:auto; margin:0;"> selecionar todas as exibidas
-        </label>
-        <span id="selContagem">0 selecionadas</span>
+  </div>
+</div>
+
+<div class="modal fade" id="modalAnalise" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div><h5 class="modal-title mb-0" id="analiseTitulo">Análise da vaga</h5><small class="text-muted" id="analiseEmpresa"></small></div>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div id="analiseCorpo"></div>
+        <label class="form-label small fw-bold mt-3">Descrição da vaga (salva na coleta)</label>
+        <textarea id="analiseDescricao" readonly class="form-control bg-light" style="min-height:140px; font-size:12px;"></textarea>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline-secondary" id="analiseCopiarDescricao">📋 Copiar descrição</button>
+        <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Fechar</button>
+        <a id="analiseAbrirVaga" href="#" target="_blank" rel="noopener" class="btn btn-primary">Abrir vaga</a>
       </div>
     </div>
-    <table>
-      <thead><tr>
-        <th class="sel"></th>
-        <th>Vaga</th><th>Local / modalidade</th><th>Senioridade</th><th>Stack</th>
-        <th class="sortable" data-ord="dias_aberta" style="text-align:center;">Aberta há<span class="arrow">▾</span></th>
-        <th class="sortable" data-ord="pontos" style="text-align:center;">Pontos<span class="arrow">▾</span></th>
-        <th class="sortable" data-ord="publicado_em" style="text-align:right;">Publicada<span class="arrow">▾</span></th>
-      </tr></thead>
-      <tbody id="corpo"></tbody>
-    </table>
-    <p id="vazio" style="display:none;">Nenhuma vaga corresponde aos filtros atuais.</p>
-  </main>
+  </div>
 </div>
 
-<div class="modal-bg" id="modalBg" style="display:none;">
-  <div class="modal">
-    <h2>Prévia do e-mail</h2>
-    <label>Para</label>
-    <input type="email" id="modalPara">
-    <label>Assunto</label>
-    <input type="text" id="modalAssunto">
-    <label>Corpo</label>
-    <textarea id="modalCorpo"></textarea>
-    <div class="acoes">
-      <button class="ghost" id="modalFechar" type="button">Cancelar</button>
-      <button class="primary" id="modalEnviar" type="button">Abrir no meu e-mail para enviar</button>
+<div class="modal fade" id="modalSync" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header"><h5 class="modal-title">Sincronizar com o banco (Turso)</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body">
+        <p class="small text-muted">Grava lida/candidatei/descartei direto no Turso, além do navegador.</p>
+        <div class="alert alert-warning small">⚠ O token fica salvo só neste navegador, mas dá acesso de escrita ao banco. Evite compartilhar este link enquanto a sincronização estiver ativa.</div>
+        <label class="form-label small fw-bold">URL do banco (TURSO_DATABASE_URL)</label>
+        <input type="text" class="form-control mb-2" id="syncUrl" placeholder="libsql://radar-vagas-....turso.io">
+        <label class="form-label small fw-bold">Token (TURSO_AUTH_TOKEN)</label>
+        <input type="text" class="form-control" id="syncToken" placeholder="eyJhbGci...">
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline-danger" id="syncLimpar">Desligar sincronização</button>
+        <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button class="btn btn-primary" id="syncSalvar">Salvar e testar</button>
+      </div>
     </div>
   </div>
 </div>
 
-<div class="modal-bg" id="analiseBg" style="display:none;">
-  <div class="modal">
-    <h2 id="analiseTitulo">Análise da vaga</h2>
-    <p class="sub" id="analiseEmpresa"></p>
-    <div id="analiseCorpo"></div>
-    <label style="margin-top:14px;">Descrição da vaga (salva na coleta)</label>
-    <textarea id="analiseDescricao" readonly style="width:100%; min-height:140px; padding:10px 12px; border-radius:10px; border:1px solid var(--divider); font-size:12px; font-family:inherit; line-height:1.5; background:var(--neutral-200);"></textarea>
-    <div class="acoes">
-      <button class="ghost" id="analiseCopiarDescricao" type="button">📋 Copiar descrição</button>
-      <button class="ghost" id="analiseFechar" type="button">Fechar</button>
-      <a id="analiseAbrirVaga" href="#" target="_blank" rel="noopener" style="text-decoration:none;">
-        <button class="primary" type="button">Abrir vaga</button>
-      </a>
+<div class="modal fade" id="modalLoginConfig" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header"><h5 class="modal-title">Configurar login</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body">
+        <p class="small text-muted">Client IDs são públicos (não são segredo) — cole aqui uma vez, ficam salvos neste navegador.</p>
+        <label class="form-label small fw-bold">Google Client ID</label>
+        <input type="text" class="form-control mb-1" id="cfgGoogleId" placeholder="xxxx.apps.googleusercontent.com">
+        <p class="small text-muted">Crie em <a href="https://console.cloud.google.com/apis/credentials" target="_blank">console.cloud.google.com/apis/credentials</a> → Criar credenciais → ID do cliente OAuth → Aplicativo da Web → adicione esta URL em "Origens JavaScript autorizadas".</p>
+        <label class="form-label small fw-bold mt-2">Microsoft Client ID (Application ID)</label>
+        <input type="text" class="form-control mb-1" id="cfgMsId" placeholder="00000000-0000-0000-0000-000000000000">
+        <p class="small text-muted">Crie em <a href="https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/CreateApplicationBlade" target="_blank">portal.azure.com</a> → Novo registro → tipo "SPA" → adicione esta URL como Redirect URI.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button class="btn btn-primary" id="cfgSalvar">Salvar</button>
+      </div>
     </div>
   </div>
 </div>
 
-<div class="modal-bg" id="syncBg" style="display:none;">
-  <div class="modal" style="width:460px;">
-    <h2>Sincronizar com o banco (Turso)</h2>
-    <p class="sub">Grava lida/candidatei/descartei direto no Turso, além do navegador — assim funciona em qualquer dispositivo.</p>
-    <p class="aviso">⚠ O token fica salvo só neste navegador (não vai pro código), mas dá acesso de escrita ao banco. Use um token que você pode revogar depois se preferir, e evite compartilhar este link com terceiros enquanto a sincronização estiver ativa.</p>
-    <label>URL do banco (TURSO_DATABASE_URL)</label>
-    <input type="text" id="syncUrl" placeholder="libsql://radar-vagas-....turso.io">
-    <label>Token (TURSO_AUTH_TOKEN)</label>
-    <input type="text" id="syncToken" placeholder="eyJhbGci...">
-    <div class="acoes">
-      <button class="ghost" id="syncLimpar" type="button">Desligar sincronização</button>
-      <button class="ghost" id="syncFechar" type="button">Cancelar</button>
-      <button class="primary" id="syncSalvar" type="button">Salvar e testar</button>
-    </div>
-  </div>
-</div>
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 const SENIOR_LABEL = { estagio:'Estágio', junior:'Júnior', pleno:'Pleno', senior:'Sênior', especialista:'Especialista', nao_informado:'Não informada' };
 const FONTE_LABEL = { jsonfeed:'E-mail (LinkedIn/Infojobs/Catho)' };
@@ -263,13 +262,82 @@ const STATUS_KEY = 'radar-vagas-status';
 const LIDA_KEY = 'radar-vagas-lida';
 const SYNC_URL_KEY = 'radar-vagas-turso-url';
 const SYNC_TOKEN_KEY = 'radar-vagas-turso-token';
+const USER_KEY = 'radar-vagas-usuario';
+const GOOGLE_ID_KEY = 'radar-vagas-google-client-id';
+const MS_ID_KEY = 'radar-vagas-ms-client-id';
 const REGIAO_ESTRANGEIRA = /vietnam|thailand|tailandia|philippines|filipinas|indonesia|malaysia|malasia|singapore|singapura|india\b|pakistan|bangladesh|united states|estados unidos|\busa\b|canada|australia|new zealand|nova zelandia|united kingdom|\buk\b|england|germany|alemanha|france|franca\b|spain|espanha|portugal(?!.{0,20}brasil)|poland|polonia|ireland|irlanda|netherlands|holanda|mexico|argentina|chile\b|colombia|peru\b|china\b|japan|japao|south korea|coreia do sul/i;
 let JOBS = [];
 let stacksAtivas = new Set();
 let selecionadas = new Set();
 let statusMap = new Map(Object.entries(JSON.parse(localStorage.getItem(STATUS_KEY) || '{}')));
 let lidaMap = new Map(Object.entries(JSON.parse(localStorage.getItem(LIDA_KEY) || '{}')));
+let msalInstance = null;
 
+// --- login ---
+function usuarioAtual(){ try { return JSON.parse(localStorage.getItem(USER_KEY) || 'null'); } catch { return null; } }
+function setUsuario(u){ localStorage.setItem(USER_KEY, JSON.stringify(u)); renderLogin(); render(); }
+function sairUsuario(){ localStorage.removeItem(USER_KEY); renderLogin(); render(); }
+function parseJwt(token){
+  try { return JSON.parse(decodeURIComponent(escape(atob(token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))))); }
+  catch { return {}; }
+}
+function exigirLogin(){
+  const u = usuarioAtual();
+  if (!u){ alert('Entre com Google ou Microsoft (canto superior direito) para usar esta ação.'); return false; }
+  return true;
+}
+function renderLogin(){
+  const area = document.getElementById('areaLogin');
+  const u = usuarioAtual();
+  const googleId = localStorage.getItem(GOOGLE_ID_KEY);
+  const msId = localStorage.getItem(MS_ID_KEY);
+  document.getElementById('avisoLogin').classList.toggle('d-none', !!u);
+  if (u){
+    area.innerHTML = `<span class="text-white small">Olá, ${u.nome || u.email} <span class="badge bg-secondary">${u.provedor}</span></span> <button class="btn btn-sm btn-outline-light" id="btnSair">Sair</button>`;
+    document.getElementById('btnSair').addEventListener('click', sairUsuario);
+    return;
+  }
+  if (!googleId && !msId){
+    area.innerHTML = `<button class="btn btn-sm btn-outline-light" id="btnConfigLogin">Configurar login</button>`;
+    document.getElementById('btnConfigLogin').addEventListener('click', () => new bootstrap.Modal('#modalLoginConfig').show());
+    return;
+  }
+  area.innerHTML = `
+    ${googleId ? '<div id="googleBtnHolder"></div>' : ''}
+    ${msId ? '<button class="btn btn-sm btn-light" id="btnMs">Entrar com Microsoft</button>' : ''}
+    <button class="btn btn-sm btn-outline-light" id="btnConfigLogin" title="Configurar login">⚙</button>
+  `;
+  document.getElementById('btnConfigLogin').addEventListener('click', () => new bootstrap.Modal('#modalLoginConfig').show());
+  if (googleId && window.google && google.accounts){
+    google.accounts.id.initialize({ client_id: googleId, callback: (resp) => {
+      const p = parseJwt(resp.credential);
+      setUsuario({ email: p.email, nome: p.name, provedor: 'google' });
+    }});
+    google.accounts.id.renderButton(document.getElementById('googleBtnHolder'), { theme:'filled_blue', size:'medium' });
+  }
+  if (msId){
+    document.getElementById('btnMs').addEventListener('click', () => {
+      if (!msalInstance) msalInstance = new msal.PublicClientApplication({ auth: { clientId: msId, authority: 'https://login.microsoftonline.com/common', redirectUri: window.location.origin + window.location.pathname } });
+      msalInstance.loginPopup({ scopes: ['User.Read'] }).then(resp => {
+        setUsuario({ email: resp.account.username, nome: resp.account.name, provedor: 'microsoft' });
+      }).catch(err => { console.error(err); alert('Falha no login Microsoft: ' + err.message); });
+    });
+  }
+}
+document.getElementById('cfgSalvar').addEventListener('click', () => {
+  const g = document.getElementById('cfgGoogleId').value.trim();
+  const m = document.getElementById('cfgMsId').value.trim();
+  if (g) localStorage.setItem(GOOGLE_ID_KEY, g); else localStorage.removeItem(GOOGLE_ID_KEY);
+  if (m) localStorage.setItem(MS_ID_KEY, m); else localStorage.removeItem(MS_ID_KEY);
+  bootstrap.Modal.getInstance(document.getElementById('modalLoginConfig')).hide();
+  renderLogin();
+});
+document.getElementById('modalLoginConfig').addEventListener('show.bs.modal', () => {
+  document.getElementById('cfgGoogleId').value = localStorage.getItem(GOOGLE_ID_KEY) || '';
+  document.getElementById('cfgMsId').value = localStorage.getItem(MS_ID_KEY) || '';
+});
+
+// --- sync ---
 function syncConfigurada(){ return !!(localStorage.getItem(SYNC_URL_KEY) && localStorage.getItem(SYNC_TOKEN_KEY)); }
 function tursoArg(v){
   if (v === null || v === undefined) return { type: 'null' };
@@ -290,20 +358,23 @@ function tursoExec(sql, args){
 function atualizarStatusRemoto(j){
   const id = j.id;
   if (id == null) return;
+  const u = usuarioAtual();
   tursoExec(
-    'UPDATE job SET lida = ?, status_usuario = ?, status_atualizado_em = ? WHERE id = ?',
-    [getLida(chaveJob(j)) ? 1 : 0, getStatus(chaveJob(j)), new Date().toISOString(), id]
+    'UPDATE job SET lida = ?, status_usuario = ?, status_atualizado_em = ?, usuario_email = ? WHERE id = ?',
+    [getLida(chaveJob(j)) ? 1 : 0, getStatus(chaveJob(j)), new Date().toISOString(), u ? u.email : null, id]
   );
 }
 function atualizarBadgeSync(){
   const b = document.getElementById('syncBadge');
-  if (syncConfigurada()){ b.textContent = '☁ Sincronizado com o banco'; b.className = 'syncbadge on'; }
-  else { b.textContent = '☁ Sincronização com banco desligada — clique para configurar'; b.className = 'syncbadge off'; }
+  if (syncConfigurada()){ b.textContent = '☁ Sincronizado com o banco'; b.className = 'btn btn-success btn-sm w-100 mb-3'; }
+  else { b.textContent = '☁ Sincronização desligada'; b.className = 'btn btn-outline-secondary btn-sm w-100 mb-3'; }
 }
 
+// --- status / lida ---
 function persistirStatus(){ localStorage.setItem(STATUS_KEY, JSON.stringify(Object.fromEntries(statusMap))); }
 function getStatus(k){ return statusMap.get(k) || ''; }
 function setStatus(k, valor, j){
+  if (!exigirLogin()) return;
   if (getStatus(k) === valor) statusMap.delete(k);
   else if (valor) statusMap.set(k, valor);
   else statusMap.delete(k);
@@ -313,7 +384,8 @@ function setStatus(k, valor, j){
 }
 function persistirLida(){ localStorage.setItem(LIDA_KEY, JSON.stringify(Object.fromEntries(lidaMap))); }
 function getLida(k){ return !!lidaMap.get(k); }
-function marcarLida(k, valor, j){
+function marcarLida(k, valor, j, silencioso){
+  if (!silencioso && !exigirLogin()) return;
   if (valor) lidaMap.set(k, true); else lidaMap.delete(k);
   persistirLida();
   if (j) atualizarStatusRemoto(j);
@@ -363,7 +435,7 @@ function montarStackPicker(){
   el.innerHTML = '';
   top.forEach(s => {
     const chip = document.createElement('span');
-    chip.className = 'stackchip' + (stacksAtivas.has(s) ? ' on' : '');
+    chip.className = 'badge rounded-pill stackchip ' + (stacksAtivas.has(s) ? 'bg-primary' : 'bg-secondary-subtle text-dark border');
     chip.textContent = s;
     chip.addEventListener('click', () => {
       if (stacksAtivas.has(s)) stacksAtivas.delete(s); else stacksAtivas.add(s);
@@ -413,9 +485,9 @@ function escreverFiltrosNaUrl(){
 }
 
 function corPontos(p){
-  if (p >= 70) return { bg:'var(--sage-100)', tx:'var(--sage-700)' };
-  if (p >= 40) return { bg:'var(--accent-100)', tx:'var(--accent-800)' };
-  return { bg:'var(--neutral-200)', tx:'var(--neutral-700)' };
+  if (p >= 70) return 'bg-success';
+  if (p >= 40) return 'bg-warning text-dark';
+  return 'bg-secondary';
 }
 function dataAbs(iso){
   if(!iso) return '';
@@ -448,7 +520,7 @@ function stackHtmlComMatch(j){
   const perfil = meuPerfil();
   const itens = listaStacks(j);
   if (!itens.length) return '-';
-  return itens.map(s => perfil.includes(s.toLowerCase()) ? `<span class="stackmatch">${s}</span>` : s).join(', ');
+  return itens.map(s => perfil.includes(s.toLowerCase()) ? `<span class="text-primary fw-bold">${s}</span>` : s).join(', ');
 }
 
 function renderChips(){
@@ -456,8 +528,8 @@ function renderChips(){
   chips.innerHTML = '';
   const add = (label, onRemove) => {
     const c = document.createElement('span');
-    c.className = 'chip';
-    c.innerHTML = `${label} <button type="button" aria-label="remover filtro">✕</button>`;
+    c.className = 'badge bg-primary-subtle text-primary-emphasis rounded-pill d-inline-flex align-items-center gap-1 py-2 px-3';
+    c.innerHTML = `${label} <button type="button" class="btn-close btn-close-sm" style="font-size:.6rem;" aria-label="remover"></button>`;
     c.querySelector('button').addEventListener('click', () => { onRemove(); atualizar(); });
     chips.appendChild(c);
   };
@@ -528,8 +600,7 @@ function render(){
   });
 
   document.querySelectorAll('th.sortable').forEach(th=>{
-    th.classList.toggle('active', th.dataset.ord === campo);
-    th.querySelector('.arrow').textContent = (th.dataset.ord === campo && sortState.dir === 1) ? '▴' : '▾';
+    th.classList.toggle('table-active', th.dataset.ord === campo);
   });
 
   document.getElementById('stTotal').textContent = filtradas.length;
@@ -554,7 +625,7 @@ function render(){
   const corpo = document.getElementById('corpo');
   corpo.innerHTML = '';
   filtradas.forEach(j=>{
-    const cor = corPontos(j.pontos||0);
+    const corBg = corPontos(j.pontos||0);
     const k = chaveJob(j);
     const st = statusEfetivo(j);
     const lida = lidaEfetiva(j);
@@ -562,32 +633,33 @@ function render(){
     const tr = document.createElement('tr');
     if (st === 'descartada') tr.className = 'descartada-row';
     else if (!lida) tr.className = 'naolida';
-    const fonteTag = ehFonteEmail(j) ? `<div class="fonte">${FONTE_LABEL.jsonfeed}</div>` : '';
+    const fonteTag = ehFonteEmail(j) ? `<div class="small text-success">${FONTE_LABEL.jsonfeed}</div>` : '';
     tr.innerHTML = `
-      <td class="sel"><input type="checkbox" data-k="${k}" ${selecionadas.has(k)?'checked':''}></td>
-      <td><a href="${j.url||'#'}" target="_blank" rel="noopener">${!lida?'<span class="naolida-dot" title="não lida"></span>':''}${j.titulo||''}</a><div class="empresa">${j.empresa||''}</div>${fonteTag}<span class="cat">${CATEGORIA_LABEL[j._categoria]||''}</span><br><button type="button" class="btnAnalisar" data-k="${k}">🔍 Analisar</button>
-      <div class="statusbtns">
-        <button type="button" class="btnLida" data-k="${k}">${lida?'○ Marcar não lida':'● Marcar lida'}</button>
-        <button type="button" class="btnStatus ${st==='candidatei'?'on candidatei':''}" data-k="${k}" data-v="candidatei">✓ Candidatei</button>
-        <button type="button" class="btnStatus ${st==='descartada'?'on descartada':''}" data-k="${k}" data-v="descartada">✕ Descartar</button>
+      <td><input type="checkbox" data-k="${k}" ${selecionadas.has(k)?'checked':''}></td>
+      <td><a href="${j.url||'#'}" target="_blank" rel="noopener" class="text-decoration-none">${!lida?'<span class="naolida-dot" title="não lida"></span>':''}${j.titulo||''}</a><div class="small text-muted">${j.empresa||''}</div>${fonteTag}<span class="badge bg-light text-dark border">${CATEGORIA_LABEL[j._categoria]||''}</span><br>
+      <div class="btn-group btn-group-sm mt-1">
+        <button type="button" class="btn btn-outline-secondary btn-xs btnAnalisar" data-k="${k}">🔍 Analisar</button>
+        <button type="button" class="btn btn-outline-secondary btn-xs btnLida" data-k="${k}">${lida?'○ Não lida':'● Lida'}</button>
+        <button type="button" class="btn btn-xs btnStatus ${st==='candidatei'?'btn-success':'btn-outline-success'}" data-k="${k}" data-v="candidatei">✓ Candidatei</button>
+        <button type="button" class="btn btn-xs btnStatus ${st==='descartada'?'btn-secondary':'btn-outline-secondary'}" data-k="${k}" data-v="descartada">✕ Descartar</button>
       </div></td>
-      <td>${j.local||'-'}<div style="font-size:11.5px;color:var(--neutral-700);text-transform:capitalize;">${j.modalidade||''}</div></td>
-      <td style="text-transform:capitalize;">${SENIOR_LABEL[j.senioridade]||j.senioridade||'-'}</td>
-      <td style="font-size:12.5px;max-width:220px;">${stackHtmlComMatch(j)}</td>
-      <td style="text-align:center;"><span class="dias-abertos ${dias!=null && dias>=30 ? 'antiga':''}">${dias!=null ? dias+'d' : '-'}</span></td>
-      <td style="text-align:center;"><span class="pts" style="background:${cor.bg};color:${cor.tx};">${Math.round(j.pontos||0)}</span></td>
-      <td style="text-align:right;font-size:12.5px;color:var(--neutral-700);"><div class="data-rel">${dataRel(j.publicado_em)}</div><div class="data-abs">${dataAbs(j.publicado_em)}</div></td>`;
+      <td>${j.local||'-'}<div class="small text-muted text-capitalize">${j.modalidade||''}</div></td>
+      <td class="text-capitalize">${SENIOR_LABEL[j.senioridade]||j.senioridade||'-'}</td>
+      <td class="small" style="max-width:220px;">${stackHtmlComMatch(j)}</td>
+      <td class="text-center"><span class="${dias!=null && dias>=30 ? 'text-danger fw-bold':''}">${dias!=null ? dias+'d' : '-'}</span></td>
+      <td class="text-center"><span class="badge ${corBg}">${Math.round(j.pontos||0)}</span></td>
+      <td class="text-end small text-muted"><div class="fw-bold text-dark">${dataRel(j.publicado_em)}</div><div class="data-abs">${dataAbs(j.publicado_em)}</div></td>`;
     tr.querySelector('input[type=checkbox]').addEventListener('change', (e) => {
       if (e.target.checked) selecionadas.add(k); else selecionadas.delete(k);
       document.getElementById('selContagem').textContent = selecionadas.size + ' selecionadas';
       document.getElementById('selTodas').checked = (window.__filtradas||[]).every(j => selecionadas.has(chaveJob(j)));
     });
-    tr.querySelector('.btnAnalisar').addEventListener('click', () => { marcarLida(k, true, j); abrirAnalise(j); });
+    tr.querySelector('.btnAnalisar').addEventListener('click', () => { marcarLida(k, true, j, true); abrirAnalise(j); });
     tr.querySelector('.btnLida').addEventListener('click', () => marcarLida(k, !lidaEfetiva(j), j));
     tr.querySelectorAll('.btnStatus').forEach(b => b.addEventListener('click', () => setStatus(k, b.dataset.v, j)));
     corpo.appendChild(tr);
   });
-  document.getElementById('vazio').style.display = filtradas.length ? 'none' : 'block';
+  document.getElementById('vazio').classList.toggle('d-none', filtradas.length > 0);
 }
 
 function abrirAnalise(j){
@@ -602,27 +674,29 @@ function abrirAnalise(j){
   const match = stacksJob.filter(s => perfil.includes(s.toLowerCase()));
   const pctMatch = stacksJob.length ? Math.round(match.length / stacksJob.length * 100) : 0;
   const pontos = j.pontos || 0;
-  let aderencia = 'baixa', aderenciaLabel = 'Baixa';
-  if (pontos >= 70 || pctMatch >= 60) { aderencia = 'alta'; aderenciaLabel = 'Alta'; }
-  else if (pontos >= 40 || pctMatch >= 30) { aderencia = 'media'; aderenciaLabel = 'Média'; }
+  let aderencia = 'aderencia-baixa', aderenciaLabel = 'Baixa';
+  if (pontos >= 70 || pctMatch >= 60) { aderencia = 'aderencia-alta'; aderenciaLabel = 'Alta'; }
+  else if (pontos >= 40 || pctMatch >= 30) { aderencia = 'aderencia-media'; aderenciaLabel = 'Média'; }
   const dias = diasAbertaCalc(j);
 
   document.getElementById('analiseTitulo').textContent = j.titulo || 'Vaga';
   document.getElementById('analiseEmpresa').textContent = j.empresa + (j.local ? ' · ' + j.local : '');
   document.getElementById('analiseCorpo').innerHTML = `
-    <div class="analise-linha"><span>Aderência ao seu perfil</span><span class="aderencia ${aderencia}">${aderenciaLabel}</span></div>
-    <div class="analise-linha"><span>Categoria detectada</span><b>${CATEGORIA_LABEL[j._categoria] || '-'}</b></div>
-    <div class="analise-linha"><span>Por que essa categoria</span><b style="text-align:right; max-width:60%;">${motivos.length ? motivos.join(' · ') : 'sem palavras-chave claras no título'}</b></div>
-    <div class="analise-linha"><span>Pontuação do radar</span><b>${Math.round(pontos)} pts</b></div>
-    <div class="analise-linha"><span>Aberta há</span><b>${dias!=null ? dias+' dias' : '-'}</b></div>
-    <div class="analise-linha"><span>Senioridade</span><b>${SENIOR_LABEL[j.senioridade] || '-'}</b></div>
-    <div class="analise-linha"><span>Modalidade</span><b style="text-transform:capitalize;">${j.modalidade || '-'}</b></div>
-    <div class="analise-linha"><span>Stacks da vaga</span><b style="text-align:right; max-width:60%;">${stacksJob.join(', ') || '-'}</b></div>
-    <div class="analise-linha"><span>Combinam com seu perfil</span><b style="text-align:right; max-width:60%;">${match.length ? match.join(', ') : 'nenhuma — clique em stacks no filtro lateral para marcar seu perfil'}</b></div>
+    <table class="table table-sm">
+      <tr><td>Aderência ao seu perfil</td><td class="text-end"><span class="badge ${aderencia}">${aderenciaLabel}</span></td></tr>
+      <tr><td>Categoria detectada</td><td class="text-end fw-bold">${CATEGORIA_LABEL[j._categoria] || '-'}</td></tr>
+      <tr><td>Por que essa categoria</td><td class="text-end small">${motivos.length ? motivos.join(' · ') : 'sem palavras-chave claras'}</td></tr>
+      <tr><td>Pontuação do radar</td><td class="text-end fw-bold">${Math.round(pontos)} pts</td></tr>
+      <tr><td>Aberta há</td><td class="text-end fw-bold">${dias!=null ? dias+' dias' : '-'}</td></tr>
+      <tr><td>Senioridade</td><td class="text-end fw-bold">${SENIOR_LABEL[j.senioridade] || '-'}</td></tr>
+      <tr><td>Modalidade</td><td class="text-end fw-bold text-capitalize">${j.modalidade || '-'}</td></tr>
+      <tr><td>Stacks da vaga</td><td class="text-end small">${stacksJob.join(', ') || '-'}</td></tr>
+      <tr><td>Combinam com seu perfil</td><td class="text-end small">${match.length ? match.join(', ') : 'nenhuma — clique em stacks no filtro lateral'}</td></tr>
+    </table>
   `;
   document.getElementById('analiseAbrirVaga').href = j.url || '#';
-  document.getElementById('analiseDescricao').value = j.descricao || 'Sem descrição salva para esta vaga (coletada antes deste campo existir, ou a fonte não fornece descrição).';
-  document.getElementById('analiseBg').style.display = 'flex';
+  document.getElementById('analiseDescricao').value = j.descricao || 'Sem descrição salva para esta vaga.';
+  new bootstrap.Modal(document.getElementById('modalAnalise')).show();
 }
 document.getElementById('analiseCopiarDescricao').addEventListener('click', () => {
   const txt = document.getElementById('analiseDescricao').value;
@@ -633,8 +707,6 @@ document.getElementById('analiseCopiarDescricao').addEventListener('click', () =
     setTimeout(() => { b.textContent = orig; }, 1500);
   });
 });
-document.getElementById('analiseFechar').addEventListener('click', () => { document.getElementById('analiseBg').style.display = 'none'; });
-document.getElementById('analiseBg').addEventListener('click', (e) => { if (e.target.id === 'analiseBg') document.getElementById('analiseBg').style.display = 'none'; });
 
 function atualizar(){
   montarStackPicker();
@@ -705,10 +777,8 @@ document.getElementById('prepararEmail').addEventListener('click', () => {
   document.getElementById('modalPara').value = destino;
   document.getElementById('modalAssunto').value = assunto;
   document.getElementById('modalCorpo').value = corpo;
-  document.getElementById('modalBg').style.display = 'flex';
+  new bootstrap.Modal(document.getElementById('modalEmail')).show();
 });
-document.getElementById('modalFechar').addEventListener('click', () => { document.getElementById('modalBg').style.display = 'none'; });
-document.getElementById('modalBg').addEventListener('click', (e) => { if (e.target.id === 'modalBg') document.getElementById('modalBg').style.display = 'none'; });
 document.getElementById('modalEnviar').addEventListener('click', () => {
   const destino = document.getElementById('modalPara').value.trim();
   const assunto = document.getElementById('modalAssunto').value;
@@ -717,20 +787,16 @@ document.getElementById('modalEnviar').addEventListener('click', () => {
   window.location.href = 'mailto:' + encodeURIComponent(destino) + '?subject=' + encodeURIComponent(assunto) + '&body=' + encodeURIComponent(corpo);
 });
 
-lerFiltrosDaUrl();
-atualizarBadgeSync();
 document.getElementById('syncBadge').addEventListener('click', () => {
   document.getElementById('syncUrl').value = localStorage.getItem(SYNC_URL_KEY) || '';
   document.getElementById('syncToken').value = localStorage.getItem(SYNC_TOKEN_KEY) || '';
-  document.getElementById('syncBg').style.display = 'flex';
+  new bootstrap.Modal(document.getElementById('modalSync')).show();
 });
-document.getElementById('syncFechar').addEventListener('click', () => { document.getElementById('syncBg').style.display = 'none'; });
-document.getElementById('syncBg').addEventListener('click', (e) => { if (e.target.id === 'syncBg') document.getElementById('syncBg').style.display = 'none'; });
 document.getElementById('syncLimpar').addEventListener('click', () => {
   localStorage.removeItem(SYNC_URL_KEY);
   localStorage.removeItem(SYNC_TOKEN_KEY);
   atualizarBadgeSync();
-  document.getElementById('syncBg').style.display = 'none';
+  bootstrap.Modal.getInstance(document.getElementById('modalSync')).hide();
 });
 document.getElementById('syncSalvar').addEventListener('click', () => {
   const url = document.getElementById('syncUrl').value.trim();
@@ -739,10 +805,15 @@ document.getElementById('syncSalvar').addEventListener('click', () => {
   localStorage.setItem(SYNC_URL_KEY, url);
   localStorage.setItem(SYNC_TOKEN_KEY, token);
   tursoExec('SELECT 1').then(r => {
-    if (r && r.ok){ atualizarBadgeSync(); document.getElementById('syncBg').style.display = 'none'; }
-    else { alert('Não consegui confirmar a conexão — verifique URL e token. Os valores foram salvos; tente de novo.'); atualizarBadgeSync(); }
+    atualizarBadgeSync();
+    if (r && r.ok) bootstrap.Modal.getInstance(document.getElementById('modalSync')).hide();
+    else alert('Não consegui confirmar a conexão — verifique URL e token. Os valores foram salvos; tente de novo.');
   });
 });
+
+lerFiltrosDaUrl();
+renderLogin();
+atualizarBadgeSync();
 
 fetch('./jobs.json', { cache: 'no-store' })
   .then(r=>{ if(!r.ok) throw new Error('jobs.json ainda não existe neste endereço'); return r.json(); })
@@ -751,7 +822,7 @@ fetch('./jobs.json', { cache: 'no-store' })
     atualizar();
   })
   .catch(err=>{
-    document.getElementById('erro').style.display='block';
+    document.getElementById('erro').classList.remove('d-none');
     document.getElementById('erro').textContent = 'Não consegui carregar jobs.json: ' + err.message + '. Rode o workflow ao menos uma vez para gerar este arquivo.';
   });
 </script>
