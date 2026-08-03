@@ -193,6 +193,10 @@
           </div>
           <span class="small text-muted" id="selContagem">0 selecionadas</span>
         </div>
+        <div class="d-flex gap-2">
+          <button class="btn btn-outline-secondary btn-sm" id="btnExportarCsv" type="button">⬇ Exportar CSV</button>
+          <button class="btn btn-outline-secondary btn-sm" id="btnDiagnosticoLote" type="button">🤖 Diagnosticar selecionadas</button>
+        </div>
       </div>
 
       <div class="table-responsive">
@@ -250,6 +254,7 @@
                 <h6 class="card-title text-primary">Preferências de vaga</h6>
                 <label class="form-label small fw-bold mt-2">Senioridade</label>
                 <select id="perfilSenioridade" class="form-select form-select-sm">
+                  <option value="">Não informar</option>
                   <option value="junior">Júnior</option>
                   <option value="pleno">Pleno</option>
                   <option value="senior">Sênior</option>
@@ -257,6 +262,7 @@
                 </select>
                 <label class="form-label small fw-bold mt-3">Modalidade preferida</label>
                 <select id="perfilModalidade" class="form-select form-select-sm">
+                  <option value="">Não informar</option>
                   <option value="remoto">Remoto</option>
                   <option value="hibrido">Híbrido</option>
                   <option value="presencial">Presencial</option>
@@ -331,6 +337,11 @@
           <label class="form-label small fw-bold">Diagnóstico da IA (com base no seu perfil)</label>
           <div id="diagnosticoIaTexto" class="border rounded p-3 bg-primary-subtle small" style="max-height:280px; overflow-y:auto; line-height:1.5; white-space:pre-wrap;"></div>
           <button class="btn btn-outline-primary btn-sm mt-2" id="btnSalvarDiagnostico">💾 Salvar diagnóstico para esta vaga</button>
+        </div>
+        <button class="btn btn-outline-secondary btn-sm mt-3" id="btnCartaApresentacao" type="button">✍️ Gerar carta de apresentação</button>
+        <div id="cartaBox" class="d-none mt-2">
+          <textarea id="cartaTexto" class="form-control small" rows="6"></textarea>
+          <button class="btn btn-outline-secondary btn-sm mt-2" id="btnCopiarCarta">📋 Copiar carta</button>
         </div>
       </div>
       <div class="modal-footer">
@@ -729,14 +740,14 @@ function meuPerfil(){
 }
 const PERFIL_LOCAL_KEY = 'radar-vagas-perfil-config';
 function perfilPadrao(){
-  return { stacks: '', quero: '', evitar: '', senioridade: 'senior', modalidade: 'remoto', cidades: '', corte: 55 };
+  return { stacks: '', quero: '', evitar: '', senioridade: '', modalidade: '', cidades: '', corte: 55 };
 }
 function preencherFormPerfil(cfg){
   document.getElementById('perfilStacksInput').value = cfg.stacks || '';
   document.getElementById('perfilQuero').value = cfg.quero || '';
   document.getElementById('perfilEvitar').value = cfg.evitar || '';
-  document.getElementById('perfilSenioridade').value = cfg.senioridade || 'senior';
-  document.getElementById('perfilModalidade').value = cfg.modalidade || 'remoto';
+  document.getElementById('perfilSenioridade').value = cfg.senioridade || '';
+  document.getElementById('perfilModalidade').value = cfg.modalidade || '';
   document.getElementById('perfilCidades').value = cfg.cidades || '';
   document.getElementById('perfilCorte').value = cfg.corte || 55;
   document.getElementById('perfilCorteLabel').textContent = cfg.corte || 55;
@@ -786,6 +797,7 @@ document.getElementById('abrirConfigIa').addEventListener('click', () => {
   document.getElementById('cfgOpenaiKey').value = localStorage.getItem(OPENAI_KEY_KEY) || '';
   new bootstrap.Modal('#modalConfigIa').show();
 });
+atualizarBadgeIa();
 document.getElementById('cfgOpenaiSalvar').addEventListener('click', () => {
   const k = document.getElementById('cfgOpenaiKey').value.trim();
   if (k) localStorage.setItem(OPENAI_KEY_KEY, k);
@@ -796,6 +808,22 @@ document.getElementById('cfgOpenaiLimpar').addEventListener('click', () => {
   document.getElementById('cfgOpenaiKey').value = '';
 });
 function iaConfigurada(){ return !!localStorage.getItem(OPENAI_KEY_KEY); }
+const IA_USO_KEY = 'radar-vagas-ia-uso';
+function registrarUsoIa(){
+  const hoje = new Date().toISOString().slice(0,10);
+  let d = {}; try { d = JSON.parse(localStorage.getItem(IA_USO_KEY) || '{}'); } catch { d = {}; }
+  d[hoje] = (d[hoje]||0) + 1;
+  localStorage.setItem(IA_USO_KEY, JSON.stringify(d));
+  atualizarBadgeIa();
+}
+function usoIaHoje(){
+  const hoje = new Date().toISOString().slice(0,10);
+  let d = {}; try { d = JSON.parse(localStorage.getItem(IA_USO_KEY) || '{}'); } catch { d = {}; }
+  return d[hoje] || 0;
+}
+function atualizarBadgeIa(){
+  document.getElementById('abrirConfigIa').textContent = `🤖 IA (${usoIaHoje()} hoje)`;
+}
 function chamarOpenAI(mensagens){
   const key = localStorage.getItem(OPENAI_KEY_KEY);
   if (!key){ new bootstrap.Modal('#modalConfigIa').show(); return Promise.reject(new Error('sem chave')); }
@@ -805,12 +833,13 @@ function chamarOpenAI(mensagens){
     body: JSON.stringify({ model: 'gpt-4o-mini', temperature: 0.4, messages: mensagens }),
   }).then(r => r.json()).then(data => {
     if (data.error) throw new Error(data.error.message);
+    registrarUsoIa();
     return data.choices[0].message.content;
   });
 }
 function textoPerfilResumo(){
   const cfg = JSON.parse(localStorage.getItem(PERFIL_LOCAL_KEY) || 'null') || perfilPadrao();
-  return `Senioridade desejada: ${cfg.senioridade}. Modalidade preferida: ${cfg.modalidade}. Cidades aceitas: ${cfg.cidades || 'qualquer'}. Domina: ${cfg.stacks || '-'}. Quer atuar em: ${cfg.quero || '-'}. Quer evitar: ${cfg.evitar || '-'}.`;
+  return `Senioridade desejada: ${cfg.senioridade || 'n\u00e3o informada'}. Modalidade preferida: ${cfg.modalidade || 'n\u00e3o informada'}. Cidades aceitas: ${cfg.cidades || 'qualquer'}. Domina: ${cfg.stacks || '-'}. Quer atuar em: ${cfg.quero || '-'}. Quer evitar: ${cfg.evitar || '-'}.`;
 }
 let __vagaAtualAnalise = null;
 document.getElementById('btnTraduzir').addEventListener('click', () => {
@@ -860,6 +889,72 @@ document.getElementById('btnSalvarDiagnostico').addEventListener('click', () => 
     [u.email, j.id, texto, new Date().toISOString()]);
   const b = document.getElementById('btnSalvarDiagnostico');
   const orig = b.textContent; b.textContent = '✓ Salvo'; setTimeout(()=>{ b.textContent = orig; }, 1500);
+});
+document.getElementById('btnCartaApresentacao').addEventListener('click', () => {
+  const j = __vagaAtualAnalise;
+  if (!j) return;
+  const btn = document.getElementById('btnCartaApresentacao');
+  const box = document.getElementById('cartaBox');
+  const texto = document.getElementById('cartaTexto');
+  btn.textContent = 'Gerando...'; btn.disabled = true;
+  chamarOpenAI([
+    { role: 'system', content: 'Voce escreve mensagens curtas de candidatura a vaga em portugues do Brasil, tom profissional e direto, sem cliche, maximo 120 palavras.' },
+    { role: 'user', content: `Perfil do candidato: ${textoPerfilResumo()}\n\nVaga: ${j.titulo} - ${j.empresa}\nDescricao: ${document.getElementById('analiseDescricao').innerText.slice(0,2000)}\n\nEscreva uma mensagem de candidatura curta (para LinkedIn ou e-mail) conectando o perfil do candidato a essa vaga especifica.` },
+  ]).then(resultado => {
+    texto.value = resultado;
+    box.classList.remove('d-none');
+  }).catch(err => alert('Falha ao gerar carta: ' + err.message))
+  .finally(() => { btn.textContent = '✍️ Gerar carta de apresentação'; btn.disabled = false; });
+});
+document.getElementById('btnCopiarCarta').addEventListener('click', () => {
+  navigator.clipboard.writeText(document.getElementById('cartaTexto').value).then(() => {
+    const b = document.getElementById('btnCopiarCarta');
+    const orig = b.textContent; b.textContent = '✓ Copiado'; setTimeout(()=>{ b.textContent = orig; }, 1500);
+  });
+});
+
+// --- exportar CSV ---
+function csvEscape(v){ return '"' + String(v==null?'':v).replace(/"/g,'""') + '"'; }
+document.getElementById('btnExportarCsv').addEventListener('click', () => {
+  let lista = (window.__filtradas||[]).filter(j => selecionadas.has(chaveJob(j)));
+  if (!lista.length) lista = window.__filtradas || [];
+  if (!lista.length){ alert('Nenhuma vaga para exportar.'); return; }
+  const cab = ['titulo','empresa','local','modalidade','senioridade','pontos','status','url'];
+  const linhas = [cab.join(',')];
+  lista.forEach(j => {
+    linhas.push([j.titulo, j.empresa, j.local, j.modalidade, j.senioridade, Math.round(j.pontos||0), statusEfetivo(j)||'-', j.url].map(csvEscape).join(','));
+  });
+  const blob = new Blob(['\ufeff' + linhas.join('\n')], { type: 'text/csv;charset=utf-8;' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'radar-vagas-' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+});
+
+// --- diagnostico em lote ---
+document.getElementById('btnDiagnosticoLote').addEventListener('click', async () => {
+  if (!iaConfigurada()){ new bootstrap.Modal('#modalConfigIa').show(); return; }
+  const lista = (window.__filtradas||[]).filter(j => selecionadas.has(chaveJob(j)));
+  if (!lista.length){ alert('Marque ao menos uma vaga (checkbox) para diagnosticar em lote.'); return; }
+  const u = usuarioAtual();
+  const btn = document.getElementById('btnDiagnosticoLote');
+  const orig = btn.textContent;
+  for (let i = 0; i < lista.length; i++){
+    const j = lista[i];
+    btn.textContent = `Diagnosticando ${i+1}/${lista.length}...`;
+    try {
+      const resultado = await chamarOpenAI([
+        { role: 'system', content: 'Voce e um consultor de carreira em TI. Responda em portugues do Brasil, direto e objetivo, sem enrolacao.' },
+        { role: 'user', content: `Perfil do candidato: ${textoPerfilResumo()}\n\nVaga: ${j.titulo} - ${j.empresa} (${j.local||''}, ${j.modalidade||''})\nDescricao: ${(j.descricao||'').replace(/<[^>]+>/g,' ').slice(0,3000)}\n\nDe um diagnostico curto e pratico: 1) adesao real ao perfil (nota 0-10 e por que), 2) principais pontos fortes do candidato pra essa vaga, 3) lacunas ou riscos, 4) recomendacao final (vale a pena se candidatar ou nao).` },
+      ]);
+      if (u && j.id != null){
+        await tursoExec('INSERT INTO diagnostico_ia (usuario_email, job_id, texto, gerado_em) VALUES (?, ?, ?, ?) ON CONFLICT(usuario_email, job_id) DO UPDATE SET texto=excluded.texto, gerado_em=excluded.gerado_em',
+          [u.email, j.id, resultado, new Date().toISOString()]);
+      }
+    } catch (err) { console.warn('falhou diagnostico de', j.titulo, err); }
+  }
+  btn.textContent = orig;
+  alert(`Diagnóstico em lote concluído para ${lista.length} vaga(s). Abra "Analisar" em cada uma para ver o resultado.`);
 });
 function descricaoLimpa(desc){
   const d = desc || '<p>Sem descrição salva para esta vaga.</p>';
