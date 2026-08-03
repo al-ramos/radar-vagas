@@ -288,6 +288,13 @@
             </div>
           </div>
         </div>
+        <div class="card mt-3">
+          <div class="card-body">
+            <h6 class="card-title text-primary">Currículo / resumo livre</h6>
+            <p class="small text-muted mb-1">Cole aqui seu currículo, um resumo em texto livre ou qualquer coisa relevante sobre você — a IA usa isso como fonte principal na análise e diagnóstico de cada vaga, junto com os campos acima.</p>
+            <textarea id="perfilLivre" class="form-control form-control-sm" rows="6" placeholder="Cole aqui seu currículo ou um resumo da sua experiência, projetos, certificações etc."></textarea>
+          </div>
+        </div>
         <p class="small text-muted mt-3 mb-0" id="perfilStatusTexto">Salvo no banco, associado à sua conta — disponível em qualquer dispositivo com sincronização ligada.</p>
       </div>
       <div class="modal-footer">
@@ -741,7 +748,7 @@ function meuPerfil(){
 }
 const PERFIL_LOCAL_KEY = 'radar-vagas-perfil-config';
 function perfilPadrao(){
-  return { stacks: '', quero: '', evitar: '', senioridade: '', modalidade: '', cidades: '', corte: 55 };
+  return { stacks: '', quero: '', evitar: '', senioridade: '', modalidade: '', cidades: '', corte: 55, livre: '' };
 }
 function preencherFormPerfil(cfg){
   document.getElementById('perfilStacksInput').value = cfg.stacks || '';
@@ -752,6 +759,7 @@ function preencherFormPerfil(cfg){
   document.getElementById('perfilCidades').value = cfg.cidades || '';
   document.getElementById('perfilCorte').value = cfg.corte || 55;
   document.getElementById('perfilCorteLabel').textContent = cfg.corte || 55;
+  document.getElementById('perfilLivre').value = cfg.livre || '';
   window.__perfilPersistido = (cfg.stacks || '').split(',').map(s=>s.trim().toLowerCase()).filter(Boolean);
 }
 function carregarPerfil(){
@@ -780,6 +788,7 @@ function salvarPerfil(){
     modalidade: document.getElementById('perfilModalidade').value,
     cidades: document.getElementById('perfilCidades').value.trim(),
     corte: Number(document.getElementById('perfilCorte').value),
+    livre: document.getElementById('perfilLivre').value.trim(),
   };
   localStorage.setItem(PERFIL_LOCAL_KEY, JSON.stringify(cfg));
   window.__perfilPersistido = cfg.stacks.split(',').map(s=>s.trim().toLowerCase()).filter(Boolean);
@@ -842,7 +851,11 @@ function chamarOpenAI(mensagens){
 }
 function textoPerfilResumo(){
   const cfg = JSON.parse(localStorage.getItem(PERFIL_LOCAL_KEY) || 'null') || perfilPadrao();
-  return `Senioridade desejada: ${cfg.senioridade || 'n\u00e3o informada'}. Modalidade preferida: ${cfg.modalidade || 'n\u00e3o informada'}. Cidades aceitas: ${cfg.cidades || 'qualquer'}. Domina: ${cfg.stacks || '-'}. Quer atuar em: ${cfg.quero || '-'}. Quer evitar: ${cfg.evitar || '-'}.`;
+  const base = `Senioridade desejada: ${cfg.senioridade || 'n\u00e3o informada'}. Modalidade preferida: ${cfg.modalidade || 'n\u00e3o informada'}. Cidades aceitas: ${cfg.cidades || 'qualquer'}. Domina: ${cfg.stacks || '-'}. Quer atuar em: ${cfg.quero || '-'}. Quer evitar: ${cfg.evitar || '-'}.`;
+  if (cfg.livre && cfg.livre.trim()){
+    return base + `\n\nCurr\u00edculo / resumo livre do candidato:\n${cfg.livre.trim()}`;
+  }
+  return base;
 }
 function montarPromptDiagnostico(j){
   return `Aja como consultor de carreira em TI. Responda em portugu\u00eas do Brasil, direto e objetivo.\n\nPerfil do candidato: ${textoPerfilResumo()}\n\nVaga: ${j.titulo} \u2014 ${j.empresa} (${j.local||''}, ${j.modalidade||''})\nDescri\u00e7\u00e3o: ${(document.getElementById('analiseDescricao').innerText || '').slice(0,3000)}\n\nD\u00ea um diagn\u00f3stico curto e pr\u00e1tico: 1) ader\u00eancia real ao perfil (nota 0-10 e por qu\u00ea), 2) principais pontos fortes do candidato pra essa vaga, 3) lacunas ou riscos, 4) recomenda\u00e7\u00e3o final (vale a pena se candidatar ou n\u00e3o).`;
