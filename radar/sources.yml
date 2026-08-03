@@ -38,7 +38,7 @@
   id: wildlifestudios
 - empresa: Arco Educacao
   tipo: greenhouse
-  id: arco
+  id: arcoeducacao
 - empresa: Binance
   tipo: greenhouse
   id: binance
@@ -93,6 +93,168 @@
 - empresa: New Balance Brasil
   tipo: greenhouse
   id: new
-
-
-- { empresa: "Gmail (LinkedIn/Infojobs/Catho)", tipo: jsonfeed, id: "https://script.google.com/macros/s/AKfycbxtSsnVpQUcKU3cRZ6UcY1SDpmQdzFYDNJZTJwZhA9WmvbsWJCQVXHs-TGvYrlQHk8Aug/exec" }
+- empresa: VTEX
+  tipo: greenhouse
+  id: vtex
+- empresa: McAfee
+  tipo: greenhouse
+  id: mcafee
+- empresa: Okta
+  tipo: greenhouse
+  id: okta
+- empresa: Datadog
+  tipo: greenhouse
+  id: datadog
+- empresa: New Relic
+  tipo: greenhouse
+  id: newrelic
+- empresa: SolarWinds
+  tipo: greenhouse
+  id: solarwinds
+- empresa: GitLab
+  tipo: greenhouse
+  id: gitlab
+- empresa: Docker
+  tipo: ashby
+  id: docker
+- empresa: Canonical
+  tipo: greenhouse
+  id: canonical
+- empresa: Veeam Software
+  tipo: greenhouse
+  id: veeamsoftware
+- empresa: Commvault
+  tipo: greenhouse
+  id: commvault
+- empresa: Rubrik
+  tipo: greenhouse
+  id: rubrik
+- empresa: Pure Storage
+  tipo: greenhouse
+  id: purestorage
+- empresa: Extreme Networks
+  tipo: lever
+  id: extremenetworks
+- empresa: Appian
+  tipo: greenhouse
+  id: appian
+- empresa: Mendix
+  tipo: lever
+  id: mendix
+- empresa: UiPath
+  tipo: ashby
+  id: uipath
+- empresa: Blue Prism
+  tipo: lever
+  id: blue
+- empresa: Snowflake
+  tipo: ashby
+  id: snowflake
+- empresa: Databricks
+  tipo: greenhouse
+  id: databricks
+- empresa: Matillion
+  tipo: lever
+  id: matillion
+- empresa: Fivetran
+  tipo: greenhouse
+  id: fivetran
+- empresa: Confluent
+  tipo: ashby
+  id: confluent
+- empresa: MongoDB
+  tipo: greenhouse
+  id: mongodb
+- empresa: Redis
+  tipo: ashby
+  id: redis
+- empresa: Elastic
+  tipo: greenhouse
+  id: elastic
+- empresa: Neo4j
+  tipo: greenhouse
+  id: neo4j
+- empresa: Percona
+  tipo: ashby
+  id: percona
+- empresa: Capco
+  tipo: greenhouse
+  id: capco
+- empresa: Velocity Partners
+  tipo: ashby
+  id: velocity
+- empresa: Gorilla Logic
+  tipo: ashby
+  id: gorilla
+- empresa: PSL Corp
+  tipo: greenhouse
+  id: psl
+- empresa: Kin + Carta
+  tipo: ashby
+  id: kin
+- empresa: Valtech
+  tipo: greenhouse
+  id: valtech
+- empresa: AKQA
+  tipo: greenhouse
+  id: akqa
+- empresa: R/GA
+  tipo: greenhouse
+  id: rga
+- empresa: Wunderman Thompson
+  tipo: greenhouse
+  id: wundermanthompson
+- empresa: Getnet
+  tipo: greenhouse
+  id: getnet
+- empresa: Twilio
+  tipo: greenhouse
+  id: twilio
+- empresa: RD Station
+  tipo: greenhouse
+  id: rdstation
+- empresa: ActiveCampaign
+  tipo: lever
+  id: activecampaign
+- empresa: FullStory
+  tipo: ashby
+  id: fullstory
+- empresa: Mixpanel
+  tipo: greenhouse
+  id: mixpanel
+- empresa: Amplitude
+  tipo: greenhouse
+  id: amplitude
+- empresa: Simon Data
+  tipo: ashby
+  id: simondata
+- empresa: Listrak
+  tipo: greenhouse
+  id: listrak
+- empresa: Klaviyo
+  tipo: greenhouse
+  id: klaviyo
+- empresa: Omnisend
+  tipo: lever
+  id: omnisend
+- empresa: Yotpo
+  tipo: greenhouse
+  id: yotpo
+- empresa: Gorgias
+  tipo: ashby
+  id: gorgias
+- empresa: Recharge
+  tipo: ashby
+  id: recharge
+- empresa: Bold Commerce
+  tipo: greenhouse
+  id: bold
+- empresa: Mollie
+  tipo: ashby
+  id: mollie
+- empresa: Adyen
+  tipo: greenhouse
+  id: adyen
+- empresa: Stripe
+  tipo: greenhouse
+  id: stripe
