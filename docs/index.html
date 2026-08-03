@@ -183,6 +183,7 @@
         <div class="col-6 col-md-3"><div class="card stat-card bg-light"><div class="card-body py-2"><b id="stAtt" style="font-size:1.05rem;">-</b><span class="small">última coleta</span></div></div></div>
       </div>
 
+      <div class="d-flex flex-wrap gap-2 mb-2" id="categoriaChips"></div>
       <div class="d-flex flex-wrap gap-2 mb-3" id="chips"></div>
 
       <div class="d-flex justify-content-between align-items-center mb-2">
@@ -194,11 +195,16 @@
           <span class="small text-muted" id="selContagem">0 selecionadas</span>
         </div>
         <div class="d-flex gap-2">
+          <div class="btn-group btn-group-sm" role="group">
+            <button type="button" class="btn btn-primary" id="btnViewTabela">📄 Tabela</button>
+            <button type="button" class="btn btn-outline-primary" id="btnViewKanban">🗂️ Kanban</button>
+          </div>
           <button class="btn btn-outline-secondary btn-sm" id="btnExportarCsv" type="button">⬇ Exportar CSV</button>
           <button class="btn btn-outline-secondary btn-sm" id="btnDiagnosticoLote" type="button">🤖 Diagnosticar selecionadas</button>
         </div>
       </div>
 
+      <div id="viewTabela">
       <div class="table-responsive">
         <table class="table table-hover align-middle bg-white">
           <thead class="table-light">
@@ -233,6 +239,25 @@
             <tbody id="corpoProcessadas"></tbody>
           </table>
         </div>
+      </div>
+      </div>
+
+      <div id="viewKanban" class="d-none">
+        <div class="row g-3">
+          <div class="col-md-4">
+            <h6 class="text-muted">Pendente (<span id="kanContPendente">0</span>)</h6>
+            <div id="kanPendente" class="d-flex flex-column gap-2"></div>
+          </div>
+          <div class="col-md-4">
+            <h6 class="text-success">Candidatei-me (<span id="kanContCandidatei">0</span>)</h6>
+            <div id="kanCandidatei" class="d-flex flex-column gap-2"></div>
+          </div>
+          <div class="col-md-4">
+            <h6 class="text-muted">Descartada (<span id="kanContDescartada">0</span>)</h6>
+            <div id="kanDescartada" class="d-flex flex-column gap-2"></div>
+          </div>
+        </div>
+        <p class="small text-muted mt-2">Kanban mostra as 30 vagas pendentes de maior pontuação — use a tabela pra ver o catálogo completo.</p>
       </div>
     </main>
   </div>
@@ -1193,6 +1218,7 @@ function render(){
   pendentes.forEach(j => corpo.appendChild(montarLinha(j)));
   processadas.forEach(j => corpoProcessadas.appendChild(montarLinha(j)));
   document.getElementById('vazio').classList.toggle('d-none', filtradas.length > 0);
+  if (modoView === 'kanban') renderKanban();
 }
 
 function abrirAnalise(j){
@@ -1256,9 +1282,76 @@ document.getElementById('analiseCopiarDescricao').addEventListener('click', () =
 
 function atualizar(){
   montarStackPicker();
+  montarCategoriaChips();
   renderChips();
   render();
   escreverFiltrosNaUrl();
+}
+
+function montarCategoriaChips(){
+  const el = document.getElementById('categoriaChips');
+  const contagem = {};
+  JOBS.forEach(j => { contagem[j._categoria] = (contagem[j._categoria]||0) + 1; });
+  const catAtual = document.getElementById('fCategoria').value;
+  el.innerHTML = '';
+  Object.keys(CATEGORIA_LABEL).forEach(cat => {
+    if (!contagem[cat]) return;
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'btn btn-sm ' + (catAtual === cat ? 'btn-primary' : 'btn-outline-secondary');
+    b.textContent = `${CATEGORIA_LABEL[cat]} (${contagem[cat]})`;
+    b.addEventListener('click', () => {
+      document.getElementById('fCategoria').value = (catAtual === cat) ? 'todas' : cat;
+      atualizar();
+    });
+    el.appendChild(b);
+  });
+}
+
+let modoView = 'tabela';
+document.getElementById('btnViewTabela').addEventListener('click', () => {
+  modoView = 'tabela';
+  document.getElementById('btnViewTabela').className = 'btn btn-primary';
+  document.getElementById('btnViewKanban').className = 'btn btn-outline-primary';
+  document.getElementById('viewTabela').classList.remove('d-none');
+  document.getElementById('viewKanban').classList.add('d-none');
+});
+document.getElementById('btnViewKanban').addEventListener('click', () => {
+  modoView = 'kanban';
+  document.getElementById('btnViewKanban').className = 'btn btn-primary';
+  document.getElementById('btnViewTabela').className = 'btn btn-outline-primary';
+  document.getElementById('viewTabela').classList.add('d-none');
+  document.getElementById('viewKanban').classList.remove('d-none');
+  renderKanban();
+});
+function cartaoKanban(j){
+  const cor = corPontos(j.pontos||0);
+  const div = document.createElement('div');
+  div.className = 'card card-body p-2 small';
+  div.innerHTML = `
+    <div class="fw-bold">${j.titulo||''}</div>
+    <div class="text-muted">${j.empresa||''} · ${j.local||'-'}</div>
+    <div class="d-flex justify-content-between align-items-center mt-1">
+      <span class="badge ${cor}">${Math.round(j.pontos||0)} pts</span>
+      <button type="button" class="btn btn-outline-secondary btn-xs btnAnalisarKan">🔍 Analisar</button>
+    </div>`;
+  div.querySelector('.btnAnalisarKan').addEventListener('click', () => { marcarLida(chaveJob(j), true, j, true); abrirAnalise(j); });
+  return div;
+}
+function renderKanban(){
+  const base = (window.__filtradas || []);
+  const pendentes = base.filter(j => !statusEfetivo(j)).sort((a,b)=>(b.pontos||0)-(a.pontos||0)).slice(0,30);
+  const candidatei = base.filter(j => statusEfetivo(j) === 'candidatei');
+  const descartada = base.filter(j => statusEfetivo(j) === 'descartada');
+  const montar = (id, contId, lista) => {
+    const el = document.getElementById(id);
+    el.innerHTML = '';
+    lista.forEach(j => el.appendChild(cartaoKanban(j)));
+    document.getElementById(contId).textContent = lista.length;
+  };
+  montar('kanPendente', 'kanContPendente', pendentes);
+  montar('kanCandidatei', 'kanContCandidatei', candidatei);
+  montar('kanDescartada', 'kanContDescartada', descartada);
 }
 
 ['fTexto','fCategoria','fFonte','fSenioridade','fModalidade','fCorte','fOrdenar','fStatus','fRegiaoBr','fNaoLidas'].forEach(id=>{
