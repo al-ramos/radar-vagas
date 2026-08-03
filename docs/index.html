@@ -158,7 +158,7 @@
       <button class="btn btn-outline-primary btn-sm w-100 mb-3" id="abrirPerfil" type="button">👤 Meu perfil</button>
       <button class="btn btn-outline-secondary btn-sm w-100 mb-3" id="abrirConfigIa" type="button">🤖 Configurar IA</button>
       <hr>
-      <button class="btn btn-outline-secondary btn-sm w-100 mb-3" id="syncBadge" type="button">☁ Sincronização</button>
+      <button class="btn btn-link btn-sm p-0 mb-3 text-decoration-none" id="syncBadge" type="button">☁ Sincronização</button>
       <div class="mb-2">
         <label class="form-label small fw-bold">E-mail para envio</label>
         <input type="email" class="form-control form-control-sm" id="emailDestino" placeholder="voce@exemplo.com">
@@ -193,8 +193,8 @@
             <label class="form-check-label small" for="selTodas">selecionar todas</label>
           </div>
           <span class="small text-muted" id="selContagem">0 selecionadas</span>
-          <button class="btn btn-link btn-sm p-0" type="button" data-bs-toggle="collapse" data-bs-target="#areaProcessadas">
-            ✅ Já processadas (<span id="contagemProcessadas">0</span>) ▾
+          <button class="btn btn-outline-success btn-sm ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#areaProcessadas" aria-expanded="false">
+            ✅ Já processadas (<span id="contagemProcessadas">0</span>)
           </button>
         </div>
         <div class="d-flex gap-2">
@@ -663,8 +663,8 @@ function tursoQuery(sql, args){
 }
 function atualizarBadgeSync(){
   const b = document.getElementById('syncBadge');
-  if (syncConfigurada()){ b.textContent = '☁ Perfil sincronizado com o banco'; b.className = 'btn btn-success btn-sm w-100 mb-3'; }
-  else { b.textContent = '☁ Sincronização do perfil desligada'; b.className = 'btn btn-outline-secondary btn-sm w-100 mb-3'; }
+  if (syncConfigurada()){ b.textContent = '☁ Perfil sincronizado'; b.className = 'btn btn-link btn-sm p-0 mb-3 text-success text-decoration-none'; }
+  else { b.textContent = '☁ Sincronização desligada'; b.className = 'btn btn-link btn-sm p-0 mb-3 text-muted text-decoration-none'; }
 }
 
 // --- status / lida ---
