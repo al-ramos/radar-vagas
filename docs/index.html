@@ -50,23 +50,6 @@
         </select>
       </div>
       <div class="mb-3">
-        <label class="form-label small fw-bold">Fonte</label>
-        <select id="fFonte" class="form-select form-select-sm">
-          <option value="todas">Todas</option>
-          <option value="ats">ATS direto (Gupy/Greenhouse/etc)</option>
-          <option value="jsonfeed">E-mails (LinkedIn/Infojobs/Catho)</option>
-        </select>
-      </div>
-      <div class="mb-3">
-        <label class="form-label small fw-bold">Status</label>
-        <select id="fStatus" class="form-select form-select-sm">
-          <option value="padrao">Ocultar descartadas</option>
-          <option value="todas">Todas</option>
-          <option value="candidatei">Só candidatei-me</option>
-          <option value="descartadas">Só descartadas</option>
-        </select>
-      </div>
-      <div class="mb-3">
         <label class="form-label small fw-bold">Senioridade</label>
         <select id="fSenioridade" class="form-select form-select-sm">
           <option value="todas">Todas</option>
@@ -99,18 +82,38 @@
         <label class="form-label small fw-bold">Stack (clique para filtrar)</label>
         <div class="d-flex flex-wrap gap-1" id="stackPicker"></div>
       </div>
-      <div class="mb-3">
-        <label class="form-label small fw-bold">Corte mínimo: <span id="corteLabel">0</span> pts</label>
-        <input type="range" class="form-range" id="fCorte" min="0" max="100" step="5" value="0">
-      </div>
-      <div class="mb-3">
-        <label class="form-label small fw-bold">Ordenar por</label>
-        <select id="fOrdenar" class="form-select form-select-sm">
-          <option value="publicado_em">Mais recente</option>
-          <option value="pontos">Pontuação</option>
-          <option value="dias_aberta">Aberta há mais tempo</option>
-          <option value="empresa">Empresa (A-Z)</option>
-        </select>
+      <button class="btn btn-link btn-sm p-0 mb-2" type="button" data-bs-toggle="collapse" data-bs-target="#filtrosAvancados">Filtros avançados ▾</button>
+      <div class="collapse" id="filtrosAvancados">
+        <div class="mb-3">
+          <label class="form-label small fw-bold">Fonte</label>
+          <select id="fFonte" class="form-select form-select-sm">
+            <option value="todas">Todas</option>
+            <option value="ats">ATS direto (Gupy/Greenhouse/etc)</option>
+            <option value="jsonfeed">E-mails (LinkedIn/Infojobs/Catho)</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label small fw-bold">Status</label>
+          <select id="fStatus" class="form-select form-select-sm">
+            <option value="padrao">Ocultar descartadas</option>
+            <option value="todas">Todas</option>
+            <option value="candidatei">Só candidatei-me</option>
+            <option value="descartadas">Só descartadas</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label small fw-bold">Corte mínimo: <span id="corteLabel">0</span> pts</label>
+          <input type="range" class="form-range" id="fCorte" min="0" max="100" step="5" value="0">
+        </div>
+        <div class="mb-3">
+          <label class="form-label small fw-bold">Ordenar por</label>
+          <select id="fOrdenar" class="form-select form-select-sm">
+            <option value="publicado_em">Mais recente</option>
+            <option value="pontos">Pontuação</option>
+            <option value="dias_aberta">Aberta há mais tempo</option>
+            <option value="empresa">Empresa (A-Z)</option>
+          </select>
+        </div>
       </div>
       <button class="btn btn-outline-dark btn-sm w-100 mb-3" id="limpar">Limpar filtros</button>
       <hr>
