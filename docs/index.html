@@ -214,6 +214,26 @@
         </table>
       </div>
       <p id="vazio" class="text-center text-muted py-5 d-none">Nenhuma vaga corresponde aos filtros atuais.</p>
+
+      <button class="btn btn-link btn-sm p-0 mt-4 mb-2" type="button" data-bs-toggle="collapse" data-bs-target="#areaProcessadas">
+        ✅ Já processadas (<span id="contagemProcessadas">0</span>) — lidas, candidatadas, descartadas ou já diagnosticadas ▾
+      </button>
+      <div class="collapse" id="areaProcessadas">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle bg-white">
+            <thead class="table-light">
+              <tr>
+                <th style="width:20px;"></th>
+                <th>Vaga</th><th>Local / modalidade</th><th>Senioridade</th><th>Stack</th>
+                <th class="text-center">Aberta há</th>
+                <th class="text-center">Pontos</th>
+                <th class="text-end">Publicada</th>
+              </tr>
+            </thead>
+            <tbody id="corpoProcessadas"></tbody>
+          </table>
+        </div>
+      </div>
     </main>
   </div>
 </div>
@@ -423,6 +443,18 @@ let selecionadas = new Set();
 let statusMap = new Map(Object.entries(JSON.parse(localStorage.getItem(STATUS_KEY) || '{}')));
 let lidaMap = new Map(Object.entries(JSON.parse(localStorage.getItem(LIDA_KEY) || '{}')));
 let msalInstance = null;
+let analisadasSet = new Set();
+function ehProcessada(j){
+  return lidaEfetiva(j) || !!statusEfetivo(j) || analisadasSet.has(chaveJob(j));
+}
+function carregarAnalisadas(){
+  const u = usuarioAtual();
+  if (!u || !syncConfigurada()) return;
+  tursoQuery('SELECT job_id FROM diagnostico_ia WHERE usuario_email = ?', [u.email]).then(linhas => {
+    analisadasSet = new Set(linhas.map(l => String(l.job_id)));
+    render();
+  });
+}
 
 // --- login / cadastro ---
 function usuarioAtual(){ try { return JSON.parse(localStorage.getItem(USER_KEY) || 'null'); } catch { return null; } }
@@ -907,6 +939,13 @@ document.getElementById('btnDiagnosticoIa').addEventListener('click', () => {
     texto.textContent = resultado;
     box.classList.remove('d-none');
     box.dataset.textoAtual = resultado;
+    if (exigirLogin() && j.id != null){
+      const u = usuarioAtual();
+      tursoExec('INSERT INTO diagnostico_ia (usuario_email, job_id, texto, gerado_em) VALUES (?, ?, ?, ?) ON CONFLICT(usuario_email, job_id) DO UPDATE SET texto=excluded.texto, gerado_em=excluded.gerado_em',
+        [u.email, j.id, resultado, new Date().toISOString()]);
+      analisadasSet.add(chaveJob(j));
+      render();
+    }
   }).catch(err => alert('Falha no diagnóstico: ' + err.message))
   .finally(() => { btn.textContent = '🤖 Diagnóstico com IA'; btn.disabled = false; });
 });
@@ -1109,7 +1148,14 @@ function render(){
 
   const corpo = document.getElementById('corpo');
   corpo.innerHTML = '';
-  filtradas.forEach(j=>{
+  const corpoProcessadas = document.getElementById('corpoProcessadas');
+  corpoProcessadas.innerHTML = '';
+  const pendentes = [];
+  const processadas = [];
+  filtradas.forEach(j => (ehProcessada(j) ? processadas : pendentes).push(j));
+  document.getElementById('contagemProcessadas').textContent = processadas.length;
+
+  function montarLinha(j){
     const corBg = corPontos(j.pontos||0);
     const k = chaveJob(j);
     const st = statusEfetivo(j);
@@ -1142,8 +1188,10 @@ function render(){
     tr.querySelector('.btnAnalisar').addEventListener('click', () => { marcarLida(k, true, j, true); abrirAnalise(j); });
     tr.querySelector('.btnLida').addEventListener('click', () => marcarLida(k, !lidaEfetiva(j), j));
     tr.querySelectorAll('.btnStatus').forEach(b => b.addEventListener('click', () => setStatus(k, b.dataset.v, j)));
-    corpo.appendChild(tr);
-  });
+    return tr;
+  }
+  pendentes.forEach(j => corpo.appendChild(montarLinha(j)));
+  processadas.forEach(j => corpoProcessadas.appendChild(montarLinha(j)));
   document.getElementById('vazio').classList.toggle('d-none', filtradas.length > 0);
 }
 
@@ -1315,6 +1363,7 @@ function iniciarApp(){
   renderLogin();
   atualizarBadgeSync();
   carregarPerfil();
+  carregarAnalisadas();
   document.getElementById('btnSalvarPerfil').addEventListener('click', salvarPerfil);
   fetch('./jobs.json', { cache: 'no-store' })
     .then(r=>{ if(!r.ok) throw new Error('jobs.json ainda não existe neste endereço'); return r.json(); })
