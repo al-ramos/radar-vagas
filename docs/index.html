@@ -89,6 +89,13 @@
   .aderencia.alta{ background:var(--sage-100); color:var(--sage-700); }
   .aderencia.media{ background:var(--accent-100); color:var(--accent-800); }
   .aderencia.baixa{ background:var(--neutral-200); color:var(--neutral-700); }
+  .syncbadge{ display:block; width:100%; text-align:center; padding:8px 10px; border-radius:999px; font-size:11px; font-weight:700; cursor:pointer; margin-bottom:18px; border:1px solid var(--divider); }
+  .syncbadge.on{ background:var(--sage-100); color:var(--sage-700); border-color:var(--sage-700); }
+  .syncbadge.off{ background:var(--neutral-200); color:var(--neutral-700); }
+  .naolida-dot{ display:inline-block; width:8px; height:8px; border-radius:999px; background:var(--accent); margin-right:6px; vertical-align:1px; }
+  tr.naolida td a{ font-weight:800; }
+  .modal label{ margin-top:10px; }
+  .modal p.aviso{ font-size:11.5px; color:var(--accent-800); background:var(--accent-100); border-radius:10px; padding:10px 12px; line-height:1.5; margin:6px 0 14px; }
 </style>
 </head>
 <body>
@@ -96,6 +103,7 @@
   <aside>
     <p class="kick">Radar de vagas</p>
     <p class="brand">Painel</p>
+    <button class="syncbadge" id="syncBadge" type="button"></button>
     <button id="copiarLink" type="button">🔗 Copiar link com filtros</button>
     <label>Categoria</label>
     <select id="fCategoria">
@@ -141,6 +149,7 @@
       <option value="presencial">Presencial</option>
     </select>
     <label class="checkline"><input type="checkbox" id="fRegiaoBr"> Somente Brasil / remoto BR</label>
+    <label class="checkline"><input type="checkbox" id="fNaoLidas"> Somente não lidas</label>
     <label>Stack (clique para filtrar)</label>
     <div class="stackpicker" id="stackPicker"></div>
     <label>Corte mínimo: <span id="corteLabel">0</span> pts</label>
@@ -229,24 +238,85 @@
   </div>
 </div>
 
+<div class="modal-bg" id="syncBg" style="display:none;">
+  <div class="modal" style="width:460px;">
+    <h2>Sincronizar com o banco (Turso)</h2>
+    <p class="sub">Grava lida/candidatei/descartei direto no Turso, além do navegador — assim funciona em qualquer dispositivo.</p>
+    <p class="aviso">⚠ O token fica salvo só neste navegador (não vai pro código), mas dá acesso de escrita ao banco. Use um token que você pode revogar depois se preferir, e evite compartilhar este link com terceiros enquanto a sincronização estiver ativa.</p>
+    <label>URL do banco (TURSO_DATABASE_URL)</label>
+    <input type="text" id="syncUrl" placeholder="libsql://radar-vagas-....turso.io">
+    <label>Token (TURSO_AUTH_TOKEN)</label>
+    <input type="text" id="syncToken" placeholder="eyJhbGci...">
+    <div class="acoes">
+      <button class="ghost" id="syncLimpar" type="button">Desligar sincronização</button>
+      <button class="ghost" id="syncFechar" type="button">Cancelar</button>
+      <button class="primary" id="syncSalvar" type="button">Salvar e testar</button>
+    </div>
+  </div>
+</div>
+
 <script>
 const SENIOR_LABEL = { estagio:'Estágio', junior:'Júnior', pleno:'Pleno', senior:'Sênior', especialista:'Especialista', nao_informado:'Não informada' };
 const FONTE_LABEL = { jsonfeed:'E-mail (LinkedIn/Infojobs/Catho)' };
 const CATEGORIA_LABEL = { dev_front:'Dev · Front-end', dev_back:'Dev · Back-end', dev_full:'Dev · Full-stack', dev_outro:'Dev · Outro', infra:'Infra / DevOps', suporte:'Suporte', outro:'Outro' };
 const STATUS_KEY = 'radar-vagas-status';
+const LIDA_KEY = 'radar-vagas-lida';
+const SYNC_URL_KEY = 'radar-vagas-turso-url';
+const SYNC_TOKEN_KEY = 'radar-vagas-turso-token';
 const REGIAO_ESTRANGEIRA = /vietnam|thailand|tailandia|philippines|filipinas|indonesia|malaysia|malasia|singapore|singapura|india\b|pakistan|bangladesh|united states|estados unidos|\busa\b|canada|australia|new zealand|nova zelandia|united kingdom|\buk\b|england|germany|alemanha|france|franca\b|spain|espanha|portugal(?!.{0,20}brasil)|poland|polonia|ireland|irlanda|netherlands|holanda|mexico|argentina|chile\b|colombia|peru\b|china\b|japan|japao|south korea|coreia do sul/i;
 let JOBS = [];
 let stacksAtivas = new Set();
 let selecionadas = new Set();
 let statusMap = new Map(Object.entries(JSON.parse(localStorage.getItem(STATUS_KEY) || '{}')));
+let lidaMap = new Map(Object.entries(JSON.parse(localStorage.getItem(LIDA_KEY) || '{}')));
+
+function syncConfigurada(){ return !!(localStorage.getItem(SYNC_URL_KEY) && localStorage.getItem(SYNC_TOKEN_KEY)); }
+function tursoArg(v){
+  if (v === null || v === undefined) return { type: 'null' };
+  if (typeof v === 'number') return { type: 'integer', value: String(Math.trunc(v)) };
+  return { type: 'text', value: String(v) };
+}
+function tursoExec(sql, args){
+  if (!syncConfigurada()) return Promise.resolve(null);
+  let url = localStorage.getItem(SYNC_URL_KEY).trim();
+  if (url.startsWith('libsql://')) url = 'https://' + url.slice('libsql://'.length);
+  const token = localStorage.getItem(SYNC_TOKEN_KEY).trim();
+  return fetch(url.replace(/\/$/, '') + '/v2/pipeline', {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ requests: [{ type: 'execute', stmt: { sql, args: (args||[]).map(tursoArg) } }, { type: 'close' }] }),
+  }).catch(err => { console.warn('sync turso falhou', err); return null; });
+}
+function atualizarStatusRemoto(j){
+  const id = j.id;
+  if (id == null) return;
+  tursoExec(
+    'UPDATE job SET lida = ?, status_usuario = ?, status_atualizado_em = ? WHERE id = ?',
+    [getLida(chaveJob(j)) ? 1 : 0, getStatus(chaveJob(j)), new Date().toISOString(), id]
+  );
+}
+function atualizarBadgeSync(){
+  const b = document.getElementById('syncBadge');
+  if (syncConfigurada()){ b.textContent = '☁ Sincronizado com o banco'; b.className = 'syncbadge on'; }
+  else { b.textContent = '☁ Sincronização com banco desligada — clique para configurar'; b.className = 'syncbadge off'; }
+}
 
 function persistirStatus(){ localStorage.setItem(STATUS_KEY, JSON.stringify(Object.fromEntries(statusMap))); }
 function getStatus(k){ return statusMap.get(k) || ''; }
-function setStatus(k, valor){
+function setStatus(k, valor, j){
   if (getStatus(k) === valor) statusMap.delete(k);
   else if (valor) statusMap.set(k, valor);
   else statusMap.delete(k);
   persistirStatus();
+  if (j) atualizarStatusRemoto(j);
+  render();
+}
+function persistirLida(){ localStorage.setItem(LIDA_KEY, JSON.stringify(Object.fromEntries(lidaMap))); }
+function getLida(k){ return !!lidaMap.get(k); }
+function marcarLida(k, valor, j){
+  if (valor) lidaMap.set(k, true); else lidaMap.delete(k);
+  persistirLida();
+  if (j) atualizarStatusRemoto(j);
   render();
 }
 
@@ -364,6 +434,16 @@ function dataRel(iso){
 function meuPerfil(){
   return Array.from(stacksAtivas || []).map(s=>s.trim().toLowerCase()).filter(Boolean);
 }
+function lidaEfetiva(j){
+  const k = chaveJob(j);
+  if (lidaMap.has(k)) return lidaMap.get(k);
+  return !!j.lida;
+}
+function statusEfetivo(j){
+  const k = chaveJob(j);
+  if (statusMap.has(k)) return statusMap.get(k);
+  return j.status_usuario || '';
+}
 function stackHtmlComMatch(j){
   const perfil = meuPerfil();
   const itens = listaStacks(j);
@@ -412,6 +492,7 @@ function render(){
   const ord = document.getElementById('fOrdenar').value;
   const status = document.getElementById('fStatus').value;
   const br = document.getElementById('fRegiaoBr').checked;
+  const naoLidas = document.getElementById('fNaoLidas').checked;
   document.getElementById('corteLabel').textContent = corte;
 
   let filtradas = JOBS.filter(j=>{
@@ -421,10 +502,11 @@ function render(){
     if (fonte === 'ats' && ehFonteEmail(j)) return false;
     if (cat !== 'todas' && j._categoria !== cat) return false;
     if ((j.pontos||0) < corte) return false;
-    const st = getStatus(chaveJob(j));
+    const st = statusEfetivo(j);
     if (status === 'padrao' && st === 'descartada') return false;
     if (status === 'candidatei' && st !== 'candidatei') return false;
     if (status === 'descartadas' && st !== 'descartada') return false;
+    if (naoLidas && lidaEfetiva(j)) return false;
     if (br && j.local && REGIAO_ESTRANGEIRA.test(j.local)) return false;
     if (stacksAtivas.size){
       const stacksJob = listaStacks(j);
@@ -474,15 +556,18 @@ function render(){
   filtradas.forEach(j=>{
     const cor = corPontos(j.pontos||0);
     const k = chaveJob(j);
-    const st = getStatus(k);
+    const st = statusEfetivo(j);
+    const lida = lidaEfetiva(j);
     const dias = diasAbertaCalc(j);
     const tr = document.createElement('tr');
     if (st === 'descartada') tr.className = 'descartada-row';
+    else if (!lida) tr.className = 'naolida';
     const fonteTag = ehFonteEmail(j) ? `<div class="fonte">${FONTE_LABEL.jsonfeed}</div>` : '';
     tr.innerHTML = `
       <td class="sel"><input type="checkbox" data-k="${k}" ${selecionadas.has(k)?'checked':''}></td>
-      <td><a href="${j.url||'#'}" target="_blank" rel="noopener">${j.titulo||''}</a><div class="empresa">${j.empresa||''}</div>${fonteTag}<span class="cat">${CATEGORIA_LABEL[j._categoria]||''}</span><br><button type="button" class="btnAnalisar" data-k="${k}">🔍 Analisar</button>
+      <td><a href="${j.url||'#'}" target="_blank" rel="noopener">${!lida?'<span class="naolida-dot" title="não lida"></span>':''}${j.titulo||''}</a><div class="empresa">${j.empresa||''}</div>${fonteTag}<span class="cat">${CATEGORIA_LABEL[j._categoria]||''}</span><br><button type="button" class="btnAnalisar" data-k="${k}">🔍 Analisar</button>
       <div class="statusbtns">
+        <button type="button" class="btnLida" data-k="${k}">${lida?'○ Marcar não lida':'● Marcar lida'}</button>
         <button type="button" class="btnStatus ${st==='candidatei'?'on candidatei':''}" data-k="${k}" data-v="candidatei">✓ Candidatei</button>
         <button type="button" class="btnStatus ${st==='descartada'?'on descartada':''}" data-k="${k}" data-v="descartada">✕ Descartar</button>
       </div></td>
@@ -497,8 +582,9 @@ function render(){
       document.getElementById('selContagem').textContent = selecionadas.size + ' selecionadas';
       document.getElementById('selTodas').checked = (window.__filtradas||[]).every(j => selecionadas.has(chaveJob(j)));
     });
-    tr.querySelector('.btnAnalisar').addEventListener('click', () => abrirAnalise(j));
-    tr.querySelectorAll('.btnStatus').forEach(b => b.addEventListener('click', () => setStatus(k, b.dataset.v)));
+    tr.querySelector('.btnAnalisar').addEventListener('click', () => { marcarLida(k, true, j); abrirAnalise(j); });
+    tr.querySelector('.btnLida').addEventListener('click', () => marcarLida(k, !lidaEfetiva(j), j));
+    tr.querySelectorAll('.btnStatus').forEach(b => b.addEventListener('click', () => setStatus(k, b.dataset.v, j)));
     corpo.appendChild(tr);
   });
   document.getElementById('vazio').style.display = filtradas.length ? 'none' : 'block';
@@ -557,7 +643,7 @@ function atualizar(){
   escreverFiltrosNaUrl();
 }
 
-['fTexto','fCategoria','fFonte','fSenioridade','fModalidade','fCorte','fOrdenar','fStatus','fRegiaoBr'].forEach(id=>{
+['fTexto','fCategoria','fFonte','fSenioridade','fModalidade','fCorte','fOrdenar','fStatus','fRegiaoBr','fNaoLidas'].forEach(id=>{
   document.getElementById(id).addEventListener('input', atualizar);
 });
 document.querySelectorAll('th.sortable').forEach(th=>{
@@ -583,6 +669,7 @@ document.getElementById('limpar').addEventListener('click', ()=>{
   document.getElementById('fOrdenar').value='publicado_em';
   document.getElementById('fStatus').value='padrao';
   document.getElementById('fRegiaoBr').checked=false;
+  document.getElementById('fNaoLidas').checked=false;
   stacksAtivas.clear();
   atualizar();
 });
@@ -631,6 +718,31 @@ document.getElementById('modalEnviar').addEventListener('click', () => {
 });
 
 lerFiltrosDaUrl();
+atualizarBadgeSync();
+document.getElementById('syncBadge').addEventListener('click', () => {
+  document.getElementById('syncUrl').value = localStorage.getItem(SYNC_URL_KEY) || '';
+  document.getElementById('syncToken').value = localStorage.getItem(SYNC_TOKEN_KEY) || '';
+  document.getElementById('syncBg').style.display = 'flex';
+});
+document.getElementById('syncFechar').addEventListener('click', () => { document.getElementById('syncBg').style.display = 'none'; });
+document.getElementById('syncBg').addEventListener('click', (e) => { if (e.target.id === 'syncBg') document.getElementById('syncBg').style.display = 'none'; });
+document.getElementById('syncLimpar').addEventListener('click', () => {
+  localStorage.removeItem(SYNC_URL_KEY);
+  localStorage.removeItem(SYNC_TOKEN_KEY);
+  atualizarBadgeSync();
+  document.getElementById('syncBg').style.display = 'none';
+});
+document.getElementById('syncSalvar').addEventListener('click', () => {
+  const url = document.getElementById('syncUrl').value.trim();
+  const token = document.getElementById('syncToken').value.trim();
+  if (!url || !token){ alert('Preencha URL e token.'); return; }
+  localStorage.setItem(SYNC_URL_KEY, url);
+  localStorage.setItem(SYNC_TOKEN_KEY, token);
+  tursoExec('SELECT 1').then(r => {
+    if (r && r.ok){ atualizarBadgeSync(); document.getElementById('syncBg').style.display = 'none'; }
+    else { alert('Não consegui confirmar a conexão — verifique URL e token. Os valores foram salvos; tente de novo.'); atualizarBadgeSync(); }
+  });
+});
 
 fetch('./jobs.json', { cache: 'no-store' })
   .then(r=>{ if(!r.ok) throw new Error('jobs.json ainda não existe neste endereço'); return r.json(); })

@@ -24,7 +24,10 @@ CREATE TABLE IF NOT EXISTS job (
   primeira_vez TEXT NOT NULL,
   ultima_vez TEXT NOT NULL,
   ativo INTEGER DEFAULT 1,
-  avisado INTEGER DEFAULT 0
+  avisado INTEGER DEFAULT 0,
+  lida INTEGER DEFAULT 0,
+  status_usuario TEXT DEFAULT '',
+  status_atualizado_em TEXT
 );
 
 CREATE TABLE IF NOT EXISTS job_event (
