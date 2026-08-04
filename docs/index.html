@@ -186,6 +186,12 @@
       <div class="d-flex flex-wrap gap-2 mb-2" id="categoriaChips"></div>
       <div class="d-flex flex-wrap gap-2 mb-3" id="chips"></div>
 
+      <ul class="nav nav-pills gap-2 mb-2">
+        <li class="nav-item"><button class="nav-link active abaBtn" type="button" data-aba="perfil">🎯 Do meu perfil <span class="badge rounded-pill bg-light text-dark ms-1" id="qtdPerfil">0</span></button></li>
+        <li class="nav-item"><button class="nav-link abaBtn" type="button" data-aba="outras">Outras vagas <span class="badge rounded-pill bg-light text-dark ms-1" id="qtdOutras">0</span></button></li>
+        <li class="nav-item"><button class="nav-link abaBtn" type="button" data-aba="processadas">✅ Processadas <span class="badge rounded-pill bg-light text-dark ms-1" id="qtdProcessadas">0</span></button></li>
+      </ul>
+      <div id="avisoPerfilVazio" class="alert alert-warning small d-none">Configure "Meu perfil" (stacks que você domina) pra eu separar automaticamente as vagas que combinam com você.</div>
       <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2 sticky-top bg-white py-2" style="top:0; z-index:10;">
         <div class="d-flex align-items-center gap-3 flex-wrap">
           <div class="form-check mb-0">
@@ -193,9 +199,6 @@
             <label class="form-check-label small" for="selTodas">selecionar todas</label>
           </div>
           <span class="small text-muted" id="selContagem">0 selecionadas</span>
-          <button class="btn btn-outline-success btn-sm ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#areaProcessadas" aria-expanded="false">
-            ✅ Já processadas (<span id="contagemProcessadas">0</span>)
-          </button>
         </div>
         <div class="d-flex gap-2">
           <div class="btn-group btn-group-sm" role="group">
@@ -212,25 +215,7 @@
         </div>
       </div>
 
-      <div class="collapse mb-3" id="areaProcessadas">
-        <div class="alert alert-light border small mb-2">Lidas, candidatadas, descartadas ou já diagnosticadas</div>
-        <div class="table-responsive">
-          <table class="table table-hover align-middle bg-white">
-            <thead class="table-light">
-              <tr>
-                <th style="width:20px;"></th>
-                <th>Vaga</th><th>Local / modalidade</th><th>Senioridade</th><th>Stack</th>
-                <th class="text-center">Aberta há</th>
-                <th class="text-center">Pontos</th>
-                <th class="text-end">Publicada</th>
-              </tr>
-            </thead>
-            <tbody id="corpoProcessadas"></tbody>
-          </table>
-        </div>
-      </div>
 
-      <div id="viewTabela">
       <div class="table-responsive">
         <table class="table table-hover align-middle bg-white">
           <thead class="table-light">
@@ -475,6 +460,12 @@ let statusMap = new Map(Object.entries(JSON.parse(localStorage.getItem(STATUS_KE
 let lidaMap = new Map(Object.entries(JSON.parse(localStorage.getItem(LIDA_KEY) || '{}')));
 let msalInstance = null;
 let analisadasSet = new Set();
+let abaAtual = 'perfil';
+function matchPerfil(j){
+  const perfil = meuPerfil();
+  if (!perfil.length) return false;
+  return listaStacks(j).some(s => perfil.includes(s.toLowerCase()));
+}
 const DIAGNOSTICO_LOCAL_KEY = 'radar-vagas-diagnosticos';
 function diagnosticosLocais(){ try { return JSON.parse(localStorage.getItem(DIAGNOSTICO_LOCAL_KEY) || '{}'); } catch { return {}; } }
 function salvarDiagnosticoLocal(k, texto){
@@ -1167,12 +1158,19 @@ function render(){
 
   const corpo = document.getElementById('corpo');
   corpo.innerHTML = '';
-  const corpoProcessadas = document.getElementById('corpoProcessadas');
-  corpoProcessadas.innerHTML = '';
   const pendentes = [];
   const processadas = [];
   filtradas.forEach(j => (ehProcessada(j) ? processadas : pendentes).push(j));
-  document.getElementById('contagemProcessadas').textContent = processadas.length;
+  const perfilConfigurado = meuPerfil().length > 0;
+  document.getElementById('avisoPerfilVazio').classList.toggle('d-none', perfilConfigurado);
+  const doPerfil = perfilConfigurado ? pendentes.filter(j => matchPerfil(j)) : [];
+  const outras = perfilConfigurado ? pendentes.filter(j => !matchPerfil(j)) : pendentes;
+  document.getElementById('qtdPerfil').textContent = doPerfil.length;
+  document.getElementById('qtdOutras').textContent = outras.length;
+  document.getElementById('qtdProcessadas').textContent = processadas.length;
+  if (!perfilConfigurado && abaAtual === 'perfil') abaAtual = 'outras';
+  document.querySelectorAll('.abaBtn').forEach(b => b.classList.toggle('active', b.dataset.aba === abaAtual));
+  const listaAtual = abaAtual === 'perfil' ? doPerfil : abaAtual === 'processadas' ? processadas : outras;
 
   function montarLinha(j){
     const corBg = corPontos(j.pontos||0);
@@ -1209,9 +1207,8 @@ function render(){
     tr.querySelectorAll('.btnStatus').forEach(b => b.addEventListener('click', () => setStatus(k, b.dataset.v, j)));
     return tr;
   }
-  pendentes.forEach(j => corpo.appendChild(montarLinha(j)));
-  processadas.forEach(j => corpoProcessadas.appendChild(montarLinha(j)));
-  document.getElementById('vazio').classList.toggle('d-none', filtradas.length > 0);
+  listaAtual.forEach(j => corpo.appendChild(montarLinha(j)));
+  document.getElementById('vazio').classList.toggle('d-none', listaAtual.length > 0);
   if (modoView === 'kanban') renderKanban();
 }
 
@@ -1358,6 +1355,7 @@ document.querySelectorAll('th.sortable').forEach(th=>{
     atualizar();
   });
 });
+document.querySelectorAll('.abaBtn').forEach(b => b.addEventListener('click', () => { abaAtual = b.dataset.aba; render(); }));
 document.getElementById('selTodas').addEventListener('change', (e) => {
   (window.__filtradas||[]).forEach(j => { if (e.target.checked) selecionadas.add(chaveJob(j)); else selecionadas.delete(chaveJob(j)); });
   render();
