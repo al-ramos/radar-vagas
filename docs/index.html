@@ -167,6 +167,7 @@
       <p class="small text-muted mt-2">Marque as vagas na tabela (checkbox) e clique aqui: abre uma prévia editável do e-mail.</p>
       <button class="btn btn-outline-primary btn-sm w-100 mt-2" id="abrirLoteVagas" type="button">📥 Analisar lista de vagas</button>
       <p class="small text-muted mt-1">Cole vagas de fora do radar (texto/link) e a IA classifica cada uma pro seu perfil.</p>
+      <a class="btn btn-outline-secondary btn-sm w-100 mt-2" href="candidaturas.html" target="_blank">📄 Histórico público de candidaturas</a>
     </aside>
 
     <main class="col-12 col-md-9 col-lg-10 p-3 p-md-4">
@@ -1411,9 +1412,10 @@ function render(){
     if (st === 'descartada') tr.className = 'descartada-row';
     else if (!lida) tr.className = 'naolida';
     const fonteTag = ehFonteEmail(j) ? `<div class="small text-success">${FONTE_LABEL.jsonfeed}</div>` : '';
+    const mortoTag = Number(j.link_morto) === 1 ? '<span class="badge bg-secondary ms-1" title="o ATS respondeu que a vaga foi encerrada">link encerrado</span>' : '';
     tr.innerHTML = `
       <td><input type="checkbox" data-k="${k}" ${selecionadas.has(k)?'checked':''}></td>
-      <td><a href="${j.url||'#'}" target="_blank" rel="noopener" class="text-decoration-none">${!lida?'<span class="naolida-dot" title="não lida"></span>':''}${j.titulo||''}</a><div class="small text-muted">${j.empresa||''} <button type="button" class="btn btn-link btn-xs p-0 empresaFav" data-empresa="${j.empresa}" title="favoritar empresa">${empresasFavoritas().has(j.empresa)?'⭐':'☆'}</button></div>${fonteTag}<span class="badge bg-light text-dark border">${CATEGORIA_LABEL[j._categoria]||''}</span><br>
+      <td><a href="${j.url||'#'}" target="_blank" rel="noopener" class="text-decoration-none">${!lida?'<span class="naolida-dot" title="não lida"></span>':''}${j.titulo||''}</a><div class="small text-muted">${j.empresa||''} <button type="button" class="btn btn-link btn-xs p-0 empresaFav" data-empresa="${j.empresa}" title="favoritar empresa">${empresasFavoritas().has(j.empresa)?'⭐':'☆'}</button></div>${fonteTag}<span class="badge bg-light text-dark border">${CATEGORIA_LABEL[j._categoria]||''}</span>${mortoTag}<br>
       <div class="btn-group btn-group-sm mt-1">
         <button type="button" class="btn btn-outline-secondary btn-xs btnAnalisar" data-k="${k}">🔍 Analisar</button>
         <button type="button" class="btn btn-outline-secondary btn-xs btnLida" data-k="${k}">${lida?'○ Não lida':'● Lida'}</button>
