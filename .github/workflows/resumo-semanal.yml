@@ -1,0 +1,27 @@
+name: resumo-semanal
+
+on:
+  schedule:
+    - cron: "0 12 * * 1"   # segunda-feira, 09h de Brasilia
+  workflow_dispatch:
+
+jobs:
+  resumo:
+    runs-on: ubuntu-latest
+    env:
+      TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
+      TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
+      RADAR_PERFIL_EMAIL: ${{ secrets.RADAR_PERFIL_EMAIL }}
+      WHATSAPP_TOKEN: ${{ secrets.WHATSAPP_TOKEN }}
+      WHATSAPP_PHONE_ID: ${{ secrets.WHATSAPP_PHONE_ID }}
+      WHATSAPP_TO: ${{ secrets.WHATSAPP_TO }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: pip install -r requirements.txt
+
+      - run: python radar/resumo_semanal.py

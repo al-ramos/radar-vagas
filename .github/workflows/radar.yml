@@ -14,7 +14,7 @@ jobs:
     env:
       TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
       TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
-      RADAR_PERFIL_EMAIL: ${{ vars.RADAR_PERFIL_EMAIL }}
+      RADAR_PERFIL_EMAIL: ${{ secrets.RADAR_PERFIL_EMAIL }}
     steps:
       - uses: actions/checkout@v4
 
@@ -30,6 +30,9 @@ jobs:
 
       - run: python radar/score.py
 
+      - run: python radar/checar_links.py --limite 400
+        continue-on-error: true
+
       - run: python radar/notify.py
         continue-on-error: true
         env:
@@ -41,11 +44,12 @@ jobs:
         run: |
           mkdir -p docs
           python radar/export_json.py --out docs/jobs.json --somente-ativas
+          python radar/export_json.py --out docs/candidaturas.json --somente-candidatadas
 
       - name: salvar painel
         run: |
           git config user.name "radar-bot"
           git config user.email "radar@users.noreply.github.com"
-          git add docs/jobs.json
+          git add docs/jobs.json docs/candidaturas.json
           git commit -m "coleta $(date +%F)" || echo "sem mudancas"
           git push
