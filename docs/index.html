@@ -315,7 +315,9 @@
               <div class="card-body">
                 <h6 class="card-title text-primary">Stacks e interesses</h6>
                 <label class="form-label small fw-bold mt-2">Domino (usado na aderência)</label>
+                <div id="perfilStackCheckboxes" class="border rounded p-2 mb-1" style="max-height:220px; overflow-y:auto;"></div>
                 <textarea id="perfilStacksInput" class="form-control form-control-sm" rows="2" placeholder="python, aws, kubernetes, react"></textarea>
+                <p class="small text-muted mb-0">Marque acima ou edite a lista direto no campo de texto — os dois ficam sincronizados.</p>
                 <label class="form-label small fw-bold mt-3">Quero atuar em</label>
                 <textarea id="perfilQuero" class="form-control form-control-sm" rows="2" placeholder="arquitetura, plataforma, llm, mlops"></textarea>
                 <label class="form-label small fw-bold mt-3">Evitar</label>
@@ -793,12 +795,47 @@ function meuPerfil(){
   if (window.__perfilPersistido && window.__perfilPersistido.length) return window.__perfilPersistido;
   return Array.from(stacksAtivas || []).map(s=>s.trim().toLowerCase()).filter(Boolean);
 }
+const CATEGORIAS_STACK = {
+  'Linguagens': ['python','java','javascript','typescript','c#','.net','php','go','ruby','kotlin','swift','c++','scala'],
+  'Front-end': ['react','vue','angular','next.js','html','css','tailwind'],
+  'Back-end / frameworks': ['node.js','spring','django','flask','fastapi','laravel','rails','express'],
+  'Bancos de dados': ['sql','postgresql','mysql','mongodb','redis','oracle','sql server'],
+  'Cloud / infra': ['aws','azure','gcp','docker','kubernetes','terraform','linux'],
+  'Dados / IA': ['sql','spark','airflow','power bi','machine learning','llm'],
+};
+function montarStackCheckboxes(selecionadas){
+  const sel = new Set((selecionadas||[]).map(s=>s.trim().toLowerCase()).filter(Boolean));
+  const wrap = document.getElementById('perfilStackCheckboxes');
+  wrap.innerHTML = '';
+  Object.entries(CATEGORIAS_STACK).forEach(([cat, itens]) => {
+    const bloco = document.createElement('div');
+    bloco.className = 'mb-2';
+    bloco.innerHTML = `<div class="small fw-bold text-muted mb-1">${cat}</div>`;
+    const linha = document.createElement('div');
+    linha.className = 'd-flex flex-wrap gap-2';
+    itens.forEach(s => {
+      const id = 'chk_' + s.replace(/[^a-z0-9]/gi,'_');
+      const div = document.createElement('div');
+      div.className = 'form-check form-check-inline m-0';
+      div.innerHTML = `<input class="form-check-input stackChk" type="checkbox" id="${id}" value="${s}" ${sel.has(s)?'checked':''}><label class="form-check-label small" for="${id}">${s}</label>`;
+      linha.appendChild(div);
+    });
+    bloco.appendChild(linha);
+    wrap.appendChild(bloco);
+  });
+  wrap.querySelectorAll('.stackChk').forEach(chk => chk.addEventListener('change', sincronizarStackTextarea));
+}
+function sincronizarStackTextarea(){
+  const marcadas = Array.from(document.querySelectorAll('#perfilStackCheckboxes .stackChk:checked')).map(c=>c.value);
+  document.getElementById('perfilStacksInput').value = marcadas.join(', ');
+}
 const PERFIL_LOCAL_KEY = 'radar-vagas-perfil-config';
 function perfilPadrao(){
   return { stacks: '', quero: '', evitar: '', senioridade: '', modalidade: '', cidades: '', corte: 55, livre: '' };
 }
 function preencherFormPerfil(cfg){
   document.getElementById('perfilStacksInput').value = cfg.stacks || '';
+  montarStackCheckboxes((cfg.stacks||'').split(','));
   document.getElementById('perfilQuero').value = cfg.quero || '';
   document.getElementById('perfilEvitar').value = cfg.evitar || '';
   document.getElementById('perfilSenioridade').value = cfg.senioridade || '';
