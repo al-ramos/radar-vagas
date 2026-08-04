@@ -14,6 +14,7 @@ jobs:
     env:
       TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
       TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
+      RADAR_PERFIL_EMAIL: ${{ vars.RADAR_PERFIL_EMAIL }}
     steps:
       - uses: actions/checkout@v4
 
