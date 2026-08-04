@@ -30,8 +30,9 @@ jobs:
 
       - run: python radar/score.py
 
-      - run: python radar/checar_links.py --limite 400
+      - run: python radar/checar_links.py --limite 200 --workers 20
         continue-on-error: true
+        timeout-minutes: 5
 
       - run: python radar/notify.py
         continue-on-error: true
