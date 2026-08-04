@@ -1,5 +1,6 @@
 """Pontuacao deterministica de 0 a 100, explicavel componente por componente."""
 import datetime as dt
+import json
 import os
 import re
 
@@ -83,9 +84,12 @@ def main():
     ).fetchall()
     atualizacoes = []
     for jid, tit, desc, sen, mod, loc, pub in linhas:
-        pts, _ = pontuar(tit, desc or "", sen, mod, loc, pub)
+        pts, motivos = pontuar(tit, desc or "", sen, mod, loc, pub)
         dom = ", ".join(achados(f"{tit} {desc}", P.get("domino")))
-        atualizacoes.append(("UPDATE job SET pontos = ?, stack = ? WHERE id = ?", (pts, dom, jid)))
+        atualizacoes.append((
+            "UPDATE job SET pontos = ?, stack = ?, motivos_pontos = ? WHERE id = ?",
+            (pts, dom, json.dumps(motivos, ensure_ascii=False), jid),
+        ))
     db.lote(con, atualizacoes)
     con.commit()
     print(f"pontuadas: {len(linhas)}")

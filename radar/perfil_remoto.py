@@ -1,15 +1,26 @@
 """Carrega o perfil parametrizado pelo usuario no painel (tabela `perfil`,
 coluna config_json no Turso) - unica fonte de perfil usada por score.py e
-notify.py. Nao ha mais fallback pro profile.yml: se o perfil nao estiver
-configurado, a execucao falha com erro claro.
+notify.py.
 
-Exige a variavel de ambiente RADAR_PERFIL_EMAIL com o e-mail da conta usada
-para logar no painel e salvar "Meu perfil".
+Se o perfil nao estiver configurado, degrada com defaults neutros (nao trava
+collect.py/score.py) mas marca P["_sem_perfil"] = True, para que notify.py
+saiba nao mandar alerta sem perfil real.
 """
 import json
 import os
 
 import db
+
+_PADRAO = {
+    "senioridade": "pleno",
+    "modalidade_preferida": "remoto",
+    "cidades": [],
+    "corte": 55,
+    "domino": [],
+    "quero": [],
+    "evitar": [],
+    "_sem_perfil": True,
+}
 
 
 def _dividir(txt):
@@ -19,21 +30,16 @@ def _dividir(txt):
 def carregar():
     email = os.environ.get("RADAR_PERFIL_EMAIL", "").strip()
     if not email:
-        raise SystemExit(
-            "RADAR_PERFIL_EMAIL nao configurado. Defina esse secret com o "
-            "e-mail da conta usada para logar no painel e salvar 'Meu perfil' "
-            "antes de rodar score.py/notify.py."
-        )
+        print("[perfil_remoto] RADAR_PERFIL_EMAIL nao configurado - usando perfil neutro (sem stacks/quero/evitar).")
+        return dict(_PADRAO)
     con = db.conectar()
     linha = con.execute(
         "SELECT config_json FROM perfil WHERE usuario_email = ?", (email,)
     ).fetchone()
     if not linha or not linha[0]:
-        raise SystemExit(
-            f"Nenhum perfil salvo no banco para '{email}'. Entre no painel com "
-            "essa conta, abra 'Meu perfil' e clique em Salvar antes de rodar "
-            "score.py/notify.py."
-        )
+        print(f"[perfil_remoto] Nenhum perfil salvo para '{email}' - usando perfil neutro. "
+              "Entre no painel e salve 'Meu perfil' para pontuacao/alerta corretos.")
+        return dict(_PADRAO)
     cfg = json.loads(linha[0])
     return {
         "senioridade": cfg.get("senioridade") or "",
@@ -43,4 +49,5 @@ def carregar():
         "domino": _dividir(cfg.get("stacks")),
         "quero": _dividir(cfg.get("quero")),
         "evitar": _dividir(cfg.get("evitar")),
+        "_sem_perfil": False,
     }

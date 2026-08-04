@@ -39,6 +39,9 @@ def bate_com_perfil(stack):
 
 
 def main():
+    if P.get("_sem_perfil"):
+        print("sem perfil configurado - nao envia alerta (evita spam sem base real)")
+        return
     con = db.conectar()
     linhas = con.execute(
         "SELECT id, empresa, titulo, local, stack, pontos, url FROM job"

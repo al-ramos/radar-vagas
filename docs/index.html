@@ -1295,6 +1295,13 @@ function render(){
   if (modoView === 'kanban') renderKanban();
 }
 
+function breakdownPontosHtml(j){
+  if (!j.motivos_pontos) return '';
+  let itens;
+  try { itens = JSON.parse(j.motivos_pontos); } catch { return ''; }
+  if (!Array.isArray(itens) || !itens.length) return '';
+  return '<div class="mt-1">' + itens.map(m => `• ${m}`).join('<br>') + '</div>';
+}
 function abrirAnalise(j){
   const t = ((j.titulo||'') + ' ' + (j.stack||'')).toLowerCase();
   const motivos = [];
@@ -1320,6 +1327,7 @@ function abrirAnalise(j){
       <tr><td>Categoria detectada</td><td class="text-end fw-bold">${CATEGORIA_LABEL[j._categoria] || '-'}</td></tr>
       <tr><td>Por que essa categoria</td><td class="text-end small">${motivos.length ? motivos.join(' · ') : 'sem palavras-chave claras'}</td></tr>
       <tr><td>Pontuação do radar</td><td class="text-end fw-bold">${Math.round(pontos)} pts</td></tr>
+      <tr><td colspan="2" class="small text-muted pt-0">${breakdownPontosHtml(j)}</td></tr>
       <tr><td>Aberta há</td><td class="text-end fw-bold">${dias!=null ? dias+' dias' : '-'}</td></tr>
       <tr><td>Senioridade</td><td class="text-end fw-bold">${SENIOR_LABEL[j.senioridade] || '-'}</td></tr>
       <tr><td>Modalidade</td><td class="text-end fw-bold text-capitalize">${j.modalidade || '-'}</td></tr>
