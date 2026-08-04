@@ -289,22 +289,11 @@
               <div class="card-body">
                 <h6 class="card-title text-primary">Preferências de vaga</h6>
                 <label class="form-label small fw-bold mt-2">Senioridade</label>
-                <select id="perfilSenioridade" class="form-select form-select-sm">
-                  <option value="">Não informar</option>
-                  <option value="junior">Júnior</option>
-                  <option value="pleno">Pleno</option>
-                  <option value="senior">Sênior</option>
-                  <option value="especialista">Especialista</option>
-                </select>
+                <div id="perfilSenioridadeChk" class="d-flex flex-wrap gap-2"></div>
                 <label class="form-label small fw-bold mt-3">Modalidade preferida</label>
-                <select id="perfilModalidade" class="form-select form-select-sm">
-                  <option value="">Não informar</option>
-                  <option value="remoto">Remoto</option>
-                  <option value="hibrido">Híbrido</option>
-                  <option value="presencial">Presencial</option>
-                </select>
+                <div id="perfilModalidadeChk" class="d-flex flex-wrap gap-2"></div>
                 <label class="form-label small fw-bold mt-3">Cidades / regiões aceitáveis</label>
-                <input type="text" id="perfilCidades" class="form-control form-control-sm" placeholder="Remoto, Brasil, São Paulo">
+                <div id="perfilCidadesChk" class="d-flex flex-wrap gap-2"></div>
                 <label class="form-label small fw-bold mt-3">Corte mínimo de alerta: <span id="perfilCorteLabel">55</span> pts</label>
                 <input type="range" class="form-range" id="perfilCorte" min="0" max="100" step="5" value="55">
               </div>
@@ -319,9 +308,9 @@
                 <textarea id="perfilStacksInput" class="form-control form-control-sm" rows="2" placeholder="python, aws, kubernetes, react"></textarea>
                 <p class="small text-muted mb-0">Marque acima ou edite a lista direto no campo de texto — os dois ficam sincronizados.</p>
                 <label class="form-label small fw-bold mt-3">Quero atuar em</label>
-                <textarea id="perfilQuero" class="form-control form-control-sm" rows="2" placeholder="arquitetura, plataforma, llm, mlops"></textarea>
+                <div id="perfilQueroChk" class="d-flex flex-wrap gap-2"></div>
                 <label class="form-label small fw-bold mt-3">Evitar</label>
-                <textarea id="perfilEvitar" class="form-control form-control-sm" rows="2" placeholder="estagio, trainee, suporte tecnico"></textarea>
+                <div id="perfilEvitarChk" class="d-flex flex-wrap gap-2"></div>
               </div>
             </div>
           </div>
@@ -331,9 +320,12 @@
             <h6 class="card-title text-primary">Currículo / resumo livre</h6>
             <p class="small text-muted mb-1">Cole aqui seu currículo, um resumo em texto livre ou qualquer coisa relevante sobre você — a IA usa isso como fonte principal na análise e diagnóstico de cada vaga, junto com os campos acima.</p>
             <textarea id="perfilLivre" class="form-control form-control-sm" rows="6" placeholder="Cole aqui seu currículo ou um resumo da sua experiência, projetos, certificações etc."></textarea>
+            <button class="btn btn-outline-primary btn-sm mt-2" id="btnAnalisarCurriculo" type="button">🔎 Analisar e preencher checkboxes automaticamente</button>
+            <p class="small text-muted mt-1 mb-0">Leio o texto acima e marco sozinho as stacks, preferências e senioridade que reconhecer — revise antes de salvar.</p>
           </div>
         </div>
         <p class="small text-muted mt-3 mb-0" id="perfilStatusTexto">Salvo no banco, associado à sua conta — disponível em qualquer dispositivo com sincronização ligada.</p>
+        <div class="alert alert-primary small mt-2 d-none" id="avisoPrimeiroPerfil">👋 Primeiro acesso: cole seu currículo/resumo abaixo em "Currículo / resumo livre" e clique em "Analisar e preencher" — eu marco os checkboxes acima automaticamente pra você.</div>
       </div>
       <div class="modal-footer">
         <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Fechar</button>
@@ -836,15 +828,37 @@ function perfilPadrao(){
 function preencherFormPerfil(cfg){
   document.getElementById('perfilStacksInput').value = cfg.stacks || '';
   montarStackCheckboxes((cfg.stacks||'').split(','));
-  document.getElementById('perfilQuero').value = cfg.quero || '';
-  document.getElementById('perfilEvitar').value = cfg.evitar || '';
-  document.getElementById('perfilSenioridade').value = cfg.senioridade || '';
-  document.getElementById('perfilModalidade').value = cfg.modalidade || '';
-  document.getElementById('perfilCidades').value = cfg.cidades || '';
+  montarRadioChk('perfilSenioridadeChk', 'senioridade', [['','Não informar'],['junior','Júnior'],['pleno','Pleno'],['senior','Sênior'],['especialista','Especialista']], cfg.senioridade || '');
+  montarRadioChk('perfilModalidadeChk', 'modalidade', [['','Não informar'],['remoto','Remoto'],['hibrido','Híbrido'],['presencial','Presencial']], cfg.modalidade || '');
+  montarCheckboxLista('perfilCidadesChk', ['Remoto','São Paulo (capital)','Grande São Paulo','Mogi das Cruzes','Brasil (qualquer cidade)'], cfg.cidades || '');
+  montarCheckboxLista('perfilQueroChk', ['arquitetura','plataforma','llm / ia generativa','mlops','devops / sre','dados','segurança','liderança técnica'], cfg.quero || '');
+  montarCheckboxLista('perfilEvitarChk', ['estágio','trainee','suporte técnico n1','freelance','presencial obrigatório'], cfg.evitar || '');
   document.getElementById('perfilCorte').value = cfg.corte || 55;
   document.getElementById('perfilCorteLabel').textContent = cfg.corte || 55;
   document.getElementById('perfilLivre').value = cfg.livre || '';
   window.__perfilPersistido = (cfg.stacks || '').split(',').map(s=>s.trim().toLowerCase()).filter(Boolean);
+}
+function montarRadioChk(containerId, nome, opcoes, valorAtual){
+  const el = document.getElementById(containerId);
+  el.innerHTML = opcoes.map(([v,l]) => {
+    const id = containerId+'_'+(v||'nenhum');
+    return `<div class="form-check form-check-inline m-0"><input class="form-check-input" type="radio" name="${nome}" id="${id}" value="${v}" ${valorAtual===v?'checked':''}><label class="form-check-label small" for="${id}">${l}</label></div>`;
+  }).join('');
+}
+function valorRadioChk(containerId){
+  const el = document.querySelector(`#${containerId} input:checked`);
+  return el ? el.value : '';
+}
+function montarCheckboxLista(containerId, itens, valorTexto){
+  const sel = new Set((valorTexto||'').split(',').map(s=>s.trim().toLowerCase()).filter(Boolean));
+  const el = document.getElementById(containerId);
+  el.innerHTML = itens.map(it => {
+    const id = containerId+'_'+it.replace(/[^a-z0-9]/gi,'_');
+    return `<div class="form-check form-check-inline m-0"><input class="form-check-input" type="checkbox" id="${id}" value="${it}" ${sel.has(it.toLowerCase())?'checked':''}><label class="form-check-label small" for="${id}">${it}</label></div>`;
+  }).join('');
+}
+function valorCheckboxLista(containerId){
+  return Array.from(document.querySelectorAll(`#${containerId} input:checked`)).map(c=>c.value).join(', ');
 }
 function carregarPerfil(){
   let local = {};
@@ -866,11 +880,11 @@ function salvarPerfil(){
   if (!exigirLogin()) return;
   const cfg = {
     stacks: document.getElementById('perfilStacksInput').value.trim(),
-    quero: document.getElementById('perfilQuero').value.trim(),
-    evitar: document.getElementById('perfilEvitar').value.trim(),
-    senioridade: document.getElementById('perfilSenioridade').value,
-    modalidade: document.getElementById('perfilModalidade').value,
-    cidades: document.getElementById('perfilCidades').value.trim(),
+    quero: valorCheckboxLista('perfilQueroChk'),
+    evitar: valorCheckboxLista('perfilEvitarChk'),
+    senioridade: valorRadioChk('perfilSenioridadeChk'),
+    modalidade: valorRadioChk('perfilModalidadeChk'),
+    cidades: valorCheckboxLista('perfilCidadesChk'),
     corte: Number(document.getElementById('perfilCorte').value),
     livre: document.getElementById('perfilLivre').value.trim(),
   };
@@ -884,6 +898,38 @@ function salvarPerfil(){
   const orig = b.textContent; b.textContent = '✓ Salvo'; setTimeout(()=>{ b.textContent = orig; }, 1500);
 }
 document.getElementById('abrirPerfil').addEventListener('click', () => new bootstrap.Modal('#modalPerfil').show());
+
+const CIDADES_OPCOES = ['Remoto','São Paulo (capital)','Grande São Paulo','Mogi das Cruzes','Brasil (qualquer cidade)'];
+const QUERO_OPCOES = ['arquitetura','plataforma','llm / ia generativa','mlops','devops / sre','dados','segurança','liderança técnica'];
+const EVITAR_OPCOES = ['estágio','trainee','suporte técnico n1','freelance','presencial obrigatório'];
+function marcarChkPorTexto(containerId, opcoes, texto){
+  opcoes.forEach(op => {
+    const chave = op.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+    if (texto.includes(chave.split(' / ')[0]) || texto.includes(chave)){
+      const el = document.querySelector(`#${containerId} input[value="${op}"]`);
+      if (el) el.checked = true;
+    }
+  });
+}
+document.getElementById('btnAnalisarCurriculo').addEventListener('click', () => {
+  const texto = document.getElementById('perfilLivre').value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  if (!texto.trim()){ alert('Cole seu currículo ou um resumo no campo abaixo antes de analisar.'); return; }
+  const todasStacks = Object.values(CATEGORIAS_STACK).flat();
+  const stacksAchadas = todasStacks.filter(s => texto.includes(s.toLowerCase()));
+  const jaMarcadas = Array.from(document.querySelectorAll('#perfilStackCheckboxes .stackChk:checked')).map(c=>c.value);
+  montarStackCheckboxes(Array.from(new Set([...jaMarcadas, ...stacksAchadas])));
+  sincronizarStackTextarea();
+  marcarChkPorTexto('perfilCidadesChk', CIDADES_OPCOES, texto);
+  marcarChkPorTexto('perfilQueroChk', QUERO_OPCOES, texto);
+  marcarChkPorTexto('perfilEvitarChk', EVITAR_OPCOES, texto);
+  if (/senior|sr\.|especialista/.test(texto)) document.querySelector('#perfilSenioridadeChk input[value="senior"]').checked = true;
+  else if (/pleno/.test(texto)) document.querySelector('#perfilSenioridadeChk input[value="pleno"]').checked = true;
+  else if (/junior|jr\./.test(texto)) document.querySelector('#perfilSenioridadeChk input[value="junior"]').checked = true;
+  if (/100% remoto|totalmente remoto|remoto\b/.test(texto)) document.querySelector('#perfilModalidadeChk input[value="remoto"]').checked = true;
+  else if (/hibrido/.test(texto)) document.querySelector('#perfilModalidadeChk input[value="hibrido"]').checked = true;
+  const b = document.getElementById('btnAnalisarCurriculo');
+  const orig = b.textContent; b.textContent = '✓ Preenchido — revise e salve'; setTimeout(()=>{ b.textContent = orig; }, 2500);
+});
 
 // --- IA: traducao e diagnostico ---
 const OPENAI_KEY_KEY = 'radar-vagas-openai-key';
