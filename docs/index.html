@@ -210,8 +210,11 @@
             <ul class="dropdown-menu dropdown-menu-end">
               <li><button class="dropdown-item" id="btnExportarCsv" type="button">⬇ Exportar CSV</button></li>
               <li><button class="dropdown-item" id="btnDiagnosticoLote" type="button">🤖 Diagnosticar selecionadas</button></li>
+              <li><button class="dropdown-item" id="btnComparar" type="button">⚖ Comparar selecionadas</button></li>
             </ul>
           </div>
+          <button class="btn btn-outline-secondary btn-sm" id="btnTendencias" type="button">📊 Tendências</button>
+          <button class="btn btn-outline-secondary btn-sm" id="btnEmpresasFiltro" type="button">🏢 Empresas</button>
         </div>
       </div>
 
@@ -379,7 +382,10 @@
         <button class="btn btn-outline-secondary btn-sm mt-3" id="btnCartaApresentacao" type="button">✍️ Gerar carta de apresentação</button>
         <div id="cartaBox" class="d-none mt-2">
           <textarea id="cartaTexto" class="form-control small" rows="6"></textarea>
-          <button class="btn btn-outline-secondary btn-sm mt-2" id="btnCopiarCarta">📋 Copiar carta</button>
+          <div class="d-flex gap-2 mt-2">
+            <button class="btn btn-outline-secondary btn-sm" id="btnCopiarCarta">📋 Copiar carta</button>
+            <button class="btn btn-outline-primary btn-sm" id="btnSalvarCarta">💾 Salvar carta com esta vaga</button>
+          </div>
         </div>
       </div>
       <div class="modal-footer">
@@ -452,10 +458,27 @@ let stacksAtivas = new Set();
 let selecionadas = new Set();
 let statusMap = new Map(Object.entries(JSON.parse(localStorage.getItem(STATUS_KEY) || '{}')));
 let lidaMap = new Map(Object.entries(JSON.parse(localStorage.getItem(LIDA_KEY) || '{}')));
+const FAVORITAS_KEY = 'radar-vagas-empresas-favoritas';
+const BLOQUEADAS_KEY = 'radar-vagas-empresas-bloqueadas';
+function empresasFavoritas(){ try { return new Set(JSON.parse(localStorage.getItem(FAVORITAS_KEY)||'[]')); } catch { return new Set(); } }
+function empresasBloqueadas(){ try { return new Set(JSON.parse(localStorage.getItem(BLOQUEADAS_KEY)||'[]')); } catch { return new Set(); } }
+function alternarEmpresaSet(key, empresa){
+  const s = new Set(JSON.parse(localStorage.getItem(key)||'[]'));
+  if (s.has(empresa)) s.delete(empresa); else s.add(empresa);
+  localStorage.setItem(key, JSON.stringify(Array.from(s)));
+}
+const CARTA_LOCAL_KEY = 'radar-vagas-cartas';
+function cartasLocais(){ try { return JSON.parse(localStorage.getItem(CARTA_LOCAL_KEY)||'{}'); } catch { return {}; } }
+function salvarCartaLocal(k, texto){
+  const d = cartasLocais();
+  d[k] = texto;
+  localStorage.setItem(CARTA_LOCAL_KEY, JSON.stringify(d));
+}
 let msalInstance = null;
 let analisadasSet = new Set();
 let abaAtual = 'perfil';
 function matchPerfil(j){
+  if (empresasFavoritas().has(j.empresa)) return true;
   const perfil = meuPerfil();
   if (!perfil.length) return false;
   return listaStacks(j).some(s => perfil.includes(s.toLowerCase()));
@@ -1076,6 +1099,67 @@ document.getElementById('btnCopiarCarta').addEventListener('click', () => {
     const orig = b.textContent; b.textContent = '✓ Copiado'; setTimeout(()=>{ b.textContent = orig; }, 1500);
   });
 });
+document.getElementById('btnSalvarCarta').addEventListener('click', () => {
+  const j = __vagaAtualAnalise;
+  if (!j) return;
+  salvarCartaLocal(chaveJob(j), document.getElementById('cartaTexto').value);
+  analisadasSet.add(chaveJob(j));
+  const b = document.getElementById('btnSalvarCarta');
+  const orig = b.textContent; b.textContent = '✓ Salva'; setTimeout(()=>{ b.textContent = orig; }, 1500);
+});
+document.getElementById('btnTendencias').addEventListener('click', () => {
+  const contagemStack = {}, contagemEmpresa = {};
+  let somaPts = 0;
+  JOBS.forEach(j => {
+    listaStacks(j).forEach(s => { contagemStack[s] = (contagemStack[s]||0)+1; });
+    contagemEmpresa[j.empresa] = (contagemEmpresa[j.empresa]||0)+1;
+    somaPts += (j.pontos||0);
+  });
+  const topStacks = Object.entries(contagemStack).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  const topEmpresas = Object.entries(contagemEmpresa).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  const media = JOBS.length ? Math.round(somaPts/JOBS.length) : 0;
+  const barra = (n, max) => `<div class="progress" style="height:8px;"><div class="progress-bar" style="width:${Math.round(n/max*100)}%;"></div></div>`;
+  const maxS = topStacks[0]?.[1] || 1, maxE = topEmpresas[0]?.[1] || 1;
+  document.getElementById('tendenciasCorpo').innerHTML = `
+    <p><b>${JOBS.length}</b> vagas na base · pontuação média <b>${media}</b> pts</p>
+    <div class="row">
+      <div class="col-md-6"><h6>Stacks mais pedidas</h6>${topStacks.map(([s,n])=>`<div class="d-flex justify-content-between small"><span>${s}</span><span>${n}</span></div>${barra(n,maxS)}`).join('')}</div>
+      <div class="col-md-6"><h6>Empresas com mais vagas</h6>${topEmpresas.map(([e,n])=>`<div class="d-flex justify-content-between small"><span>${e}</span><span>${n}</span></div>${barra(n,maxE)}`).join('')}</div>
+    </div>`;
+  new bootstrap.Modal('#modalTendencias').show();
+});
+function renderEmpresasModal(){
+  const fav = empresasFavoritas(), blo = empresasBloqueadas();
+  const todas = Array.from(new Set(JOBS.map(j=>j.empresa))).sort();
+  document.getElementById('empresasCorpo').innerHTML = todas.map(e => `
+    <div class="d-flex justify-content-between align-items-center border-bottom py-1">
+      <span class="small">${e}</span>
+      <div class="btn-group btn-group-sm">
+        <button type="button" class="btn ${fav.has(e)?'btn-warning':'btn-outline-secondary'} btn-xs btnFavE" data-e="${e}">⭐ Favorita</button>
+        <button type="button" class="btn ${blo.has(e)?'btn-danger':'btn-outline-secondary'} btn-xs btnBloE" data-e="${e}">⛔ Bloquear</button>
+      </div>
+    </div>`).join('');
+  document.querySelectorAll('.btnFavE').forEach(b => b.addEventListener('click', () => { alternarEmpresaSet(FAVORITAS_KEY, b.dataset.e); renderEmpresasModal(); render(); }));
+  document.querySelectorAll('.btnBloE').forEach(b => b.addEventListener('click', () => { alternarEmpresaSet(BLOQUEADAS_KEY, b.dataset.e); renderEmpresasModal(); render(); }));
+}
+document.getElementById('btnEmpresasFiltro').addEventListener('click', () => { renderEmpresasModal(); new bootstrap.Modal('#modalEmpresas').show(); });
+document.getElementById('btnComparar').addEventListener('click', () => {
+  const lista = (window.__filtradas||[]).filter(j => selecionadas.has(chaveJob(j)));
+  if (!lista.length){ alert('Marque ao menos 2 vagas (checkbox) para comparar.'); return; }
+  const linhas = [
+    ['Vaga', j=>j.titulo], ['Empresa', j=>j.empresa], ['Local', j=>j.local||'-'],
+    ['Modalidade', j=>j.modalidade||'-'], ['Senioridade', j=>SENIOR_LABEL[j.senioridade]||'-'],
+    ['Stack', j=>listaStacks(j).join(', ')||'-'], ['Pontos', j=>Math.round(j.pontos||0)],
+    ['Aberta há', j=>{ const d=diasAbertaCalc(j); return d!=null?d+'d':'-'; }],
+    ['Publicada', j=>dataAbs(j.publicado_em)],
+  ];
+  const html = `<table class="table table-sm table-bordered"><tbody>` +
+    linhas.map(([rot, fn]) => `<tr><td class="fw-bold">${rot}</td>${lista.map(j=>`<td>${fn(j)}</td>`).join('')}</tr>`).join('') +
+    `<tr><td></td>${lista.map(j=>`<td><a href="${j.url}" target="_blank" rel="noopener" class="btn btn-outline-primary btn-sm">Abrir</a></td>`).join('')}</tr>` +
+    `</tbody></table>`;
+  document.getElementById('compararCorpo').innerHTML = html;
+  new bootstrap.Modal('#modalComparar').show();
+});
 
 // --- exportar CSV ---
 function csvEscape(v){ return '"' + String(v==null?'':v).replace(/"/g,'""') + '"'; }
@@ -1191,6 +1275,7 @@ function render(){
     if (fonte === 'ats' && ehFonteEmail(j)) return false;
     if (cat !== 'todas' && j._categoria !== cat) return false;
     if ((j.pontos||0) < corte) return false;
+    if (empresasBloqueadas().has(j.empresa)) return false;
     const st = statusEfetivo(j);
     if (status === 'padrao' && st === 'descartada') return false;
     if (status === 'candidatei' && st !== 'candidatei') return false;
@@ -1267,7 +1352,7 @@ function render(){
     const fonteTag = ehFonteEmail(j) ? `<div class="small text-success">${FONTE_LABEL.jsonfeed}</div>` : '';
     tr.innerHTML = `
       <td><input type="checkbox" data-k="${k}" ${selecionadas.has(k)?'checked':''}></td>
-      <td><a href="${j.url||'#'}" target="_blank" rel="noopener" class="text-decoration-none">${!lida?'<span class="naolida-dot" title="não lida"></span>':''}${j.titulo||''}</a><div class="small text-muted">${j.empresa||''}</div>${fonteTag}<span class="badge bg-light text-dark border">${CATEGORIA_LABEL[j._categoria]||''}</span><br>
+      <td><a href="${j.url||'#'}" target="_blank" rel="noopener" class="text-decoration-none">${!lida?'<span class="naolida-dot" title="não lida"></span>':''}${j.titulo||''}</a><div class="small text-muted">${j.empresa||''} <button type="button" class="btn btn-link btn-xs p-0 empresaFav" data-empresa="${j.empresa}" title="favoritar empresa">${empresasFavoritas().has(j.empresa)?'⭐':'☆'}</button></div>${fonteTag}<span class="badge bg-light text-dark border">${CATEGORIA_LABEL[j._categoria]||''}</span><br>
       <div class="btn-group btn-group-sm mt-1">
         <button type="button" class="btn btn-outline-secondary btn-xs btnAnalisar" data-k="${k}">🔍 Analisar</button>
         <button type="button" class="btn btn-outline-secondary btn-xs btnLida" data-k="${k}">${lida?'○ Não lida':'● Lida'}</button>
@@ -1287,6 +1372,7 @@ function render(){
     });
     tr.querySelector('.btnAnalisar').addEventListener('click', () => { marcarLida(k, true, j, true); abrirAnalise(j); });
     tr.querySelector('.btnLida').addEventListener('click', () => marcarLida(k, !lidaEfetiva(j), j));
+    tr.querySelector('.empresaFav').addEventListener('click', () => { alternarEmpresaSet(FAVORITAS_KEY, j.empresa); render(); });
     tr.querySelectorAll('.btnStatus').forEach(b => b.addEventListener('click', () => setStatus(k, b.dataset.v, j)));
     return tr;
   }
@@ -1340,6 +1426,12 @@ function abrirAnalise(j){
   document.getElementById('analiseDescricao').innerHTML = descricaoLimpa(j.descricao);
   document.getElementById('btnTraduzir').textContent = '🌐 Traduzir'; document.getElementById('btnTraduzir').dataset.traduzido = '0';
   document.getElementById('diagnosticoIaBox').classList.add('d-none');
+  document.getElementById('cartaBox').classList.add('d-none');
+  const cartaSalva = cartasLocais()[chaveJob(j)];
+  if (cartaSalva){
+    document.getElementById('cartaTexto').value = cartaSalva;
+    document.getElementById('cartaBox').classList.remove('d-none');
+  }
   const u2 = usuarioAtual();
   const diagLocal = diagnosticosLocais()[chaveJob(j)];
   if (diagLocal && diagLocal.texto){
