@@ -266,10 +266,15 @@
       <div class="modal-header"><h5 class="modal-title">Configurar IA</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
       <div class="modal-body">
         <p class="small text-muted">Usada para traduzir descrições e gerar diagnóstico de aderência com seu perfil.</p>
-        <div class="alert alert-warning small">⚠ A chave fica salva só neste navegador, mas é enviada direto à OpenAI a cada chamada. Não compartilhe este link enquanto estiver configurada.</div>
-        <label class="form-label small fw-bold">OpenAI API Key</label>
+        <div class="alert alert-warning small">⚠ A chave fica salva só neste navegador, mas é enviada direto ao provedor a cada chamada. Não compartilhe este link enquanto estiver configurada.</div>
+        <label class="form-label small fw-bold">Provedor</label>
+        <select id="cfgProvedorIa" class="form-select form-select-sm mb-2">
+          <option value="openai">OpenAI (gpt-4o-mini)</option>
+          <option value="claude">Claude (claude-3-5-haiku)</option>
+        </select>
+        <label class="form-label small fw-bold">API Key</label>
         <input type="text" class="form-control mb-1" id="cfgOpenaiKey" placeholder="sk-...">
-        <p class="small text-muted">Crie em <a href="https://platform.openai.com/api-keys" target="_blank">platform.openai.com/api-keys</a>. Custo por chamada é baixo (modelo gpt-4o-mini).</p>
+        <p class="small text-muted" id="cfgIaAjuda">Crie em <a href="https://platform.openai.com/api-keys" target="_blank">platform.openai.com/api-keys</a>. Custo por chamada é baixo (modelo gpt-4o-mini).</p>
       </div>
       <div class="modal-footer">
         <button class="btn btn-outline-danger" id="cfgOpenaiLimpar">Remover chave</button>
@@ -974,13 +979,33 @@ document.getElementById('btnAnalisarCurriculo').addEventListener('click', () => 
 
 // --- IA: traducao e diagnostico ---
 const OPENAI_KEY_KEY = 'radar-vagas-openai-key';
-function openaiKeyKey(){ const u = usuarioAtual(); return OPENAI_KEY_KEY + ':' + (u ? u.email : 'anon'); }
-document.getElementById('abrirConfigIa').addEventListener('click', () => {
+const PROVEDOR_IA_KEY = 'radar-vagas-provedor-ia';
+function provedorKeyKey(){ const u = usuarioAtual(); return PROVEDOR_IA_KEY + ':' + (u ? u.email : 'anon'); }
+function provedorAtual(){ return localStorage.getItem(provedorKeyKey()) || 'openai'; }
+function openaiKeyKey(){ const u = usuarioAtual(); return OPENAI_KEY_KEY + ':' + provedorAtual() + ':' + (u ? u.email : 'anon'); }
+function atualizarAjudaIa(){
+  const provedor = document.getElementById('cfgProvedorIa').value;
+  const ajuda = document.getElementById('cfgIaAjuda');
+  if (provedor === 'claude'){
+    ajuda.innerHTML = 'Crie em <a href="https://console.anthropic.com/settings/keys" target="_blank">console.anthropic.com/settings/keys</a>. Custo por chamada é baixo (modelo claude-3-5-haiku).';
+  } else {
+    ajuda.innerHTML = 'Crie em <a href="https://platform.openai.com/api-keys" target="_blank">platform.openai.com/api-keys</a>. Custo por chamada é baixo (modelo gpt-4o-mini).';
+  }
+}
+document.getElementById('cfgProvedorIa').addEventListener('change', () => {
   document.getElementById('cfgOpenaiKey').value = localStorage.getItem(openaiKeyKey()) || '';
+  atualizarAjudaIa();
+});
+document.getElementById('abrirConfigIa').addEventListener('click', () => {
+  document.getElementById('cfgProvedorIa').value = provedorAtual();
+  document.getElementById('cfgOpenaiKey').value = localStorage.getItem(openaiKeyKey()) || '';
+  atualizarAjudaIa();
   new bootstrap.Modal('#modalConfigIa').show();
 });
 atualizarBadgeIa();
 document.getElementById('cfgOpenaiSalvar').addEventListener('click', () => {
+  const provedor = document.getElementById('cfgProvedorIa').value;
+  localStorage.setItem(provedorKeyKey(), provedor);
   const k = document.getElementById('cfgOpenaiKey').value.trim();
   if (k) localStorage.setItem(openaiKeyKey(), k);
   bootstrap.Modal.getInstance(document.getElementById('modalConfigIa')).hide();
@@ -1010,6 +1035,24 @@ function atualizarBadgeIa(){
 function chamarOpenAI(mensagens){
   const key = localStorage.getItem(openaiKeyKey());
   if (!key){ new bootstrap.Modal('#modalConfigIa').show(); return Promise.reject(new Error('sem chave')); }
+  if (provedorAtual() === 'claude'){
+    const sistema = mensagens.filter(m=>m.role==='system').map(m=>m.content).join('\n');
+    const userMsgs = mensagens.filter(m=>m.role!=='system').map(m=>({ role: m.role, content: m.content }));
+    return fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'x-api-key': key,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true',
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({ model: 'claude-3-5-haiku-20241022', max_tokens: 1024, system: sistema, messages: userMsgs }),
+    }).then(r => r.json()).then(data => {
+      if (data.error) throw new Error(data.error.message);
+      registrarUsoIa();
+      return data.content[0].text;
+    });
+  }
   return fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
     headers: { 'Authorization': 'Bearer ' + key, 'Content-Type': 'application/json' },
