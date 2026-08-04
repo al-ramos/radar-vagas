@@ -1,12 +1,13 @@
 # radar-vagas
 
 Coletor de vagas de TI que monitora o ATS de empresas-alvo, normaliza, deduplica,
-pontua por afinidade com o seu perfil e avisa no Telegram. Custo zero: GitHub
-Actions como agendador, SQLite versionado no proprio repositorio.
+pontua por afinidade com o seu perfil e avisa no WhatsApp. Usa GitHub Actions
+como agendador e persiste os dados no Turso ou em SQLite local.
 
 ## Setup
 
-1. Crie este repositorio como **privado** no GitHub e suba estes arquivos.
+1. Crie o repositorio no GitHub. Prefira **privado** se nao quiser expor as
+   configuracoes das fontes e do perfil; o painel do GitHub Pages sera publico.
 2. WhatsApp (Meta Cloud API, gratuito no tier de teste):
    - crie um app em https://developers.facebook.com, tipo "Business";
    - adicione o produto **WhatsApp** — vem com numero de teste e token
@@ -18,8 +19,14 @@ Actions como agendador, SQLite versionado no proprio repositorio.
      número** no formato `55DDNNNNNNNNN`.
 3. Em *Settings > Secrets and variables > Actions*, crie os segredos
    `WHATSAPP_TOKEN`, `WHATSAPP_PHONE_ID` e `WHATSAPP_TO`.
-4. Edite `radar/sources.yml` (empresas-alvo) e `radar/profile.yml` (seu perfil).
-5. Teste local antes de agendar:
+4. Para usar o Turso, crie tambem os segredos `TURSO_DATABASE_URL` e
+   `TURSO_AUTH_TOKEN`. Sem eles, a execucao local usa `data/radar.db`.
+5. Em **Variables**, crie `RADAR_PERFIL_EMAIL` com o e-mail usado para salvar
+   seu perfil no painel. Se a variavel estiver ausente ou o perfil remoto nao
+   existir, o radar usa `radar/profile.yml` como fallback.
+6. Edite `radar/sources.yml` (empresas-alvo) e `radar/profile.yml` (perfil de
+   fallback).
+7. Teste local antes de agendar:
 
 ```bash
 python -m venv .venv && source .venv/bin/activate
@@ -30,7 +37,7 @@ python radar/score.py
 WHATSAPP_TOKEN=xxx WHATSAPP_PHONE_ID=yyy WHATSAPP_TO=55DDNNNNNNNNN python radar/notify.py
 ```
 
-6. Faca push. O workflow roda em dias uteis as 08h de Brasilia, e tambem
+8. Faca push. O workflow roda em dias uteis as 08h de Brasilia, e tambem
    manualmente pela aba Actions (`workflow_dispatch`).
 
 ## Descoberta automatica de empresas (recomendado para escalar)
@@ -79,7 +86,8 @@ O tipo `jsonld` funciona em qualquer pagina que publique dado estruturado
 - `radar/score.py` — pontuacao deterministica de 0 a 100 (sem LLM, sem custo)
 - `radar/notify.py` — digest no WhatsApp (Meta Cloud API) do que passou do corte
 - `radar/schema.sql` — 4 tabelas: `raw_fetch`, `job`, `job_event`
-- `data/radar.db` — SQLite versionado; o historico e o ativo do projeto
+- `radar/db.py` — usa Turso/libSQL quando configurado e SQLite local como fallback
+- `data/radar.db` — banco SQLite para execucao local
 
 ## Pontuacao
 
@@ -124,9 +132,9 @@ Para ativar o endereco publico:
 4. Aguarde 1-2 minutos. O endereco fica em
    `https://SEU-USUARIO.github.io/radar-vagas/` (aparece na mesma tela).
 
-**Atencao — o repositorio e privado, mas o site do GitHub Pages e publico**
-(qualquer um com o link acessa), a menos que sua conta tenha GitHub
-Enterprise. Como o painel mostra apenas titulo, empresa, local e link da
+**Atencao — mesmo com o repositorio privado, o site do GitHub Pages pode ser
+publico** (qualquer um com o link acessa), dependendo do plano e da configuracao
+da conta. Como o painel mostra apenas titulo, empresa, local e link da
 vaga (nada sensivel do seu perfil), isso costuma ser aceitavel - mas se
 preferir manter tudo privado, nao ative o Pages e continue usando o arquivo
 `Painel do Radar de Vagas.dc.html` localmente, abrindo `data/jobs.json` na
@@ -138,7 +146,8 @@ vagas ativas no momento da coleta.
 ## Limites e proximos passos
 
 - **Actions**: 2.000 min/mes em repo privado; uma rodada leva ~2 min.
-- **SQLite no Git**: bom ate ~50 MB de historico; depois, Postgres gerenciado.
+- **Persistencia**: SQLite atende ao uso local; para automacao e crescimento,
+  use o Turso configurado pelos segredos do GitHub Actions.
 - **Sem semantica**: vaga com vocabulario fora do dicionario passa batido.
   Proximo upgrade gratuito: embeddings locais via Ollama no runner.
 - **Sem interface**: use Datasette local, ou exporte JSON para GitHub Pages.
