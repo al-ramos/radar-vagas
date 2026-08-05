@@ -167,6 +167,8 @@
       <p class="small text-muted mt-2">Marque as vagas na tabela (checkbox) e clique aqui: abre uma prévia editável do e-mail.</p>
       <button class="btn btn-outline-primary btn-sm w-100 mt-2" id="abrirLoteVagas" type="button">📥 Analisar lista de vagas</button>
       <p class="small text-muted mt-1">Cole vagas de fora do radar (texto/link) e a IA classifica cada uma pro seu perfil.</p>
+      <button class="btn btn-outline-success btn-sm w-100 mt-2" id="abrirImportacao" type="button">📊 Importar planilha</button>
+      <p class="small text-muted mt-1">Importe CSV ou XLSX. Os dados são processados somente neste navegador.</p>
       <a class="btn btn-outline-secondary btn-sm w-100 mt-2" href="candidaturas.html" target="_blank">📄 Histórico público de candidaturas</a>
     </aside>
 
@@ -375,7 +377,8 @@
       </div>
       <div class="modal-body">
         <div id="analiseCorpo"></div>
-        <label class="form-label small fw-bold mt-3">Descrição da vaga (salva na coleta)</label>
+        <label class="form-label small fw-bold mt-3">Descrição da função</label>
+        <div id="resumoFuncao" class="alert alert-light border small mb-2"></div>
         <div class="d-flex gap-2 mb-2">
           <button class="btn btn-outline-secondary btn-sm" id="btnTraduzir" type="button">🌐 Traduzir</button>
           <button class="btn btn-outline-secondary btn-sm" id="btnDiagnosticoIa" type="button">🤖 Diagnóstico com IA</button>
@@ -387,7 +390,10 @@
           <div id="diagnosticoIaTexto" class="border rounded p-3 bg-primary-subtle small" style="max-height:280px; overflow-y:auto; line-height:1.5; white-space:pre-wrap;"></div>
           <button class="btn btn-outline-primary btn-sm mt-2" id="btnSalvarDiagnostico">💾 Salvar diagnóstico para esta vaga</button>
         </div>
-        <button class="btn btn-outline-secondary btn-sm mt-3" id="btnCartaApresentacao" type="button">✍️ Gerar carta de apresentação</button>
+        <div class="d-flex flex-wrap gap-2 mt-3">
+          <button class="btn btn-outline-primary btn-sm" id="btnMensagemRapida" type="button">💬 Criar mensagem rápida</button>
+          <button class="btn btn-outline-secondary btn-sm" id="btnCartaApresentacao" type="button">✍️ Gerar com IA</button>
+        </div>
         <div id="cartaBox" class="d-none mt-2">
           <textarea id="cartaTexto" class="form-control small" rows="6"></textarea>
           <div class="d-flex gap-2 mt-2">
@@ -465,9 +471,28 @@ Vaga 2: ..."></textarea>
   </div>
 </div>
 
+<div class="modal fade" id="modalImportacao" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header"><h5 class="modal-title">📊 Importar planilha de vagas</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body">
+        <p class="small text-muted">Aceita CSV e XLSX. Colunas reconhecidas: <code>titulo</code>, <code>empresa</code>, <code>local</code>, <code>modalidade</code>, <code>senioridade</code>, <code>stack</code>, <code>descricao</code>, <code>url</code>, <code>publicado_em</code> e <code>pontos</code>. Também reconhece nomes equivalentes em português e inglês.</p>
+        <input class="form-control" type="file" id="arquivoImportacao" accept=".csv,.xlsx,.xls,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+        <div id="importacaoResultado" class="small mt-3"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline-danger me-auto" id="limparImportadas" type="button">Remover vagas importadas</button>
+        <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button class="btn btn-success" id="confirmarImportacao" type="button" disabled>Importar vagas</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script>
 const SENIOR_LABEL = { estagio:'Estágio', junior:'Júnior', pleno:'Pleno', senior:'Sênior', especialista:'Especialista', nao_informado:'Não informada' };
-const FONTE_LABEL = { jsonfeed:'E-mail (LinkedIn/Infojobs/Catho)' };
+const FONTE_LABEL = { jsonfeed:'E-mail (LinkedIn/Infojobs/Catho)', importada:'Planilha importada' };
 const CATEGORIA_LABEL = { dev_front:'Dev · Front-end', dev_back:'Dev · Back-end', dev_full:'Dev · Full-stack', dev_outro:'Dev · Outro', infra:'Infra / DevOps', suporte:'Suporte', outro:'Outro' };
 const STATUS_KEY = 'radar-vagas-status';
 const LIDA_KEY = 'radar-vagas-lida';
@@ -478,6 +503,8 @@ const GOOGLE_ID_KEY = 'radar-vagas-google-client-id';
 const MS_ID_KEY = 'radar-vagas-ms-client-id';
 const REGIAO_ESTRANGEIRA = /vietnam|thailand|tailandia|philippines|filipinas|indonesia|malaysia|malasia|singapore|singapura|india\b|pakistan|bangladesh|united states|estados unidos|\busa\b|canada|australia|new zealand|nova zelandia|united kingdom|\buk\b|england|germany|alemanha|france|franca\b|spain|espanha|portugal(?!.{0,20}brasil)|poland|polonia|ireland|irlanda|netherlands|holanda|mexico|argentina|chile\b|colombia|peru\b|china\b|japan|japao|south korea|coreia do sul/i;
 let JOBS = [];
+const IMPORTADAS_KEY = 'radar-vagas-importadas';
+let importacaoPendente = [];
 let stacksAtivas = new Set();
 let selecionadas = new Set();
 let statusMap = new Map(Object.entries(JSON.parse(localStorage.getItem(STATUS_KEY) || '{}')));
@@ -497,6 +524,49 @@ function salvarCartaLocal(k, texto){
   const d = cartasLocais();
   d[k] = texto;
   localStorage.setItem(CARTA_LOCAL_KEY, JSON.stringify(d));
+}
+
+function vagasImportadas(){
+  try { return JSON.parse(localStorage.getItem(IMPORTADAS_KEY) || '[]'); }
+  catch { return []; }
+}
+function textoPlanilha(v){
+  return String(v == null ? '' : v).replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+}
+function chaveColuna(v){
+  return textoPlanilha(v).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
+}
+const ALIASES_IMPORTACAO = {
+  titulo:['titulo','cargo','funcao','vaga','job_title','title'], empresa:['empresa','companhia','company'],
+  local:['local','localizacao','cidade','location'], modalidade:['modalidade','modelo','regime','work_model'],
+  senioridade:['senioridade','nivel','seniority'], stack:['stack','stacks','competencias','habilidades','skills'],
+  descricao:['descricao','descricao_da_vaga','descricao_da_funcao','description'], url:['url','link','link_da_vaga'],
+  publicado_em:['publicado_em','data','data_publicacao','published_at'], pontos:['pontos','fit','score']
+};
+function valorImportado(linha, campo){
+  const mapa = Object.fromEntries(Object.entries(linha).map(([k,v]) => [chaveColuna(k), v]));
+  for (const alias of ALIASES_IMPORTACAO[campo]) if (mapa[alias] != null) return mapa[alias];
+  return '';
+}
+function normalizarImportada(linha, indice){
+  const titulo = textoPlanilha(valorImportado(linha, 'titulo'));
+  if (!titulo) return null;
+  const urlBruta = textoPlanilha(valorImportado(linha, 'url'));
+  const url = /^https?:\/\//i.test(urlBruta) ? urlBruta : '';
+  const pontos = Math.max(0, Math.min(100, Number(String(valorImportado(linha, 'pontos')).replace(',','.')) || 0));
+  return {
+    id: 'importada-' + Date.now() + '-' + indice,
+    titulo, empresa: textoPlanilha(valorImportado(linha, 'empresa')) || 'Empresa não informada',
+    local: textoPlanilha(valorImportado(linha, 'local')), modalidade: chaveColuna(valorImportado(linha, 'modalidade')) || 'nao_informado',
+    senioridade: chaveColuna(valorImportado(linha, 'senioridade')) || 'nao_informado',
+    stack: textoPlanilha(valorImportado(linha, 'stack')), descricao: textoPlanilha(valorImportado(linha, 'descricao')),
+    url, publicado_em: textoPlanilha(valorImportado(linha, 'publicado_em')) || new Date().toISOString().slice(0,10),
+    primeira_vez: new Date().toISOString().slice(0,10), pontos, fonte: 'importada', ativo: 1
+  };
+}
+function mesclarImportadas(base){
+  const vistas = new Set(base.map(chaveJob));
+  return base.concat(vagasImportadas().filter(j => !vistas.has(chaveJob(j))));
 }
 let msalInstance = null;
 let analisadasSet = new Set();
@@ -1153,7 +1223,16 @@ document.getElementById('btnCartaApresentacao').addEventListener('click', () => 
     texto.value = resultado;
     box.classList.remove('d-none');
   }).catch(err => alert('Falha ao gerar carta: ' + err.message))
-  .finally(() => { btn.textContent = '✍️ Gerar carta de apresentação'; btn.disabled = false; });
+  .finally(() => { btn.textContent = '✍️ Gerar com IA'; btn.disabled = false; });
+});
+document.getElementById('btnMensagemRapida').addEventListener('click', () => {
+  const j = __vagaAtualAnalise;
+  if (!j) return;
+  const nome = (usuarioAtual() || {}).nome || '[Seu nome]';
+  const matches = listaStacks(j).filter(s => meuPerfil().includes(s.toLowerCase())).slice(0,4);
+  const experiencia = matches.length ? `Tenho experiência com ${matches.join(', ')}, competências relacionadas aos desafios descritos.` : `Minha experiência profissional tem aderência aos desafios da função.`;
+  document.getElementById('cartaTexto').value = `Olá,\n\nTenho interesse na posição de ${j.titulo} na ${j.empresa}. ${experiencia} Gostaria de conhecer melhor as prioridades da posição e conversar sobre como posso contribuir com a equipe.\n\nFico à disposição para uma conversa.\n\nAtenciosamente,\n${nome}`;
+  document.getElementById('cartaBox').classList.remove('d-none');
 });
 document.getElementById('btnCopiarCarta').addEventListener('click', () => {
   navigator.clipboard.writeText(document.getElementById('cartaTexto').value).then(() => {
@@ -1221,6 +1300,51 @@ document.getElementById('btnComparar').addEventListener('click', () => {
     `</tbody></table>`;
   document.getElementById('compararCorpo').innerHTML = html;
   new bootstrap.Modal('#modalComparar').show();
+});
+
+// --- importar / exportar planilha ---
+document.getElementById('abrirImportacao').addEventListener('click', () => {
+  importacaoPendente = [];
+  document.getElementById('arquivoImportacao').value = '';
+  document.getElementById('importacaoResultado').innerHTML = '<span class="text-muted">Selecione uma planilha para visualizar o resultado.</span>';
+  document.getElementById('confirmarImportacao').disabled = true;
+  new bootstrap.Modal(document.getElementById('modalImportacao')).show();
+});
+document.getElementById('arquivoImportacao').addEventListener('change', async (e) => {
+  const arquivo = e.target.files && e.target.files[0];
+  if (!arquivo) return;
+  const resultado = document.getElementById('importacaoResultado');
+  try {
+    const dados = await arquivo.arrayBuffer();
+    const workbook = XLSX.read(dados, { type:'array', cellDates:true });
+    const planilha = workbook.Sheets[workbook.SheetNames[0]];
+    const linhas = XLSX.utils.sheet_to_json(planilha, { defval:'', raw:false });
+    importacaoPendente = linhas.map(normalizarImportada).filter(Boolean);
+    if (!importacaoPendente.length) throw new Error('Nenhuma linha com título/cargo foi encontrada.');
+    const amostra = importacaoPendente.slice(0,5).map(j => `<li><b>${j.titulo}</b> — ${j.empresa}</li>`).join('');
+    resultado.innerHTML = `<div class="alert alert-success py-2 mb-2"><b>${importacaoPendente.length}</b> vagas válidas encontradas.</div><div>Prévia:</div><ul class="mb-0">${amostra}</ul>`;
+    document.getElementById('confirmarImportacao').disabled = false;
+  } catch (err) {
+    importacaoPendente = [];
+    resultado.innerHTML = `<div class="alert alert-danger py-2">Não foi possível ler a planilha: ${textoPlanilha(err.message)}</div>`;
+    document.getElementById('confirmarImportacao').disabled = true;
+  }
+});
+document.getElementById('confirmarImportacao').addEventListener('click', () => {
+  const atuais = vagasImportadas();
+  const mapa = new Map(atuais.map(j => [chaveJob(j), j]));
+  importacaoPendente.forEach(j => mapa.set(chaveJob(j), j));
+  localStorage.setItem(IMPORTADAS_KEY, JSON.stringify(Array.from(mapa.values())));
+  JOBS = mesclarImportadas(JOBS.filter(j => j.fonte !== 'importada')).map(j => ({ ...j, _categoria: classificarVaga(j) }));
+  bootstrap.Modal.getInstance(document.getElementById('modalImportacao')).hide();
+  atualizar();
+});
+document.getElementById('limparImportadas').addEventListener('click', () => {
+  localStorage.removeItem(IMPORTADAS_KEY);
+  JOBS = JOBS.filter(j => j.fonte !== 'importada');
+  importacaoPendente = [];
+  bootstrap.Modal.getInstance(document.getElementById('modalImportacao')).hide();
+  atualizar();
 });
 
 // --- exportar CSV ---
@@ -1486,6 +1610,11 @@ function abrirAnalise(j){
   `;
   document.getElementById('analiseAbrirVaga').href = j.url || '#';
   __vagaAtualAnalise = j;
+  const descricaoTexto = textoPlanilha(j.descricao);
+  const frasesResumo = descricaoTexto.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [];
+  document.getElementById('resumoFuncao').innerHTML = frasesResumo.length
+    ? `<b>Em resumo:</b> ${frasesResumo.slice(0,2).join(' ').trim()}`
+    : '<span class="text-muted">A fonte não forneceu uma descrição detalhada da função.</span>';
   document.getElementById('analiseDescricao').innerHTML = descricaoLimpa(j.descricao);
   document.getElementById('btnTraduzir').textContent = '🌐 Traduzir'; document.getElementById('btnTraduzir').dataset.traduzido = '0';
   document.getElementById('diagnosticoIaBox').classList.add('d-none');
@@ -1762,7 +1891,7 @@ function iniciarApp(){
   fetch('./jobs.json', { cache: 'no-store' })
     .then(r=>{ if(!r.ok) throw new Error('jobs.json ainda não existe neste endereço'); return r.json(); })
     .then(data=>{
-      JOBS = (Array.isArray(data)?data:[]).map(j => ({ ...j, _categoria: classificarVaga(j) }));
+      JOBS = mesclarImportadas(Array.isArray(data)?data:[]).map(j => ({ ...j, _categoria: classificarVaga(j) }));
       atualizar();
     })
     .catch(err=>{
