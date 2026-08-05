@@ -143,6 +143,15 @@ maquina.
 O `docs/jobs.json` e sobrescrito a cada rodada do workflow, sempre com as
 vagas ativas no momento da coleta.
 
+### Recursos do painel
+
+- importe vagas de planilhas CSV ou XLSX; o arquivo e processado localmente e
+  as vagas importadas ficam somente no `localStorage` do navegador;
+- consulte um resumo da funcao e a descricao completa coletada;
+- gere uma mensagem rapida de abordagem sem IA ou uma versao personalizada
+  usando a configuracao opcional de IA;
+- acompanhe vagas salvas, candidaturas e descartes no painel e no Kanban.
+
 ## Limites e proximos passos
 
 - **Actions**: 2.000 min/mes em repo privado; uma rodada leva ~2 min.
